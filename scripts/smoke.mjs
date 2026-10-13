@@ -146,14 +146,16 @@ try {
   assert(!payload.html.includes('srcset=') && !payload.html.includes('onclick=') && !payload.html.includes('<button'));
   assert(payload.html.includes('table-layout: fixed') || payload.html.includes('table-layout:fixed'));
   assert(payload.text.includes('先把问题留下来'));
-  // 公式里的分数必须保留竖式结构：容器纵向 flex + 分子带分数线。
-  // 公众号复制会摘掉 class，flex-direction 不在默认复制清单里，
-  // 补不回来分数就会变成分子分母左右并排（2026-10-13 修复的回归点）。
+  // 公式里的分数必须保留竖式结构：inline-block 容器 + 分子带分数线。
+  // 公众号网页编辑器的粘贴清洗器会剥掉 flex 系样式（inline-flex /
+  // flex-direction 粘贴后消失，分子分母变左右并排），所以复制实现刻意
+  // 用 inline-block 方案，此处断言防止有人改回 flex（2026-10-13 修复）。
   {
     const body = await page.goto(`${hosting.origin}/blog/smoke-1/`).then(() => page.evaluate(() => window.buildWechatRichText()));
     assert(body.html.includes('x₁ + x₂'), '公式内容应进入复制结果');
-    assert(body.html.includes('flex-direction:column'), '分数容器必须保留纵向 flex');
-    assert(/border-bottom:[^;"]*solid/.test(body.html), '分子必须保留分数线');
+    assert(body.html.includes('display:inline-block'), '分数容器必须用粘贴安全的 inline-block');
+    assert(!body.html.includes('inline-flex'), '分数容器禁止用 flex 系（公众号粘贴会被洗掉）');
+    assert(/border-bottom:[^;"]*solid\s+(#|rgb)/.test(body.html), '分数线必须是具体色值，禁止 currentColor');
     await page.goto(hosting.origin + '/blog/demo/');
   }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。

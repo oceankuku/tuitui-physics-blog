@@ -183,6 +183,12 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       // 抓好的引用操作（此时已按 class 选不中元素）。分数靠 flex 纵向排列
       // 还原横线结构：flex-direction:column 不在 wechatCopiedProperties
       // 清单里，不补的话公众号里分子分母会左右并排。
+      // 主题色要在公式补样式前取好：分数线的颜色必须写死成具体色值，
+      // 不能用 currentColor——公众号编辑器清洗后 currentColor 常变成
+      // 无效值，整条分数线会跟着消失。
+      const theme = getComputedStyle(document.documentElement);
+      const palette = { bg: theme.getPropertyValue('--bg').trim(), text: theme.getPropertyValue('--text').trim(), muted: theme.getPropertyValue('--muted').trim(), accent: theme.getPropertyValue('--accent').trim() };
+
       const sourceComputed = formulaBlockSource ? getComputedStyle(formulaBlockSource) : null;
       formulaBlocks.forEach((node) => {
         if (!sourceComputed) return;
@@ -190,13 +196,16 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
         const inline = kept.map((property) => `${property}:${sourceComputed.getPropertyValue(property)};`).join('');
         node.setAttribute('style', `${inline}display:block;text-indent:0;overflow-x:auto;`);
       });
-      // 分数容器：纵向 flex，分子在上、横线、分母在下。
+      // 分数容器：分子在上、横线、分母在下。这里刻意不用 flex——公众号
+      // 网页编辑器的粘贴清洗器会把 inline-flex/flex-direction 剥掉，粘贴
+      // 后分子分母就左右并排了（flex 方案 2026-10-13 实测被洗掉）。
+      // inline-block 外层 + 块级分子分母是各家排版工具验证过的粘贴安全做法。
       formulaFractions.forEach((node) => {
-        node.setAttribute('style', 'display:inline-flex;flex-direction:column;align-items:center;justify-content:center;vertical-align:middle;margin:0 5px;line-height:1.4;padding:2px 0;');
+        node.setAttribute('style', 'display:inline-block;vertical-align:middle;text-align:center;margin:0 5px;line-height:1.4;');
       });
-      // 分子：底部横线即分数线，须独占一行且不换行撑破分数结构。
+      // 分子：底部横线即分数线；display:block 让分子分母各占一行。
       formulaNumerators.forEach((node) => {
-        node.setAttribute('style', 'display:block;padding:0 6px 2px;border-bottom:1.6px solid currentColor;text-align:center;');
+        node.setAttribute('style', `display:block;padding:0 6px 2px;border-bottom:2px solid ${palette.text};text-align:center;`);
       });
       formulaDenominators.forEach((node) => {
         node.setAttribute('style', 'display:block;padding:2px 6px 0;text-align:center;');
@@ -249,9 +258,6 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
         cell.style.overflowWrap = 'anywhere';
         cell.style.verticalAlign = 'top';
       });
-
-      const theme = getComputedStyle(document.documentElement);
-      const palette = { bg: theme.getPropertyValue('--bg').trim(), text: theme.getPropertyValue('--text').trim(), muted: theme.getPropertyValue('--muted').trim(), accent: theme.getPropertyValue('--accent').trim() };
 
       const wrapper = document.createElement('section');
       // 微信公众号编辑器在 iPhone（含 13 Pro）上内容栏可用宽度约 677px。

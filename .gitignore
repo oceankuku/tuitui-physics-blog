@@ -5,6 +5,7 @@ release/
 .checks/
 .workbuddy/
 workspace/inbox/
+workspace/高中物理题型/
 .env
 .env.*
 !.env.example

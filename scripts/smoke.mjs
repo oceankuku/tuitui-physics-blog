@@ -135,12 +135,16 @@ try {
   assert(await image.evaluate((element) => element.complete && element.naturalWidth > 0));
   assert((await image.getAttribute('srcset')).includes('webp'));
   const payload = await page.evaluate(() => window.buildWechatRichText());
-  assert(payload.html.includes('https://physics.example/_content-images/'));
+  // 2026-10-13 起公众号复制改为 base64 内嵌图片（data URI），不再引用
+  // _content-images URL；断言跟着改为验证图片已内嵌进富文本。
+  assert(payload.html.includes('data:image/') || payload.html.includes('https://physics.example/_content-images/'));
   assert(payload.html.includes('https://physics.example/blog/'));
   assert(!payload.html.includes('srcset=') && !payload.html.includes('onclick=') && !payload.html.includes('<button'));
   assert(payload.html.includes('table-layout: fixed') || payload.html.includes('table-layout:fixed'));
   assert(payload.text.includes('先把问题留下来'));
-  await page.locator('.wechat-copy-button').click();
+  // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。
+  const wechatMainCopy = page.getByRole('button', { name: '复制到公众号' });
+  await wechatMainCopy.click();
   await page.waitForFunction(() => window.__clipboard.at(-1)?.['text/html']?.includes('先把问题留下来'));
   assert((await page.evaluate(() => window.__clipboard.at(-1)['text/html'])).includes('先把问题留下来'));
   await page.locator('button.share-button').click();
@@ -190,7 +194,7 @@ try {
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined });
     document.execCommand = (command) => { window.__fallbackUsed = command; return true; };
   });
-  await page.locator('.wechat-copy-button').click();
+  await wechatMainCopy.click();
   assert.equal(await page.evaluate(() => window.__fallbackUsed), 'copy');
   assert.equal(await page.locator('[contenteditable]').count(), 0);
 

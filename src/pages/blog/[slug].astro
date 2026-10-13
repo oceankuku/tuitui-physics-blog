@@ -278,8 +278,7 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
 
     const setWechatCopyFeedback = function (button, message, isError = false) {
       if (!button) return;
-      const original = button.dataset.originalHtml || button.innerHTML;
-      button.dataset.originalHtml = original;
+      const original = button.dataset.originalHtml ?? button.innerHTML;
       button.innerHTML = isError
         ? `<i class="fas fa-exclamation-circle" aria-hidden="true"></i> ${message}`
         : `<i class="fas fa-check" aria-hidden="true"></i> ${message}`;
@@ -293,6 +292,11 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
 
     window.copyArticleToWechat = async function () {
       const button = document.querySelector('.wechat-copy-button');
+      // 原始文案必须在进入加载态之前缓存，否则"正在打包图片…"会被
+      // 当成原始文案缓存住，之后每次反馈恢复都把按钮打回加载态。
+      if (button && !button.dataset.originalHtml) {
+        button.dataset.originalHtml = button.innerHTML;
+      }
       try {
         if (button) {
           button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> 正在打包图片…';

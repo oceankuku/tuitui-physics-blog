@@ -19,9 +19,12 @@ try {
   } });
   await symlink(resolve(root, 'node_modules'), resolve(fixture, 'node_modules'), 'dir');
   const content = resolve(fixture, 'src/content/blog');
-  // smoke-1 额外带一个含分数的公式，用于校验公众号复制里的分数结构。
+  // smoke-1 额外带一个含分数的公式，用于校验公众号复制里的分数结构；
+  // smoke-2 额外带表格和代码块，用于校验 table-layout 固定布局与代码选区行为。
   for (let i = 1; i <= 9; i++) {
-    const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n:::\n' : `Fixture body ${i}.\n`;
+    const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n:::\n'
+      : i === 2 ? 'Fixture body 2.\n\n| 列甲 | 列乙 |\n| --- | --- |\n| 甲一 | 乙一 |\n\n```text\nfixture code block\n```\n'
+      : `Fixture body ${i}.\n`;
     await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n---\n\n## Check\n\n${body}`);
   }
   await writeFile(resolve(content, 'private-fixture.md'), '---\ntitle: "Private fixture"\ndescription: "Must stay private"\npubDate: 2026-10-10\ndraft: true\n---\n\nPrivate body.\n');
@@ -105,7 +108,7 @@ try {
   await page.getByRole('button', { name: '关闭素材预览' }).click();
 
   await page.goto(hosting.origin + '/blog/');
-  // 公开文章数 = 9 篇 fixture + 3 篇站点文章；按 PAGE_SIZE=8 动态计算第二页数量。
+  // 公开文章数 = 9 篇 fixture + 站点已发布文章；按 PAGE_SIZE=8 动态计算第二页数量。
   const totalPosts = await page.locator('.post-card').count();
   const expectedSecondPage = totalPosts - 8;
   assert.equal(await page.locator('.post-card:visible').count(), Math.min(8, totalPosts));
@@ -113,18 +116,18 @@ try {
   assert.equal(await page.locator('.post-card:visible').count(), expectedSecondPage);
   assert(page.url().includes('page=2'));
   await page.reload(); assert.equal(await page.locator('#currentPage').innerText(), '2');
-  await page.locator('#searchInput').fill('先把问题');
+  await page.locator('#searchInput').fill('布满小点');
   assert.equal(await page.locator('.post-card:visible').count(), 1);
   await page.locator('#searchInput').fill('no-matching-article');
   assert(await page.locator('#emptyState').isVisible());
   await page.locator('#searchInput').fill('');
-  await page.locator('.filter-button').filter({ hasText: '物理' }).click();
+  await page.locator('.filter-button').filter({ hasText: '纸带问题' }).click();
   assert.equal(await page.locator('.post-card:visible').count(), 1);
   await page.locator('#clearTags').click();
   assert.equal(await page.locator('.post-card:visible').count(), Math.min(8, totalPosts));
 
   // Reader links stay on the current host and export the selected article.
-  for (const [slug, expected] of [['demo', '先把问题留下来'], ['smoke-1', 'Fixture body 1.']]) {
+  for (const [slug, expected] of [['paper-tape-analysis', '布满小点的纸'], ['smoke-1', 'Fixture body 1.']]) {
     await page.goto(`${hosting.origin}/blog/${slug}/`);
     const href = await page.getByRole('link', { name: '阅读 Markdown', exact: true }).getAttribute('href');
     assert.equal(href, `/blog/${slug}/index.md`);
@@ -132,7 +135,7 @@ try {
     assert.equal(response.status(), 200);
     assert((await response.text()).includes(expected));
   }
-  await page.goto(hosting.origin + '/blog/demo/');
+  await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
   assert((await page.locator('.article-nav-link').count()) > 0);
   assert((await page.locator('.toc-link').count()) >= 3);
   const image = page.locator('.article-content img').first();
@@ -144,8 +147,7 @@ try {
   assert(payload.html.includes('data:image/') || payload.html.includes('https://physics.example/_content-images/'));
   assert(payload.html.includes('https://physics.example/blog/'));
   assert(!payload.html.includes('srcset=') && !payload.html.includes('onclick=') && !payload.html.includes('<button'));
-  assert(payload.html.includes('table-layout: fixed') || payload.html.includes('table-layout:fixed'));
-  assert(payload.text.includes('先把问题留下来'));
+  assert(payload.text.includes('布满小点的纸'));
   // 公式里的分数必须保留竖式结构：inline-block 容器 + 分子带分数线。
   // 公众号网页编辑器的粘贴清洗器会剥掉 flex 系样式（inline-flex /
   // flex-direction 粘贴后消失，分子分母变左右并排），所以复制实现刻意
@@ -174,15 +176,21 @@ try {
         }
       }
     }
-    await page.goto(hosting.origin + '/blog/demo/');
+    await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+  }
+  // 表格复制校验：公众号编辑器里表格列宽必须固定，防止被粘贴清洗器压扁。
+  {
+    const tableBody = await page.goto(`${hosting.origin}/blog/smoke-2/`).then(() => page.evaluate(() => window.buildWechatRichText()));
+    assert(tableBody.html.includes('table-layout: fixed') || tableBody.html.includes('table-layout:fixed'), '表格必须带固定布局');
+    await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
   }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。
   const wechatMainCopy = page.getByRole('button', { name: '复制到公众号' });
   await wechatMainCopy.click();
-  await page.waitForFunction(() => window.__clipboard.at(-1)?.['text/html']?.includes('先把问题留下来'));
-  assert((await page.evaluate(() => window.__clipboard.at(-1)['text/html'])).includes('先把问题留下来'));
+  await page.waitForFunction(() => window.__clipboard.at(-1)?.['text/html']?.includes('布满小点的纸'));
+  assert((await page.evaluate(() => window.__clipboard.at(-1)['text/html'])).includes('布满小点的纸'));
   await page.locator('button.share-button').click();
-  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('https://physics.example/blog/demo/'));
+  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('https://physics.example/blog/paper-tape-analysis/'));
 
   const select = async (selector) => {
     await page.locator(selector).first().scrollIntoViewIfNeeded();
@@ -197,11 +205,13 @@ try {
   };
   await select('.article-content p');
   await page.locator('[data-selection-action="copy"]').click();
-  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('物理问题'));
+  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('丢分'));
   await select('.article-content p');
   await page.locator('[data-selection-action="quote"]').click();
   await page.waitForFunction(() => window.__clipboard.at(-1)?.['text/plain']?.includes('出处：'));
   assert((await page.evaluate(() => window.__clipboard.at(-1)['text/plain'])).includes('出处：'));
+  // 代码块选区不弹引用/卡片：用带代码块的 fixture 验证（站点文章当前均无代码块）。
+  await page.goto(`${hosting.origin}/blog/smoke-2/`);
   await select('.article-content pre code');
   await page.locator('[data-selection-action="quote"]').waitFor({ state: 'hidden' });
   assert(await page.locator('[data-selection-action="quote"]').isHidden());
@@ -234,10 +244,10 @@ try {
 
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 950 });
-    for (const path of ['/', '/blog/', '/blog/demo/', '/materials/']) {
+    for (const path of ['/', '/blog/', '/blog/paper-tape-analysis/', '/materials/']) {
       await page.goto(hosting.origin + path); await page.evaluate(() => document.fonts.ready);
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Overflow: ${path} @ ${width}`);
-      await page.screenshot({ path: resolve(root, `.checks/${width}-${path === '/' ? 'home' : path.includes('demo') ? 'article' : path.includes('materials') ? 'materials' : 'blog'}.png`), fullPage: true });
+      await page.screenshot({ path: resolve(root, `.checks/${width}-${path === '/' ? 'home' : path.includes('paper-tape') ? 'article' : path.includes('materials') ? 'materials' : 'blog'}.png`), fullPage: true });
     }
   }
   await page.locator('.menu-toggle').click(); assert(await page.locator('.site-links').isVisible());

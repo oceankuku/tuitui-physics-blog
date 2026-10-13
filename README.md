@@ -77,7 +77,11 @@ npm run test:smoke
 
 ## 部署
 
-静态托管的构建命令为 `npm run build`，发布目录为 `dist`。发布前配置真实域名、运行 `npm run brand:build` 并完成构建与校验。公众号复制中的图片地址与分享卡片二维码都依赖正式域名。
+站点通过 **Cloudflare Pages** 部署：代码托管在 GitHub（`oceankuku/tuitui-physics-blog`），推送 `main` 分支后自动执行构建并发布。构建命令为 `npm run build`，发布目录为 `dist`。
+
+**推送前必须保证 `npm ci` 可通过**（Cloudflare 安装依赖用的就是它）：修改 `package.json` 依赖后，先运行 `npm install` 更新 `package-lock.json`，与源码一起提交。可在本地用 `npm ci --dry-run` 快速验证。
+
+发布前配置真实域名、运行 `npm run brand:build` 并完成构建与校验。公众号复制中的图片地址与分享卡片二维码都依赖正式域名。
 
 支持 `_headers` 的平台会读取项目响应头配置；其他平台需设置相应 MIME 类型。未知路径应返回 404。
 

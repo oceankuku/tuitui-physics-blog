@@ -19,8 +19,17 @@
 1. 按自然写作规范通读全文，核对引用、事实、日期、图片路径。
 2. 执行 `npm run build` 和 `npm run verify`。失败时修源文件并重跑。
 3. 改过页面、复制或图片逻辑时执行 `npm run test:smoke`，并检查桌面与移动端。
-4. 告诉用户修改了哪些源文件、预览地址与检查结果。默认完成本地构建；对外发布按用户实际指令执行。
-5. 完成后关闭自己启动的临时服务。保留用户的其他修改。
+4. 告诉用户修改了哪些源文件、预览地址与检查结果。
+5. 完成后提交并推送远程（`git push origin main`），Cloudflare Pages 自动构建部署。
+6. 完成后关闭自己启动的临时服务。保留用户的其他修改。
+
+## 推送与 npm ci
+
+站点部署在 Cloudflare Pages，构建入口是 `npm ci`。推送前必须保证 `npm ci` 能通过：
+
+- 改过 `package.json` 的依赖（新增/删除/改版本）后，必须先跑 `npm install` 更新 `package-lock.json`，与源码一起提交。
+- 推送前可本地快速验证：`npm ci --dry-run`。报 "Missing ... from lock file" 即 lock 不同步。
+- 严禁只提交 `package.json` 不提交 `package-lock.json`。
 
 ## 目录边界
 

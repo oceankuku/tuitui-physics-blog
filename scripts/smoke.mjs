@@ -150,12 +150,30 @@ try {
   // 公众号网页编辑器的粘贴清洗器会剥掉 flex 系样式（inline-flex /
   // flex-direction 粘贴后消失，分子分母变左右并排），所以复制实现刻意
   // 用 inline-block 方案，此处断言防止有人改回 flex（2026-10-13 修复）。
+  // 另外公众号粘贴会剥掉 div 标签本身：公式块外层 div 上的居中/字体全丢，
+  // 所以每个公式行必须有自带完整样式（衬线+居中）的 p 承载（2026-10-13
+  // 第二次修复：公式不居中、字体不统一的根因）。
   {
     const body = await page.goto(`${hosting.origin}/blog/smoke-1/`).then(() => page.evaluate(() => window.buildWechatRichText()));
     assert(body.html.includes('x₁ + x₂'), '公式内容应进入复制结果');
     assert(body.html.includes('display:inline-block'), '分数容器必须用粘贴安全的 inline-block');
     assert(!body.html.includes('inline-flex'), '分数容器禁止用 flex 系（公众号粘贴会被洗掉）');
     assert(/border-bottom:[^;"]*solid\s+(#|rgb)/.test(body.html), '分数线必须是具体色值，禁止 currentColor');
+    {
+      const blocks = body.html.match(/<div[^>]*Times New Roman[^>]*>[\s\S]*?<\/div>/g) || [];
+      assert(blocks.length > 0, '应存在衬线公式块');
+      for (const block of blocks) {
+        const inner = block.replace(/^<div[^>]*>/, '').replace(/<\/div>$/, '');
+        const bare = inner.replace(/<p style="[^"]*">[\s\S]*?<\/p>/g, '').replace(/<[^>]+>/g, '').trim();
+        assert(!bare, `公式块内容必须全部由带样式 p 承载，发现裸露: ${bare.slice(0, 30)}`);
+        const carriers = inner.match(/<p style="([^"]*)">/g) || [];
+        assert(carriers.length > 0, '公式块内必须有载体 p');
+        for (const carrier of carriers) {
+          assert(carrier.includes('Times') || carrier.includes('Songti') || carrier.includes('SimSun'), '载体 p 必须自带衬线字体');
+          assert(carrier.includes('text-align:center'), '载体 p 必须自带居中');
+        }
+      }
+    }
     await page.goto(hosting.origin + '/blog/demo/');
   }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。

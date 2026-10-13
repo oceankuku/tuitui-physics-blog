@@ -180,9 +180,7 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       clone.querySelectorAll('script, style, iframe, button, form, input, textarea, select').forEach((node) => node.remove());
 
       // 公式块的 class 已被上面的清理逻辑摘掉，样式需要手动补回。用循环前
-      // 抓好的引用操作（此时已按 class 选不中元素）。分数靠 flex 纵向排列
-      // 还原横线结构：flex-direction:column 不在 wechatCopiedProperties
-      // 清单里，不补的话公众号里分子分母会左右并排。
+      // 抓好的引用操作（此时已按 class 选不中元素）。
       // 主题色要在公式补样式前取好：分数线的颜色必须写死成具体色值，
       // 不能用 currentColor——公众号编辑器清洗后 currentColor 常变成
       // 无效值，整条分数线会跟着消失。
@@ -192,9 +190,29 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       const sourceComputed = formulaBlockSource ? getComputedStyle(formulaBlockSource) : null;
       formulaBlocks.forEach((node) => {
         if (!sourceComputed) return;
-        const kept = ['font-family', 'font-size', 'font-style', 'text-align', 'margin-top', 'margin-bottom', 'padding-top', 'padding-bottom'];
+        const kept = ['font-family', 'font-size', 'font-style', 'line-height', 'text-align', 'margin-top', 'margin-bottom', 'padding-top', 'padding-bottom'];
         const inline = kept.map((property) => `${property}:${sourceComputed.getPropertyValue(property)};`).join('');
         node.setAttribute('style', `${inline}display:block;text-indent:0;overflow-x:auto;`);
+        // 公众号粘贴时会剥掉 div 标签本身：内容保留、div 上的样式全丢。
+        // 含分数的公式被拆平后内容裸露在 div 里（没有内层 p），粘贴后就
+        // 失去居中和衬线字体——“公式不居中、字体不统一”就是这个原因。
+        // 把所有裸露内容包进带完整公式样式的 p，让样式跟着 p 走，
+        // div 只当外层容器，剥不剥都不影响。
+        const carrierStyle = `${inline}text-indent:0;margin:0;`;
+        let bareRun = [];
+        const flushBare = () => {
+          if (bareRun.length === 0) return;
+          const carrier = document.createElement('p');
+          carrier.setAttribute('style', carrierStyle);
+          bareRun[0].parentNode?.insertBefore(carrier, bareRun[0]);
+          bareRun.forEach((child) => carrier.appendChild(child));
+          bareRun = [];
+        };
+        Array.from(node.childNodes).forEach((child) => {
+          if (child instanceof HTMLParagraphElement) flushBare();
+          else bareRun.push(child);
+        });
+        flushBare();
       });
       // 分数容器：分子在上、横线、分母在下。这里刻意不用 flex——公众号
       // 网页编辑器的粘贴清洗器会把 inline-flex/flex-direction 剥掉，粘贴

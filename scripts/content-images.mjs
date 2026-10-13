@@ -71,26 +71,47 @@ export function contentImages() {
 // 下分母、中间横线），符合数理排版惯例，避免斜杠分数的别扭观感。
 // 注意：directive 容器必须在 remark 阶段处理（remarkRehype 会把
 // containerDirective 编译成普通 div，rehype 阶段就认不出了）。
+// remark 阶段生成的是 mdast 元素：用 data.hName 指定输出标签。
 export function formulaBlocks() {
-  const fracHtml = (match) => ({
-    type: 'element', tagName: 'span',
-    properties: { className: 'formula-frac' },
-    children: [
-      { type: 'element', tagName: 'span', properties: { className: 'num' }, children: [{ type: 'text', value: match[1].trim() }] },
-      { type: 'element', tagName: 'span', properties: { className: 'den' }, children: [{ type: 'text', value: match[2].trim() }] },
-    ],
+  const fracNode = (num, den) => ({
+    type: 'paragraph',
+    data: {
+      hName: 'span',
+      hProperties: { className: ['formula-frac'] },
+      hChildren: [
+        { type: 'element', tagName: 'span', properties: { className: ['num'] }, children: [{ type: 'text', value: num.trim() }] },
+        { type: 'element', tagName: 'span', properties: { className: ['den'] }, children: [{ type: 'text', value: den.trim() }] },
+      ],
+    },
+    children: [],
   });
   const transformText = (value) => {
     const parts = String(value).split(/(\{[^{}]*\/[^{}]*\})/g).filter(Boolean);
-    if (parts.length === 1) return [{ type: 'text', value }];
+    if (parts.length <= 1) return null;
     return parts.map((part) => {
       const match = part.match(/^\{([^{}]*?)\/([^{}]*)\}$/);
-      return match ? fracHtml(match) : { type: 'text', value: part };
+      return match ? fracNode(match[1], match[2]) : { type: 'text', value: part };
     });
   };
   const transformNode = (node) => {
-    if (node.type === 'text') return transformText(node.value);
-    if (node.children?.length) node.children = node.children.flatMap(transformNode);
+    // 文本节点：拆出分数
+    if (node.type === 'text') return transformText(node.value) ?? [node];
+    // 段落：若其中混有分数，拆成兄弟节点序列
+    if (node.type === 'paragraph') {
+      const pieces = [];
+      for (const child of node.children ?? []) {
+        const out = transformNode(child);
+        for (const piece of (out ?? [child])) pieces.push(piece);
+      }
+      const hasFrac = pieces.some((piece) => piece.type === 'paragraph' && piece.data?.hName === 'span');
+      if (!hasFrac) return [node];
+      // 纯文本段落整体变分数时，直接替换；否则拍平为同级序列
+      return pieces;
+    }
+    // 其他节点（emphasis 等）：递归处理子节点
+    if (node.children?.length) {
+      node.children = node.children.flatMap((child) => transformNode(child) ?? [child]);
+    }
     return [node];
   };
   return async (tree) => {

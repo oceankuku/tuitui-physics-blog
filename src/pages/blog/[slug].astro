@@ -185,13 +185,13 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       clone.querySelectorAll('.formula-frac').forEach((node) => {
         const source = article.querySelector('.formula-frac');
         if (!source) return;
-        node.setAttribute('style', 'display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1.25;');
+        node.setAttribute('style', 'display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 5px;line-height:1.4;padding:2px 0;');
       });
       clone.querySelectorAll('.formula-frac .num').forEach((node) => {
-        node.setAttribute('style', 'padding:0 3px 1px;border-bottom:1.5px solid currentColor;');
+        node.setAttribute('style', 'padding:0 6px 2px;border-bottom:1.6px solid currentColor;');
       });
       clone.querySelectorAll('.formula-frac .den').forEach((node) => {
-        node.setAttribute('style', 'padding:1px 3px 0;');
+        node.setAttribute('style', 'padding:2px 6px 0;');
       });
 
       // 微信编辑器的内容栏比桌面文章窄。不要保留桌面布局计算出的固定宽高，
@@ -498,17 +498,19 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     /* 正式公式块：居中、衬线字体，配合 .formula-frac 还原横线分数 */
     .article-content :global(.formula-block) {
       display: block;
-      margin: 1.6rem auto;
-      padding: 0.4rem 0;
+      margin: 2rem auto;
+      padding: 1.2rem 0.6rem;
       text-align: center;
       text-indent: 0;
       font-family: 'Times New Roman', 'STIX Two Math', Georgia, 'Songti SC', SimSun, serif;
-      font-size: 1.18em;
+      font-size: 1.22em;
       font-style: italic;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.03em;
       overflow-x: auto;
+      line-height: 2;
     }
-    .article-content :global(.formula-block .op) { font-style: normal; padding: 0 0.28em; }
+    .article-content :global(.formula-block p) { margin: 0; text-indent: 0; }
+    .article-content :global(.formula-block .op) { font-style: normal; padding: 0 0.32em; }
     .article-content :global(.formula-block sub) { font-size: 0.62em; }
     .article-content :global(.formula-block sup) { font-size: 0.62em; }
     .article-content :global(.formula-frac) {
@@ -516,12 +518,13 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       flex-direction: column;
       align-items: center;
       vertical-align: middle;
-      margin: 0 0.25em;
+      margin: 0 0.35em;
       font-style: inherit;
-      line-height: 1.25;
+      line-height: 1.4;
+      padding: 0.15em 0;
     }
-    .article-content :global(.formula-frac .num) { padding: 0 0.3em 0.08em; border-bottom: 1.5px solid currentColor; }
-    .article-content :global(.formula-frac .den) { padding: 0.08em 0.3em 0; }
+    .article-content :global(.formula-frac .num) { padding: 0 0.45em 0.14em; border-bottom: 1.6px solid currentColor; }
+    .article-content :global(.formula-frac .den) { padding: 0.14em 0.45em 0; }
     .article-content :global(img) { width: 100%; height: auto; margin: 2.2rem 0; border-radius: 12px; }
     .article-content :global(table) { display: block; width: 100%; margin: 2rem 0; overflow-x: auto; border-collapse: collapse; color: var(--paper); background: var(--ink-soft); }
     .article-content :global(th), .article-content :global(td) { min-width: 130px; padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--line-on-ink); }

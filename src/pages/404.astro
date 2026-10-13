@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { siteConfig } from '../../site.config.mjs';
+---
+<Layout title={`页面不存在 - ${siteConfig.name}`} description="这个地址没有对应页面，可以返回博客继续阅读。" noindex>
+  <section class="container" style="padding-top:160px;padding-bottom:100px">
+    <p>404</p><h1>这个页面不存在</h1>
+    <p>地址可能有误，或页面已经移动。</p>
+    <p><a href="/blog/">查看博客</a> · <a href="/">返回首页</a></p>
+  </section>
+</Layout>

@@ -1,0 +1,394 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { siteConfig } from '../../site.config.mjs';
+import { jsonLd } from '../lib/site-content';
+import { staticAssets } from '../../scripts/static-assets.mjs';
+
+const assets = await staticAssets();
+const categories = [...new Set(assets.map((asset) => asset.category))];
+const formatSize = (bytes: number) => bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+---
+<Layout title={`静态素材库 - ${siteConfig.name}`} description="浏览物理老师立绘、角色参考、品牌图标与教学图片，预览原图、下载素材或复制图片路径。">
+  <script is:inline>
+    document.documentElement.dataset.materialsCategory = new URLSearchParams(location.search).get('category') === 'hero' ? 'hero' : 'all';
+  </script>
+  <section class="materials-page container">
+    <header class="library-heading">
+      <p class="library-kicker">画面里的物理碎碎念</p>
+      <h1>静态素材库<span>{assets.length} 张</span></h1>
+      <p class="library-intro">老师的每个姿势，还有配图时用得上的小素材，都放在这里。<br />挑一张，打开看看。</p>
+    </header>
+
+    <div class="library-tools">
+      <div class="category-filters" role="group" aria-label="素材分类">
+        <button type="button" class="category-button is-active" data-category="全部" aria-pressed="true">全部 <span>{assets.length}</span></button>
+        {categories.map((category) => <button type="button" class="category-button" data-category={category} aria-pressed="false">{category} <span>{assets.filter((asset) => asset.category === category).length}</span></button>)}
+      </div>
+      <div class="tools-right">
+        <label class="asset-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span class="visually-hidden">搜索素材</span><input type="search" id="asset-search" placeholder="搜索名称或文件名" /></label>
+        {import.meta.env.DEV && <button type="button" id="manage-toggle" class="manage-toggle" aria-expanded="false" aria-controls="manage-panel">管理素材</button>}
+      </div>
+    </div>
+    {import.meta.env.DEV && <div id="manage-panel" class="manage-panel" hidden>
+      <p class="manage-hint">本机管理（仅开发模式可用，正式部署的站点没有这些功能）。上传或修改后素材库会自动刷新。</p>
+      <form id="upload-form" class="upload-form">
+        <label class="upload-field"><span>选择图片</span><input type="file" id="upload-files" accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif,.ico" multiple required /></label>
+        <label class="upload-field"><span>存入分类</span>
+          <select id="upload-target">
+            <option value="uploads" selected>教学素材（uploads）</option>
+            <option value="site-assets">老师立绘</option>
+            <option value="hero-v1">Hero 横图 v1</option>
+            <option value="hero-v2">Hero 横图 v2</option>
+          </select>
+        </label>
+        <label class="upload-field"><span>名称（可选）</span><input type="text" id="upload-title" placeholder="留空时用文件名" maxlength="80" /></label>
+        <label class="upload-field"><span>描述（可选）</span><input type="text" id="upload-alt" placeholder="一句话描述图片内容" maxlength="200" /></label>
+        <button type="submit" class="upload-submit" id="upload-submit">上传</button>
+      </form>
+      <p class="manage-feedback" id="manage-feedback" role="status" aria-live="polite"></p>
+      <p class="manage-edit-hint">要改名或删除：打开任意素材的预览窗口，窗口里有「编辑信息」和「删除」按钮。</p>
+    </div>}
+    <p class="result-count" aria-live="polite" aria-atomic="true">共 {assets.length} 张素材</p>
+
+    <div class="asset-grid">
+      {assets.map((asset, index) => <article class="asset-card" data-index={index} data-category={asset.category} data-search={`${asset.title} ${asset.alt} ${asset.aliases.join(' ')}`.toLowerCase()}>
+        <button type="button" class="asset-preview" data-open={index} aria-label={`预览${asset.title}`}>
+          <img class:list={{ 'small-icon': asset.width <= 64 && asset.height <= 64 }} src={asset.preview} alt={asset.alt} width={asset.width} height={asset.height} loading={index < 4 ? 'eager' : 'lazy'} decoding="async" />
+          <span class="preview-caption" aria-hidden="true">查看原图 <span>↗</span></span>
+        </button>
+        <div class="asset-info"><h2>{asset.title}</h2><p>{asset.width} × {asset.height}<span>{asset.format} · {formatSize(asset.bytes)}</span></p></div>
+      </article>)}
+    </div>
+    <div class="empty-assets" hidden><p>没有找到这张素材。</p><button type="button" id="reset-assets">清除搜索和分类</button></div>
+  </section>
+
+  <dialog class="asset-dialog" aria-labelledby="asset-title">
+    <div class="dialog-heading"><h2 id="asset-title"></h2><button type="button" class="dialog-close" aria-label="关闭素材预览">×</button></div>
+    <div class="dialog-image"><img id="asset-original" alt="" /></div>
+    <div class="dialog-details">
+      <p id="asset-details"></p>
+      <code id="asset-path"></code>
+      <details class="asset-aliases" hidden><summary>其他引用位置</summary><ul></ul></details>
+      <div class="dialog-actions">
+        <a id="asset-download" download>下载原图 <span aria-hidden="true">↓</span></a>
+        <button type="button" id="copy-asset-path">复制图片路径</button>
+        <button type="button" id="copy-asset-markdown">复制 Markdown</button>
+        {import.meta.env.DEV && <button type="button" id="edit-asset-info" class="manage-only">编辑信息</button>}
+        {import.meta.env.DEV && <button type="button" id="delete-asset" class="manage-only manage-danger">删除</button>}
+      </div>
+      {import.meta.env.DEV && <form id="edit-form" class="edit-form" hidden>
+        <label><span>名称</span><input type="text" id="edit-title" maxlength="80" /></label>
+        <label><span>描述</span><input type="text" id="edit-alt" maxlength="200" /></label>
+        <div class="edit-form-actions"><button type="submit">保存</button><button type="button" id="edit-cancel">取消</button></div>
+      </form>}
+      <p class="asset-feedback" role="status" aria-live="polite"></p>
+      <div class="dialog-navigation"><button type="button" id="previous-asset">← 上一张</button><span id="asset-position"></span><button type="button" id="next-asset">下一张 →</button></div>
+    </div>
+  </dialog>
+  <script type="application/json" id="static-assets-data" set:html={jsonLd(assets)}></script>
+
+  <script>
+    interface Asset {
+      title: string; alt: string; category: string; path: string; aliases: string[];
+      width: number; height: number; bytes: number; format: string;
+    }
+    const assets: Asset[] = JSON.parse(document.querySelector('#static-assets-data')!.textContent!);
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.asset-card'));
+    const filters = Array.from(document.querySelectorAll<HTMLButtonElement>('.category-button'));
+    const search = document.querySelector<HTMLInputElement>('#asset-search')!;
+    const dialog = document.querySelector<HTMLDialogElement>('.asset-dialog')!;
+    const image = document.querySelector<HTMLImageElement>('#asset-original')!;
+    const download = document.querySelector<HTMLAnchorElement>('#asset-download')!;
+    const feedback = document.querySelector<HTMLElement>('.asset-feedback')!;
+    const previous = document.querySelector<HTMLButtonElement>('#previous-asset')!;
+    const next = document.querySelector<HTMLButtonElement>('#next-asset')!;
+    let category = new URLSearchParams(location.search).get('category') === 'hero' ? 'Hero 横图' : '全部';
+    let current = 0;
+    let visible = assets.map((_, index) => index);
+    let opener: HTMLButtonElement | null = null;
+    let previewVersion = 0;
+
+    function filterAssets() {
+      const query = search.value.trim().toLowerCase();
+      visible = [];
+      cards.forEach((card, index) => {
+        const show = (category === '全部' || category === card.dataset.category) && (!query || card.dataset.search!.includes(query));
+        card.hidden = !show;
+        if (show) visible.push(index);
+      });
+      document.querySelector('.result-count')!.textContent = `共 ${visible.length} 张素材`;
+      document.documentElement.dataset.materialsCategory = category === 'Hero 横图' ? 'hero' : 'all';
+      document.querySelector<HTMLElement>('.empty-assets')!.hidden = visible.length > 0;
+      filters.forEach((button) => {
+        const selected = button.dataset.category === category;
+        button.classList.toggle('is-active', selected);
+        button.setAttribute('aria-pressed', String(selected));
+      });
+    }
+    filters.forEach((button) => button.addEventListener('click', () => { category = button.dataset.category!; filterAssets(); }));
+    search.addEventListener('input', filterAssets);
+    document.querySelector('#reset-assets')!.addEventListener('click', () => { search.value = ''; category = '全部'; filterAssets(); search.focus(); });
+    filterAssets();
+
+    function showAsset(index: number) {
+      current = index;
+      previewVersion++;
+      const asset = assets[index];
+      feedback.textContent = '';
+      document.querySelector('#asset-title')!.textContent = asset.title;
+      const size = asset.bytes >= 1024 * 1024 ? `${(asset.bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(asset.bytes / 1024))} KB`;
+      document.querySelector('#asset-details')!.textContent = `${asset.category} · ${asset.width} × ${asset.height} · ${asset.format} · ${size}`;
+      image.alt = asset.alt;
+      image.classList.toggle('small-icon', asset.width <= 64 && asset.height <= 64);
+      image.src = asset.path;
+      download.href = asset.path;
+      download.download = asset.path.split('/').at(-1)!;
+      document.querySelector('#asset-path')!.textContent = asset.path;
+      const aliases = document.querySelector<HTMLDetailsElement>('.asset-aliases')!;
+      aliases.hidden = asset.aliases.length <= 1;
+      aliases.open = false;
+      aliases.querySelector('ul')!.replaceChildren(...asset.aliases.slice(1).map((path) => {
+        const li = document.createElement('li'); li.textContent = path; return li;
+      }));
+      const position = visible.indexOf(index);
+      previous.disabled = position <= 0;
+      next.disabled = position >= visible.length - 1;
+      document.querySelector('#asset-position')!.textContent = `${position + 1} / ${visible.length}`;
+    }
+    document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((button) => button.addEventListener('click', () => {
+      opener = button;
+      showAsset(Number(button.dataset.open));
+      dialog.showModal();
+      document.body.classList.add('asset-preview-open');
+    }));
+    document.querySelector('.dialog-close')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target !== dialog) return;
+      const bounds = dialog.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    });
+    dialog.addEventListener('close', () => { document.body.classList.remove('asset-preview-open'); opener?.focus(); });
+    image.addEventListener('error', () => { feedback.textContent = '图片暂时无法加载，可以尝试下载原图。'; });
+    previous.addEventListener('click', () => showAsset(visible[visible.indexOf(current) - 1]));
+    next.addEventListener('click', () => showAsset(visible[visible.indexOf(current) + 1]));
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft' && !previous.disabled) { event.preventDefault(); previous.click(); }
+      if (event.key === 'ArrowRight' && !next.disabled) { event.preventDefault(); next.click(); }
+    });
+    async function copyAsset(markdown: boolean) {
+      const asset = assets[current];
+      const version = previewVersion;
+      const alt = asset.alt.replace(/([\\\[\]])/g, '\\$1');
+      const text = markdown ? `![${alt}](${encodeURI(asset.path)})` : asset.path;
+      try {
+        await navigator.clipboard.writeText(text);
+        if (version === previewVersion && dialog.open) feedback.textContent = markdown ? 'Markdown 已复制。' : '图片路径已复制。';
+      } catch { window.prompt('请复制下面的内容', text); }
+    }
+    document.querySelector('#copy-asset-path')!.addEventListener('click', () => copyAsset(false));
+    document.querySelector('#copy-asset-markdown')!.addEventListener('click', () => copyAsset(true));
+
+    // ---------- 本机管理功能（仅开发模式渲染出这些元素） ----------
+    const manageToggle = document.querySelector<HTMLButtonElement>('#manage-toggle');
+    const managePanel = document.querySelector<HTMLElement>('#manage-panel');
+    const manageFeedback = document.querySelector<HTMLElement>('#manage-feedback');
+    const uploadForm = document.querySelector<HTMLFormElement>('#upload-form');
+    const editForm = document.querySelector<HTMLFormElement>('#edit-form');
+    const editAssetButton = document.querySelector<HTMLButtonElement>('#edit-asset-info');
+    const deleteAssetButton = document.querySelector<HTMLButtonElement>('#delete-asset');
+
+    const reloadAfterChange = () => {
+      if (manageFeedback) manageFeedback.textContent = '已完成，素材库正在刷新…';
+      setTimeout(() => location.reload(), 600);
+    };
+
+    if (manageToggle && managePanel) {
+      manageToggle.addEventListener('click', () => {
+        const open = managePanel.hidden;
+        managePanel.hidden = !open;
+        manageToggle.setAttribute('aria-expanded', String(open));
+        manageToggle.classList.toggle('is-open', open);
+      });
+    }
+
+    uploadForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const files = document.querySelector<HTMLInputElement>('#upload-files');
+      if (!files || !files.files || files.files.length === 0) return;
+      const data = new FormData();
+      Array.from(files.files).forEach((file) => data.append('files', file, file.name));
+      data.append('target', (document.querySelector<HTMLSelectElement>('#upload-target'))?.value ?? 'uploads');
+      data.append('title', (document.querySelector<HTMLInputElement>('#upload-title'))?.value.trim() ?? '');
+      data.append('alt', (document.querySelector<HTMLInputElement>('#upload-alt'))?.value.trim() ?? '');
+      if (manageFeedback) manageFeedback.textContent = `正在上传 ${files.files.length} 张…`;
+      try {
+        const response = await fetch('/api/materials/upload', { method: 'POST', body: data });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '上传失败');
+        reloadAfterChange();
+      } catch (err) {
+        if (manageFeedback) manageFeedback.textContent = err instanceof Error ? err.message : '上传失败';
+      }
+    });
+
+    function toggleEditForm(show: boolean) {
+      const form = document.querySelector<HTMLFormElement>('#edit-form');
+      if (!form) return;
+      form.hidden = !show;
+      if (show) {
+        const asset = assets[current];
+        const titleInput = document.querySelector<HTMLInputElement>('#edit-title');
+        const altInput = document.querySelector<HTMLInputElement>('#edit-alt');
+        if (titleInput) titleInput.value = asset.title;
+        if (altInput) altInput.value = asset.alt;
+        titleInput?.focus();
+      }
+    }
+    document.querySelector('#edit-cancel')?.addEventListener('click', () => toggleEditForm(false));
+    editAssetButton?.addEventListener('click', () => {
+      const form = document.querySelector<HTMLFormElement>('#edit-form');
+      if (form) toggleEditForm(form.hidden);
+    });
+
+    editForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const asset = assets[current];
+      const titleInput = document.querySelector<HTMLInputElement>('#edit-title');
+      const altInput = document.querySelector<HTMLInputElement>('#edit-alt');
+      const payload = { path: asset.path, title: titleInput?.value.trim() ?? '', alt: altInput?.value.trim() ?? '' };
+      try {
+        const response = await fetch('/api/materials/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '保存失败');
+        toggleEditForm(false);
+        reloadAfterChange();
+      } catch (err) {
+        if (manageFeedback) manageFeedback.textContent = err instanceof Error ? err.message : '保存失败';
+      }
+    });
+
+    deleteAssetButton?.addEventListener('click', async () => {
+      const asset = assets[current];
+      const really = window.confirm(`确定删除「${asset.title}」吗？\n${asset.path}\n\n此操作会从素材目录中删除原文件，不可撤销。`);
+      if (!really) return;
+      try {
+        const response = await fetch('/api/materials/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: asset.path }) });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '删除失败');
+        dialog.close();
+        reloadAfterChange();
+      } catch (err) {
+        if (manageFeedback) manageFeedback.textContent = err instanceof Error ? err.message : '删除失败';
+      }
+    });
+  </script>
+
+  <style>
+    .materials-page { padding-top: 140px; padding-bottom: 100px; }
+    .library-heading { padding-bottom: 38px; border-bottom: 1px solid var(--line); }
+    .library-kicker { font-size: .8rem; color: var(--accent-strong); margin-bottom: 16px; }
+    h1 { display: flex; align-items: baseline; gap: 20px; font-size: clamp(2.3rem, 4.5vw, 4rem); line-height: 1.2; letter-spacing: -.04em; margin-bottom: 20px; }
+    h1 span { font-size: .86rem; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+    .library-intro { color: var(--muted); margin: 0; font-size: .98rem; }
+    .library-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 22px; padding: 28px 0 12px; }
+    .tools-right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .manage-toggle { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 18px; border: 1px dashed var(--accent); border-radius: 999px; background: transparent; color: var(--accent-strong); font-size: .84rem; }
+    .manage-toggle:hover, .manage-toggle.is-open { background: var(--accent-soft); border-style: solid; }
+    .manage-panel { margin: 6px 0 22px; padding: 20px 22px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; background: var(--surface); }
+    .manage-hint, .manage-edit-hint { font-size: .78rem; color: var(--muted); margin: 0 0 14px; }
+    .manage-edit-hint { margin: 14px 0 0; }
+    .upload-form { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.4fr auto; gap: 12px; align-items: end; }
+    .upload-field { display: grid; gap: 6px; font-size: .78rem; color: var(--muted); }
+    .upload-field input[type="text"], .upload-field select { min-height: 42px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); font-size: .84rem; }
+    .upload-field input[type="file"] { font-size: .8rem; }
+    .upload-submit { min-height: 42px; padding: 8px 22px; border: 0; border-radius: 6px; background: #446d59; color: #fff; font-size: .86rem; font-weight: 600; }
+    .upload-submit:hover { background: #325441; }
+    .upload-submit:disabled { opacity: .6; }
+    .manage-feedback { min-height: 1.6em; font-size: .8rem; color: var(--accent-strong); margin: 10px 0 0; }
+    .edit-form { margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+    .edit-form label { display: grid; gap: 5px; font-size: .76rem; color: var(--muted); margin-bottom: 10px; }
+    .edit-form input { min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--text); font-size: .84rem; }
+    .edit-form-actions { display: flex; gap: 10px; }
+    .edit-form-actions button { padding: 8px 18px; border: 1px solid var(--line); border-radius: 6px; background: transparent; font-size: .82rem; }
+    .edit-form-actions button[type="submit"] { background: #446d59; border-color: #446d59; color: #fff; }
+    .manage-only { border-style: dashed; }
+    .manage-danger { color: var(--danger); border-color: var(--danger); }
+    .manage-danger:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); border-color: var(--danger); }
+    @media (max-width: 900px) { .upload-form { grid-template-columns: 1fr 1fr; } }
+    .category-filters { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+    .category-button { border: 0; border-bottom: 2px solid transparent; background: transparent; padding: 7px 0; color: var(--muted); font-size: .86rem; min-height: 44px; }
+    .category-button span { font-size: .72rem; margin-left: 4px; }
+    .category-button:hover, .category-button.is-active { color: var(--accent-strong); }
+    .category-button.is-active { border-color: var(--accent); font-weight: 600; }
+    .asset-search { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); color: var(--muted); padding: 8px 0; width: 250px; }
+    .asset-search:focus-within { border-color: var(--accent); }
+    .asset-search i { font-size: .85rem; }
+    .asset-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-size: .88rem; }
+    .asset-search input::placeholder { color: var(--muted); opacity: 1; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .result-count { color: var(--muted); font-size: .75rem; margin: 8px 0 20px; }
+    .asset-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 34px 24px; }
+    .asset-card[hidden], .empty-assets[hidden], .asset-aliases[hidden] { display: none; }
+    .asset-preview { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 5; padding: 20px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background-color: var(--surface); background-image: conic-gradient(var(--surface-strong) 25%, transparent 0 50%, var(--surface-strong) 0 75%, transparent 0); background-size: 20px 20px; }
+    .asset-preview img { width: 100%; height: 100%; object-fit: contain; transition: transform 240ms ease; }
+    .asset-preview img.small-icon { width: 64px; height: 64px; image-rendering: pixelated; }
+    .asset-card[data-category='Hero 横图'] { grid-column: span 2; }
+    .asset-card[data-category='Hero 横图'] .asset-preview { aspect-ratio: 16 / 9; padding: 0; }
+    :global(html[data-materials-category='hero']) .asset-card:not([data-category='Hero 横图']) { display: none; }
+    :global(html[data-materials-category='hero']) .asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    :global(html[data-materials-category='hero']) .asset-card { grid-column: auto; }
+    .preview-caption { position: absolute; inset: auto 0 0; display: flex; justify-content: space-between; padding: 9px 14px; color: var(--text); background: var(--surface); border-top: 1px solid var(--line); font-size: .75rem; opacity: 0; transform: translateY(8px); transition: opacity 180ms ease, transform 180ms ease; }
+    @media (hover: hover) { .asset-preview:hover img { transform: translateY(-4px); } .asset-preview:hover .preview-caption { opacity: 1; transform: translateY(0); } }
+    .asset-preview:focus-visible .preview-caption { opacity: 1; transform: translateY(0); }
+    .asset-info { padding-top: 14px; }
+    .asset-info h2 { font-size: 1rem; margin-bottom: 6px; font-weight: 600; }
+    .asset-info p { display: flex; flex-wrap: wrap; gap: 4px 10px; justify-content: space-between; font-size: .68rem; color: var(--muted); margin: 0; }
+    .empty-assets { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .empty-assets button { background: transparent; border: 0; color: var(--accent-strong); padding: 10px; text-decoration: underline; }
+    .asset-dialog { width: min(900px, calc(100% - 40px)); max-height: calc(100dvh - 40px); padding: 0; border: 1px solid var(--line); border-radius: 12px; color: var(--text); background: var(--surface); box-shadow: 0 24px 80px rgb(0 0 0 / .2); overflow: auto; }
+    .asset-dialog::backdrop { background: rgb(15 24 18 / .6); }
+    .dialog-heading { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+    .dialog-heading h2 { margin: 0; font-size: 1.15rem; }
+    .dialog-close { width: 44px; height: 44px; border: 0; background: transparent; font-size: 1.7rem; }
+    .dialog-image { display: grid; place-items: center; height: min(48dvh, 500px); padding: 20px; background-color: var(--bg); background-image: conic-gradient(var(--surface-strong) 25%, transparent 0 50%, var(--surface-strong) 0 75%, transparent 0); background-size: 24px 24px; }
+    .dialog-image img { width: 100%; height: 100%; object-fit: contain; }
+    .dialog-image img.small-icon { width: 128px; height: 128px; image-rendering: pixelated; }
+    .dialog-details { padding: 20px; }
+    #asset-details { font-size: .8rem; color: var(--muted); margin-bottom: 10px; }
+    #asset-path { display: block; font-size: .8rem; overflow-wrap: anywhere; padding: 10px 12px; border: 1px solid var(--line); background: var(--bg); border-radius: 4px; }
+    .asset-aliases { font-size: .76rem; color: var(--muted); margin-top: 12px; overflow-wrap: anywhere; }
+    .asset-aliases summary { cursor: pointer; }
+    .asset-aliases ul { padding-left: 18px; margin: 8px 0; }
+    .dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .dialog-actions a, .dialog-actions button { display: inline-flex; align-items: center; gap: 12px; justify-content: center; padding: 9px 16px; min-height: 44px; border: 1px solid var(--line); border-radius: 4px; background: transparent; font-size: .82rem; color: var(--text); }
+    .dialog-actions a { background: #446d59; border-color: #446d59; color: #fff; }
+    .dialog-actions a:hover { background: #325441; }
+    .dialog-actions button:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .asset-feedback { min-height: 1.75em; font-size: .8rem; color: var(--accent-strong); margin: 10px 0; }
+    .dialog-navigation { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 10px; font-size: .8rem; }
+    .dialog-navigation button { border: 0; background: transparent; min-height: 44px; padding: 4px; }
+    .dialog-navigation button:disabled { opacity: .4; }
+    .dialog-navigation span { color: var(--muted); }
+    :global(body.asset-preview-open) { overflow: hidden; }
+    @media (max-width: 1050px) { .asset-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 768px) {
+      .materials-page { padding-top: 108px; padding-bottom: 60px; }
+      .library-heading { padding-bottom: 28px; }
+      .library-intro { font-size: .88rem; }
+      .library-tools { gap: 14px; padding-top: 20px; }
+      .category-filters { gap: 4px 16px; }
+      .asset-search { width: 100%; min-height: 44px; }
+      .asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; }
+      :global(html[data-materials-category='hero']) .asset-grid { grid-template-columns: minmax(0, 1fr); }
+      .asset-preview { padding: 12px; }
+      .asset-info h2 { font-size: .88rem; }
+      .asset-info p { display: block; font-size: .65rem; }
+      .asset-info p span { display: block; }
+      .asset-dialog { width: calc(100% - 24px); max-height: calc(100dvh - 24px); }
+      .dialog-heading, .dialog-details { padding: 12px 16px; }
+      .dialog-image { height: 38dvh; padding: 14px; }
+      .dialog-actions { gap: 8px; }
+      .dialog-actions a, .dialog-actions button { flex: 1 1 auto; padding: 9px 12px; }
+    }
+  </style>
+</Layout>

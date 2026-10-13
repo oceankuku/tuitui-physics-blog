@@ -1,0 +1,106 @@
+{
+  "sourceProject": "wulike/videoclass",
+  "importedAt": "2026-10-10",
+  "files": [
+    {
+      "source": "public/assets/brand/apple-touch-icon.png",
+      "path": "/material-library/brand/apple-touch-icon.png",
+      "sha256": "a56820a9aef7409b2ba9999d8746a413b933ea1662a058dd282e1844d3fcf10c"
+    },
+    {
+      "source": "public/assets/brand/teacher-avatar-source.png",
+      "path": "/material-library/brand/teacher-avatar-source.png",
+      "sha256": "9de3b00c7ca799fec771d9a58b49269c32141e2e1b1dc12008b3055fad4ef17e"
+    },
+    {
+      "source": "public/assets/brand/teacher-avatar.png",
+      "path": "/material-library/brand/teacher-avatar.png",
+      "sha256": "c8a515dd0b3c1f7dc07271ee86be4697f6f4da41da2ca717ddc945865342e16d"
+    },
+    {
+      "source": "public/assets/models/train-kit/Textures/colormap.png",
+      "path": "/material-library/models/train-kit/Textures/colormap.png",
+      "sha256": "e264660f3fc9ecbd642bdb7fb7b7dc10755a061560a66651baf48274c729af09"
+    },
+    {
+      "source": "public/assets/source/teacher-reference.png",
+      "path": "/material-library/references/teacher-reference.png",
+      "sha256": "29041b43fb6bd52a97b9539b6beef89c59b948496e25a11f323d6b73a149c2aa"
+    },
+    {
+      "source": "public/assets/sprites/railway-pixel-v1/atlas.png",
+      "path": "/material-library/sprites/railway-pixel-v1/atlas.png",
+      "sha256": "074a2c60cbf86f7bb1298050f40d285d63f12479fba748f6ba3f79c93e81c39e"
+    },
+    {
+      "source": "public/assets/teacher/teacher-analyze-card.png",
+      "path": "/site-assets/teacher-analyze-card.png",
+      "sha256": "433dea46dd691dba2e7f89a402a9a943979500e7c8a2745f1b81378ea1cd5b87"
+    },
+    {
+      "source": "public/assets/teacher/teacher-approved.png",
+      "path": "/site-assets/teacher-approved.png",
+      "sha256": "90053cab45d1019a818194fc493e6bff6e737023d0182c88ac628cf196f7cdce"
+    },
+    {
+      "source": "public/assets/teacher/teacher-board-write.png",
+      "path": "/site-assets/teacher-board-write.png",
+      "sha256": "ea9e343287b8428359613c3f38ef2fd24b8fecd57f60d99fe4a2de8a5b729997"
+    },
+    {
+      "source": "public/assets/teacher/teacher-book-explain.png",
+      "path": "/site-assets/teacher-book-explain.png",
+      "sha256": "e9d217e524bc79bd3bc620f4a276dc42f2402ce62f12e34ee467a81f37570002"
+    },
+    {
+      "source": "public/assets/teacher/teacher-corrective.png",
+      "path": "/site-assets/teacher-corrective.png",
+      "sha256": "a9fa244875d291e30570514398e9bee37bee4f512623259530e811de9aad95b6"
+    },
+    {
+      "source": "public/assets/teacher/teacher-desk-tired.png",
+      "path": "/site-assets/teacher-desk-tired.png",
+      "sha256": "742d8ebde14f398fe959af9b2efc43289e6394b56eccd457d0a3c0125cc43636"
+    },
+    {
+      "source": "public/assets/teacher/teacher-encourage.png",
+      "path": "/site-assets/teacher-encourage.png",
+      "sha256": "740a9fed1ab632f3a07f88319eb7db879e87fdcadae8256c9266889dacc15dc8"
+    },
+    {
+      "source": "public/assets/teacher/teacher-lab-cart.png",
+      "path": "/site-assets/teacher-lab-cart.png",
+      "sha256": "e254d112f69dd8cb2242906a9cb52260f81e6edac8c121e5be5769a261c9c00c"
+    },
+    {
+      "source": "public/assets/teacher/teacher-pointing-v2.png",
+      "path": "/site-assets/teacher-pointing-v2.png",
+      "sha256": "85be7e5c0ec57c56ba60a40952e8811a9481bfd8a9e1b9398f7d66ad73846c08"
+    },
+    {
+      "source": "public/assets/teacher/teacher-stop-correct.png",
+      "path": "/site-assets/teacher-stop-correct.png",
+      "sha256": "be20c4ae298c77940d73f58e9d05e9d1cddb67232a80b29cc5b82d2ba8484905"
+    },
+    {
+      "source": "public/assets/teacher/teacher-tablet-intro.png",
+      "path": "/site-assets/teacher-tablet-intro.png",
+      "sha256": "3e6198d9dc01a52a05e3b4429d2381887a075d4a6f2ce5323c7de834182934b8"
+    },
+    {
+      "source": "public/assets/teacher/teacher-thinking.png",
+      "path": "/site-assets/teacher-thinking.png",
+      "sha256": "544f176bdd2fcc2dee3e75d9c10a263b04ceb86f5a4deac7c3062a90f8572bf1"
+    },
+    {
+      "source": "public/favicon.png",
+      "path": "/material-library/brand/course-favicon.png",
+      "sha256": "a7056a58bee0a6ab0f6849bb7d4deb22e3cd5d25df5e4c5bb63a15076549de71"
+    }
+  ],
+  "notes": [
+    "Original image bytes preserved.",
+    "reource.png is identical to assets/source/teacher-reference.png; imported once.",
+    "Only the train-kit texture is imported; its license and original source record are retained."
+  ]
+}

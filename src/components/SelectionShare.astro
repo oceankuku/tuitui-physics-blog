@@ -1,0 +1,622 @@
+---
+interface Props {
+  contentSelector: string;
+  title: string;
+  author: string;
+  section: string;
+  url: string;
+  logo?: string;
+}
+
+const {
+  contentSelector,
+  title,
+  author,
+  section,
+  url,
+  logo = '/brand/logo.png',
+} = Astro.props;
+---
+
+<div
+  class="selection-share"
+  data-selection-share
+  data-content-selector={contentSelector}
+  data-title={title}
+  data-author={author}
+  data-section={section}
+  data-url={url}
+  data-logo={logo}
+>
+  <div class="selection-share-toolbar" role="toolbar" aria-label="选中文字操作" hidden>
+    <button type="button" data-selection-action="copy">
+      <i class="fa-regular fa-copy" aria-hidden="true"></i>
+      <span>复制原文</span>
+    </button>
+    <button type="button" data-selection-action="quote">
+      <i class="fa-solid fa-quote-left" aria-hidden="true"></i>
+      <span>复制引用</span>
+    </button>
+    <button type="button" data-selection-action="card">
+      <i class="fa-regular fa-image" aria-hidden="true"></i>
+      <span>生成卡片</span>
+    </button>
+  </div>
+
+  <dialog class="share-card-dialog" aria-labelledby="share-card-title">
+    <div class="share-card-shell">
+      <header class="share-card-header">
+        <div>
+          <p class="share-card-kicker">分享选段</p>
+          <h2 id="share-card-title">分享卡片预览</h2>
+        </div>
+        <button class="share-card-close" type="button" data-card-close aria-label="关闭分享卡片">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="share-card-preview">
+        <canvas width="1080" height="1440" aria-label="选中文字生成的分享卡片"></canvas>
+      </div>
+
+      <div class="share-card-actions">
+        <button type="button" data-card-action="copy">
+          <i class="fa-regular fa-copy" aria-hidden="true"></i>
+          复制图片
+        </button>
+        <button type="button" data-card-action="download">
+          <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
+          下载 PNG
+        </button>
+        <button class="is-primary" type="button" data-card-action="share">
+          <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+          系统分享
+        </button>
+      </div>
+      <p class="share-card-hint">如无法复制图片，可以下载后发送，或在手机上长按保存。</p>
+    </div>
+  </dialog>
+
+  <div class="selection-share-toast" role="status" aria-live="polite" hidden></div>
+</div>
+
+<style>
+  .selection-share-toolbar {
+    position: fixed;
+    z-index: 30;
+    display: flex;
+    align-items: stretch;
+    padding: 5px;
+    color: var(--paper);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 16px 42px rgba(8, 7, 11, 0.34);
+  }
+
+  .selection-share-toolbar[hidden],
+  .selection-share-toast[hidden] { display: none; }
+
+  .selection-share-toolbar button[hidden] { display: none; }
+
+  .selection-share-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 12px;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    border-right: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+  }
+
+  .selection-share-toolbar button:last-child { border-right: 0; }
+  .selection-share-toolbar button:hover { color: var(--paper); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .selection-share-toolbar button:active { transform: translateY(1px); }
+  .selection-share-toolbar button i { color: var(--red); }
+
+  .share-card-dialog {
+    width: min(100% - 32px, 980px);
+    max-width: 980px;
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    overflow: hidden;
+    color: var(--paper);
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 28px 90px rgba(8, 7, 11, 0.58);
+  }
+
+  .share-card-dialog::backdrop { background: rgba(8, 7, 11, 0.78); backdrop-filter: blur(8px); }
+  .share-card-shell { display: grid; grid-template-columns: minmax(0, 1fr) 240px; max-height: calc(100dvh - 32px); }
+  .share-card-header { grid-column: 1 / -1; display: flex; align-items: start; justify-content: space-between; gap: 24px; padding: 22px 24px; border-bottom: 1px solid var(--line-on-ink); }
+  .share-card-kicker { margin: 0 0 4px; color: var(--red); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; }
+  .share-card-header h2 { margin: 0; color: var(--paper); font-family: var(--display); font-size: 1.35rem; letter-spacing: -0.025em; }
+  .share-card-close { width: 40px; height: 40px; flex: 0 0 auto; color: var(--muted); background: transparent; border: 1px solid var(--line-on-ink); border-radius: 8px; cursor: pointer; }
+  .share-card-close:hover { color: var(--paper); border-color: var(--red); }
+  .share-card-preview { min-width: 0; padding: 24px; overflow: auto; background: var(--bg); }
+  .share-card-preview canvas { display: block; width: min(100%, 440px); height: auto; margin-inline: auto; background: var(--ink); box-shadow: 0 18px 54px rgba(8, 7, 11, 0.42); }
+  .share-card-actions { display: grid; align-content: start; gap: 10px; padding: 24px; border-left: 1px solid var(--line-on-ink); }
+  .share-card-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 46px;
+    padding: 0 14px;
+    color: var(--paper);
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 750;
+    white-space: nowrap;
+    transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+  }
+  .share-card-actions button:hover { border-color: var(--red); }
+  .share-card-actions button:active { transform: translateY(1px); }
+  .share-card-actions button.is-primary { color: var(--paper); background: var(--red); border-color: var(--red); }
+  .share-card-actions button.is-primary:hover { background: var(--red-deep); border-color: var(--red-deep); }
+  .share-card-actions button:disabled { cursor: wait; opacity: 0.62; }
+  .share-card-hint { align-self: end; margin: auto 24px 24px; color: var(--muted); font-size: 0.76rem; line-height: 1.6; }
+
+  .selection-share-toast {
+    position: fixed;
+    z-index: 31;
+    right: 22px;
+    bottom: 22px;
+    max-width: min(360px, calc(100% - 32px));
+    padding: 12px 16px;
+    color: var(--paper);
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--red);
+    border-radius: 8px;
+    box-shadow: 0 14px 38px rgba(8, 7, 11, 0.36);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 720px) {
+    .selection-share-toolbar {
+      right: 12px !important;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      left: 12px !important;
+      top: auto !important;
+      justify-content: stretch;
+    }
+    .selection-share-toolbar button { flex: 1 1 0; padding-inline: 8px; }
+    .share-card-dialog { width: min(100% - 20px, 620px); max-height: calc(100dvh - 20px); }
+    .share-card-shell { grid-template-columns: 1fr; max-height: calc(100dvh - 20px); overflow-y: auto; }
+    .share-card-header { padding: 18px; }
+    .share-card-preview { padding: 16px; }
+    .share-card-preview canvas { width: min(100%, 340px); }
+    .share-card-actions { grid-template-columns: 1fr 1fr; padding: 16px; border-top: 1px solid var(--line-on-ink); border-left: 0; }
+    .share-card-actions button.is-primary { grid-column: 1 / -1; }
+    .share-card-hint { margin: 0 16px 18px; }
+    .selection-share-toast { right: 16px; bottom: 76px; left: 16px; max-width: none; }
+  }
+
+  @media (max-width: 420px) {
+    .selection-share-toolbar button { gap: 5px; font-size: 0.7rem; }
+    .selection-share-toolbar button i { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .selection-share-toolbar button,
+    .share-card-actions button { transition-duration: 0.001ms; }
+  }
+
+    .share-button, .share-card-actions button.is-primary, .filter-button.active { color: #fff; background: #446d59; border-color: #446d59; }
+    .share-button:hover, .share-button.copied, .share-card-actions button.is-primary:hover { color: #fff; background: #325441; border-color: #325441; }
+</style>
+
+<script>
+  import QRCode from 'qrcode';
+
+  type ShareConfig = {
+    contentSelector: string;
+    title: string;
+    author: string;
+    section: string;
+    url: string;
+    logo: string;
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-selection-share]');
+
+  if (root) {
+    const content = document.querySelector<HTMLElement>(root.dataset.contentSelector || '');
+    const toolbar = root.querySelector<HTMLElement>('.selection-share-toolbar');
+    const dialog = root.querySelector<HTMLDialogElement>('.share-card-dialog');
+    const canvas = root.querySelector<HTMLCanvasElement>('canvas');
+    const toast = root.querySelector<HTMLElement>('.selection-share-toast');
+    const config: ShareConfig = {
+      contentSelector: root.dataset.contentSelector || '',
+      title: root.dataset.title || document.title,
+      author: root.dataset.author || '站主',
+      section: root.dataset.section || '物理续航站',
+      url: root.dataset.url || location.href,
+      logo: root.dataset.logo || '/brand/logo.png',
+    };
+
+    let selectedText = '';
+    let selectedInCode = false;
+    let cardBlob: Blob | null = null;
+    let toastTimer = 0;
+    let selectionPollTimer = 0;
+
+    const normalizeText = (value: string) => value
+      .replace(/\u00a0/g, ' ')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    const hideToolbar = () => {
+      if (toolbar) toolbar.hidden = true;
+    };
+
+    const showToast = (message: string) => {
+      if (!toast) return;
+      window.clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.hidden = false;
+      toastTimer = window.setTimeout(() => { toast.hidden = true; }, 2400);
+    };
+
+    const fallbackCopy = (text: string) => {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.append(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      if (!copied) throw new Error('copy failed');
+    };
+
+    const copyText = async (text: string) => {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        fallbackCopy(text);
+      }
+    };
+
+    const escapeHtml = (text: string) => text.replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+    })[character] || character);
+
+    const citationText = () => {
+      const excerpt = selectedText.length > 600 ? `${selectedText.slice(0, 599)}…` : selectedText;
+      return `“${excerpt}”\n\n出处：${config.author}《${config.title}》\n${config.url}`;
+    };
+
+    const copyCitation = async () => {
+      const plain = citationText();
+      const paragraphs = escapeHtml(selectedText.length > 600 ? `${selectedText.slice(0, 599)}…` : selectedText)
+        .split('\n')
+        .map((paragraph) => `<p>${paragraph || '<br>'}</p>`)
+        .join('');
+      const rich = `<blockquote>${paragraphs}</blockquote><p>出处：${escapeHtml(config.author)}《${escapeHtml(config.title)}》<br><a href="${escapeHtml(config.url)}">${escapeHtml(config.url)}</a></p>`;
+
+      if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined' && window.isSecureContext) {
+        await navigator.clipboard.write([new ClipboardItem({
+          'text/plain': new Blob([plain], { type: 'text/plain' }),
+          'text/html': new Blob([rich], { type: 'text/html' }),
+        })]);
+      } else {
+        fallbackCopy(plain);
+      }
+    };
+
+    const selectionBelongsToContent = (selection: Selection) => {
+      if (!content || !selection.rangeCount) return false;
+      const range = selection.getRangeAt(0);
+      const commonNode = range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
+        ? range.commonAncestorContainer as Element
+        : range.commonAncestorContainer.parentElement;
+      if (commonNode && content.contains(commonNode)) return true;
+      try {
+        return range.intersectsNode(content);
+      } catch {
+        return false;
+      }
+    };
+
+    const selectionTouchesCode = (selection: Selection) => {
+      if (!content || !selection.rangeCount) return false;
+      const range = selection.getRangeAt(0);
+      const node = range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
+        ? range.commonAncestorContainer as Element
+        : range.commonAncestorContainer.parentElement;
+      return Boolean(node?.closest('pre, code'));
+    };
+
+    const updateToolbar = () => {
+      if (!content || !toolbar || dialog?.open) return;
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed || !selection.rangeCount || !selectionBelongsToContent(selection)) {
+        hideToolbar();
+        return;
+      }
+
+      const text = normalizeText(selection.toString());
+      if (text.length < 2) {
+        hideToolbar();
+        return;
+      }
+
+      selectedText = text;
+      selectedInCode = selectionTouchesCode(selection);
+      toolbar.querySelectorAll<HTMLElement>('[data-selection-action="quote"], [data-selection-action="card"]')
+        .forEach((button) => { button.hidden = selectedInCode; });
+      toolbar.hidden = false;
+
+      if (matchMedia('(max-width: 720px)').matches) return;
+      const rect = selection.getRangeAt(0).getBoundingClientRect();
+      const bounds = toolbar.getBoundingClientRect();
+      const left = Math.min(window.innerWidth - bounds.width - 12, Math.max(12, rect.left + rect.width / 2 - bounds.width / 2));
+      const above = rect.top - bounds.height - 12;
+      toolbar.style.left = `${left}px`;
+      const top = above > 78 ? above : rect.bottom + 12;
+      toolbar.style.top = `${Math.min(window.innerHeight - bounds.height - 12, Math.max(78, top))}px`;
+    };
+
+    const wrapCanvasText = (context: CanvasRenderingContext2D, text: string, maxWidth: number) => {
+      const lines: string[] = [];
+      text.split('\n').forEach((paragraph, paragraphIndex, paragraphs) => {
+        let line = '';
+        Array.from(paragraph).forEach((character) => {
+          const candidate = line + character;
+          if (line && context.measureText(candidate).width > maxWidth) {
+            lines.push(line.trimEnd());
+            line = character.trimStart();
+          } else {
+            line = candidate;
+          }
+        });
+        if (line) lines.push(line.trimEnd());
+        if (paragraphIndex < paragraphs.length - 1) lines.push('');
+      });
+      return lines;
+    };
+
+    const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error('image failed'));
+      image.src = src;
+    });
+
+    const canvasToBlob = (target: HTMLCanvasElement) => new Promise<Blob>((resolve, reject) => {
+      target.toBlob((blob) => blob ? resolve(blob) : reject(new Error('canvas failed')), 'image/png');
+    });
+
+    const drawShareCard = async () => {
+      if (!canvas) throw new Error('canvas unavailable');
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('canvas context unavailable');
+
+      const width = canvas.width;
+      const height = canvas.height;
+      context.fillStyle = '#eef0ed';
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = '#f7f8f5';
+      context.fillRect(64, 64, width - 128, height - 128);
+      context.fillStyle = '#446d59';
+      context.fillRect(64, 64, 12, height - 128);
+
+      context.fillStyle = '#446d59';
+      context.font = '800 28px "Helvetica Neue", "PingFang SC", sans-serif';
+      context.letterSpacing = '2px';
+      context.fillText(config.section, 118, 142);
+      context.letterSpacing = '0px';
+
+      context.fillStyle = '#cbd1cc';
+      context.fillRect(118, 182, width - 236, 2);
+
+      const quote = selectedText.length > 320 ? `${selectedText.slice(0, 319)}…` : selectedText;
+      let quoteSize = quote.length <= 90 ? 68 : quote.length <= 180 ? 56 : 46;
+      let quoteLines: string[] = [];
+      let quoteLineHeight = 0;
+      do {
+        context.font = `700 ${quoteSize}px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif`;
+        quoteLines = wrapCanvasText(context, quote, width - 260);
+        quoteLineHeight = Math.round(quoteSize * 1.52);
+        if (quoteLines.length * quoteLineHeight <= 700) break;
+        quoteSize -= 2;
+      } while (quoteSize > 38);
+
+      const maximumLines = Math.floor(700 / quoteLineHeight);
+      if (quoteLines.length > maximumLines) {
+        quoteLines = quoteLines.slice(0, maximumLines);
+        quoteLines[maximumLines - 1] = `${quoteLines[maximumLines - 1].replace(/[…。！？,.，\s]+$/u, '')}…`;
+      }
+
+      context.fillStyle = '#1c211f';
+      context.font = `700 ${quoteSize}px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif`;
+      let quoteY = 284;
+      quoteLines.forEach((line) => {
+        context.fillText(line, 140, quoteY);
+        quoteY += quoteLineHeight;
+      });
+
+      const metaTop = 1040;
+      context.fillStyle = '#446d59';
+      context.fillRect(118, metaTop, 70, 6);
+      context.fillStyle = '#1c211f';
+      context.font = '800 34px "Helvetica Neue", "PingFang SC", sans-serif';
+      const titleLines = wrapCanvasText(context, config.title, 610).slice(0, 2);
+      titleLines.forEach((line, index) => context.fillText(line, 118, metaTop + 68 + index * 48));
+      context.fillStyle = '#606963';
+      context.font = '500 25px "Helvetica Neue", "PingFang SC", sans-serif';
+      context.fillText(config.author, 118, metaTop + 180);
+      context.fillStyle = '#1c211f';
+      context.font = '800 25px "Helvetica Neue", sans-serif';
+      context.fillText(new URL(config.url).hostname.toUpperCase(), 118, metaTop + 228);
+
+      const qrCanvas = document.createElement('canvas');
+      await QRCode.toCanvas(qrCanvas, config.url, {
+        width: 174,
+        margin: 1,
+        errorCorrectionLevel: 'M',
+        color: { dark: '#1b2722', light: '#f7f8f5' },
+      });
+      context.drawImage(qrCanvas, 780, 1082, 174, 174);
+      context.fillStyle = '#606963';
+      context.font = '500 20px "Helvetica Neue", "PingFang SC", sans-serif';
+      context.textAlign = 'center';
+      context.fillText('扫码阅读原文', 867, 1292);
+      context.textAlign = 'start';
+
+      try {
+        const brandImage = await loadImage(config.logo);
+        context.drawImage(brandImage, 874, 88, 72, 72);
+      } catch {
+        context.fillStyle = '#446d59';
+        context.fillRect(884, 92, 58, 58);
+        context.fillStyle = '#1c211f';
+        context.font = '900 30px "Arial Black", sans-serif';
+        context.fillText('WL', 890, 132);
+      }
+
+      cardBlob = await canvasToBlob(canvas);
+    };
+
+    const openCard = async (button: HTMLButtonElement) => {
+      const original = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>正在生成</span>';
+      try {
+        await drawShareCard();
+        hideToolbar();
+        dialog?.showModal();
+        document.body.style.overflow = 'hidden';
+      } catch (error) {
+        console.error('生成分享卡片失败', error);
+        showToast('卡片生成失败，请稍后再试');
+      } finally {
+        button.disabled = false;
+        button.innerHTML = original;
+      }
+    };
+
+    const downloadCard = () => {
+      if (!cardBlob) return;
+      const objectUrl = URL.createObjectURL(cardBlob);
+      const link = document.createElement('a');
+      const fileName = config.title.replace(/[\\/:*?"<>|]/g, '-').slice(0, 48) || 'article-quote';
+      link.href = objectUrl;
+      link.download = `${fileName}-分享卡片.png`;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      showToast('分享卡片已下载');
+    };
+
+    const copyCard = async () => {
+      if (!cardBlob) return;
+      if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined' || !window.isSecureContext) {
+        downloadCard();
+        showToast('当前浏览器不支持复制图片，已为你下载');
+        return;
+      }
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': cardBlob })]);
+        showToast('分享卡片已复制');
+      } catch {
+        downloadCard();
+        showToast('图片复制失败，已为你下载');
+      }
+    };
+
+    const shareCard = async () => {
+      if (!cardBlob) return;
+      const file = new File([cardBlob], 'article-quote.png', { type: 'image/png' });
+      try {
+        if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+          await navigator.share({ title: config.title, text: selectedText, url: config.url, files: [file] });
+        } else if (navigator.share) {
+          await navigator.share({ title: config.title, text: citationText(), url: config.url });
+        } else {
+          await copyCard();
+        }
+      } catch (error) {
+        if ((error as DOMException).name !== 'AbortError') {
+          console.error('系统分享失败', error);
+          showToast('系统分享失败，可以下载图片后发送');
+        }
+      }
+    };
+
+    toolbar?.addEventListener('pointerdown', (event) => event.preventDefault());
+    toolbar?.addEventListener('click', async (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-selection-action]');
+      if (!button || !selectedText) return;
+      const action = button.dataset.selectionAction;
+      try {
+        if (action === 'copy') {
+          await copyText(selectedText);
+          showToast('原文已复制');
+          hideToolbar();
+        } else if (action === 'quote' && !selectedInCode) {
+          await copyCitation();
+          showToast('引用和文章出处已复制');
+          hideToolbar();
+        } else if (action === 'card' && !selectedInCode) {
+          await openCard(button);
+        }
+      } catch (error) {
+        console.error('复制失败', error);
+        showToast('复制失败，请检查浏览器权限');
+      }
+    });
+
+    root.querySelector('[data-card-close]')?.addEventListener('click', () => dialog?.close());
+    root.querySelector('[data-card-action="copy"]')?.addEventListener('click', copyCard);
+    root.querySelector('[data-card-action="download"]')?.addEventListener('click', downloadCard);
+    root.querySelector('[data-card-action="share"]')?.addEventListener('click', shareCard);
+    dialog?.addEventListener('close', () => { document.body.style.overflow = ''; });
+    dialog?.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    const scheduleToolbarUpdate = () => window.setTimeout(updateToolbar, 0);
+    const scheduleTouchToolbarUpdate = () => {
+      [0, 120, 320, 650].forEach((delay) => window.setTimeout(updateToolbar, delay));
+    };
+    const pollTouchSelection = () => {
+      window.clearInterval(selectionPollTimer);
+      let attempts = 0;
+      selectionPollTimer = window.setInterval(() => {
+        updateToolbar();
+        attempts += 1;
+        if (attempts >= 40) window.clearInterval(selectionPollTimer);
+      }, 150);
+    };
+    const handleDocumentScroll = () => {
+      hideToolbar();
+      if (matchMedia('(max-width: 720px)').matches) window.setTimeout(updateToolbar, 220);
+    };
+    document.addEventListener('selectionchange', scheduleToolbarUpdate);
+    content?.addEventListener('pointerup', scheduleToolbarUpdate);
+    content?.addEventListener('keyup', scheduleToolbarUpdate);
+    content?.addEventListener('touchstart', pollTouchSelection, { passive: true });
+    content?.addEventListener('touchend', scheduleTouchToolbarUpdate, { passive: true });
+    content?.addEventListener('contextmenu', scheduleTouchToolbarUpdate);
+    document.addEventListener('scroll', handleDocumentScroll, { passive: true, capture: true });
+    document.addEventListener('pointerdown', (event) => {
+      if (!toolbar?.contains(event.target as Node)) hideToolbar();
+    });
+  }
+</script>

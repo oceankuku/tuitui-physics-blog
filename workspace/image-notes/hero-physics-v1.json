@@ -1,0 +1,169 @@
+{
+  "createdAt": "2026-10-10",
+  "updatedAt": "2026-10-10",
+  "tool": "built-in image_gen",
+  "purpose": "Complete-frame horizontal physics illustrations with the same teacher identity. No reserved empty area. Topic diagrams are background art, not validated instructional figures.",
+  "images": [
+    {
+      "id": "01-force-analysis",
+      "title": "受力分析",
+      "path": "/material-library/hero-physics-v1/01-force-analysis.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "8cb44972a809525d45617be81bdbb620c62860557448559610a2320c76929124",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: force analysis, ramp and wooden block experiment. Keep the existing ramp apparatus and right-side teacher unchanged.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/01-force-analysis.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-c8fae913-6e48-4fae-be56-ef954f64cd21.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "02-projectile-motion",
+      "title": "平抛运动",
+      "path": "/material-library/hero-physics-v1/02-projectile-motion.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "8125f686964317b8dade2a5052e078039501f3ac5e0a7a149af714e6c76afa5f",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 平抛运动. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/02-projectile-motion.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-61581301-7810-4888-8284-ad48b668f842.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "03-circular-motion",
+      "title": "圆周运动",
+      "path": "/material-library/hero-physics-v1/03-circular-motion.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "58f0833963c2171c7b0d1680456569941dddee765453aedba6b3c18d4f5b4f5f",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 圆周运动. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/03-circular-motion.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-ea33850f-aae2-4f45-8af0-06be4ce34137.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "04-mechanical-energy",
+      "title": "机械能",
+      "path": "/material-library/hero-physics-v1/04-mechanical-energy.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "5b7da682db2b8e1c476e4a3656b3214e5001a96aca745929b403a5f0c87caf95",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 机械能. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/04-mechanical-energy.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-0adf9b08-791a-4783-a20f-050f9ed32ade.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "05-electric-field",
+      "title": "电场",
+      "path": "/material-library/hero-physics-v1/05-electric-field.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "648765960a0613a71bb11f56c08941a4b71aaa968cbe2c90e9204dda80957f48",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 电场. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/05-electric-field.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-a1621fad-51f8-429f-bfdf-042290273dee.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "06-electric-circuits",
+      "title": "电路实验",
+      "path": "/material-library/hero-physics-v1/06-electric-circuits.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "33b29e2746ad355f9af21512fbd7af3300c6afc2b6ceef2e5f490ab77b694509",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 电路实验. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/06-electric-circuits.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-38659ef7-d222-4514-8c9f-58d2ac72065f.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "07-magnetic-field",
+      "title": "磁场",
+      "path": "/material-library/hero-physics-v1/07-magnetic-field.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "c3086c51fb0ea7b31fa6f1a7a05f477b1c2c46b291f450df26fdcc676b4fe5fb",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 磁场. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/07-magnetic-field.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-fbf0784a-d2a7-4f17-9928-9b0701ec3609.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "08-electromagnetic-induction",
+      "title": "电磁感应",
+      "path": "/material-library/hero-physics-v1/08-electromagnetic-induction.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "f76c87d2332f2c60458d6d733afff89ee742a14842484545cea6053e77b6d4b8",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 电磁感应. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/08-electromagnetic-induction.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-f49a2d04-7881-4261-9f64-c5393f488e44.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "09-mechanical-waves",
+      "title": "机械波",
+      "path": "/material-library/hero-physics-v1/09-mechanical-waves.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "bf5904fc096a21e35a0aaabf4f58990e6dded643a157b67bc2e5e9d3397bf914",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 机械波. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/09-mechanical-waves.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-b284d391-c3dd-4ba1-b00b-132f1a1d798c.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    },
+    {
+      "id": "10-geometrical-optics",
+      "title": "光学",
+      "path": "/material-library/hero-physics-v1/10-geometrical-optics.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "4e87c6146f06e0444bb3f98f0ca5f99852c3185a2257dcf41db61b18c8acc5cf",
+      "prompt": "Use case: identity-preserve. Edit the supplied Image 1, the existing physics Hero illustration. Image 1 is the EDIT TARGET; Image 2 is supporting character identity reference only.\nPrimary request: remove the conspicuous milky pale fade/empty wash on the LEFT of Image 1. Replace that entire washed-out area with a fully rendered, coherent continuation of the same classroom and experiment scene. This should be a complete standalone illustration usable immediately as a picture, NOT a text-overlay template.\nKEEP UNCHANGED: the teacher's exact face and narrow half-lidded gray eyes, faint under-eye shadows, long messy black hair, single loop-shaped ahoge, facial expression, adult proportions, charcoal cardigan, white collared shirt, pose and hands. Preserve the existing topic apparatus and the main right-hand composition. Do not crop, zoom, stretch or replace the character.\nCHANGE ONLY: the washed-out left background and left foreground transitions. Make the existing classroom window frame, distant trees, shelving, books and tabletop on that side fully visible, detailed and coherent in the SAME soft hand-drawn pencil/ink anime style. Continue natural perspective and tabletop depth from the right. Match the rendering density, sharpness, muted gray-green/charcoal palette and shaded tonal range of the right half. Natural soft daylight, but no overexposure or obscuring mist.\nComposition: retain the original wide 16:9 horizontal image, a SINGLE scene edge-to-edge, full rectangular frame, all areas intentionally finished; balanced complete environment on both sides. No reserved blank area, no white or pale-gradient vignette, no foggy left overlay, no transparent canvas, no empty stripe, no collage, no UI, no newly added written text, no watermark. Preserve recognizable identity very strictly.\nTopic: 光学. Preserve the topic apparatus from Image 1 and the entire teacher. Fully complete the left scene.",
+      "referenceImages": [
+        "workspace/image-notes/hero-physics-v1-originals/10-geometrical-optics.png",
+        "public/site-assets/teacher-book-explain.png"
+      ],
+      "generatorOutput": "exec-70ac01f3-866e-4239-9162-dca0958775df.png",
+      "tool": "built-in image_gen",
+      "batch": "v1"
+    }
+  ],
+  "originalsBackup": "workspace/image-notes/hero-physics-v1-originals/"
+}

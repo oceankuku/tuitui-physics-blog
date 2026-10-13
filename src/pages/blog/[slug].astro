@@ -1,0 +1,669 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SelectionShare from '../../components/SelectionShare.astro';
+import { getCollection } from 'astro:content';
+import { canonicalUrl, articleSchema } from '../../lib/site-content';
+import { siteConfig } from '../../../site.config.mjs';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts
+    .filter((post) => !post.data.draft && post.data.pubDate && post.data.title && post.data.description)
+    .map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+const articleHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const posts = (await getCollection('blog'))
+  .filter((entry) => !entry.data.draft && entry.data.pubDate)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const currentIndex = posts.findIndex((entry) => entry.slug === post.slug);
+const newerPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined;
+const olderPost = currentIndex < posts.length - 1 ? posts[currentIndex + 1] : undefined;
+const readingMinutes = Math.max(1, Math.ceil(post.body.replace(/\s/g, '').length / 500));
+const shareDescription = `${post.data.description.slice(0, 50)}${post.data.description.length > 50 ? '...' : ''}`;
+const shareUrl = canonicalUrl(Astro.url.pathname);
+const updatedAt = post.data.updatedAt ?? post.data.pubDate;
+const markdownPath = `/blog/${post.slug}/index.md`;
+const markdownUrl = canonicalUrl(markdownPath);
+const shareText = `${shareDescription}\n\n${shareUrl}`;
+const wechatTitle = post.data.title;
+const wechatDescription = post.data.description;
+const wechatAuthor = post.data.author;
+const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<Layout
+  title={`${post.data.title} - ${siteConfig.name}`}
+  description={post.data.description}
+  image={post.data.image || siteConfig.ogImage}
+  imageWidth={post.data.image ? undefined : 1200}
+  imageHeight={post.data.image ? undefined : 630}
+  markdownUrl={markdownUrl}
+  article={{ author: post.data.author, publishedAt: post.data.pubDate.toISOString(), updatedAt: updatedAt.toISOString() }}
+  structuredData={[
+    articleSchema({ title: post.data.title, description: post.data.description, url: shareUrl, author: post.data.author, image: post.data.image, publishedAt: post.data.pubDate, updatedAt, section: siteConfig.blogTitle }),
+    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: canonicalUrl('/') },
+      { '@type': 'ListItem', position: 2, name: '博客', item: canonicalUrl('/blog/') },
+      { '@type': 'ListItem', position: 3, name: post.data.title, item: shareUrl },
+    ] },
+  ]}
+>
+  <script is:inline define:vars={{ shareText, shareUrl, wechatTitle, wechatDescription, wechatAuthor, wechatDate }}>
+    window.shareArticle = async function () {
+      const button = document.querySelector('button.share-button');
+      try {
+        await navigator.clipboard.writeText(shareText);
+        if (!button) return;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> 已复制';
+        button.classList.add('copied');
+        window.setTimeout(() => {
+          button.innerHTML = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      } catch (error) {
+        console.error('复制失败', error);
+        window.prompt('请复制下面的分享内容', shareText);
+      }
+    };
+
+    const wechatCopiedProperties = [
+      'color', 'background-color', 'font-family', 'font-size', 'font-weight', 'font-style',
+      'line-height', 'letter-spacing', 'text-align', 'text-decoration', 'text-indent',
+      'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+      'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+      'border-top', 'border-right', 'border-bottom', 'border-left', 'border-radius',
+      'display', 'vertical-align',
+      'white-space', 'list-style-type', 'border-collapse', 'overflow-wrap', 'word-break'
+    ];
+
+    const canonicalizeWechatUrl = function (value) {
+      if (!value) return value;
+      try {
+        return new URL(value, shareUrl).href;
+      } catch {
+        return value;
+      }
+    };
+
+    // 把文章里的图片转成 data URI（base64 直接嵌进富文本）。
+    // 粘贴时图片数据随文本一起进公众号编辑器，微信不需要按 URL
+    // 回源抓图——本地/占位域名阶段图片也能一键全部带过去。
+    const imageUrlCache = new Map();
+
+    const fetchArticleImage = async function (image) {
+      const rawSource = image.getAttribute('src') || image.currentSrc || image.src;
+      if (!rawSource) throw new Error('image has no src');
+      const cached = imageUrlCache.get(rawSource);
+      if (cached) return cached;
+      const response = await fetch(rawSource);
+      if (!response.ok) throw new Error('image fetch failed: ' + rawSource);
+      const blob = await response.blob();
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error('readAsDataURL failed'));
+        reader.readAsDataURL(blob);
+      });
+      imageUrlCache.set(rawSource, dataUrl);
+      return dataUrl;
+    };
+
+    window.buildWechatRichText = async function () {
+      const article = document.querySelector('.article-content');
+      if (!article) throw new Error('article content not found');
+
+      const articleImages = Array.from(article.querySelectorAll('img'));
+      const imageDataUrls = await Promise.all(articleImages.map((image) => fetchArticleImage(image).catch((error) => {
+        console.error(error);
+        return null;
+      })));
+
+      const clone = article.cloneNode(true);
+      const sourceNodes = [article, ...article.querySelectorAll('*')];
+      const cloneNodes = [clone, ...clone.querySelectorAll('*')];
+
+      const imageIndexByKey = new Map();
+      articleImages.forEach((image, index) => {
+        imageIndexByKey.set(image, index);
+      });
+
+      sourceNodes.forEach((sourceNode, index) => {
+        const targetNode = cloneNodes[index];
+        if (!(sourceNode instanceof Element) || !(targetNode instanceof Element)) return;
+
+        const computed = getComputedStyle(sourceNode);
+        const inlineStyles = wechatCopiedProperties
+          .map((property) => `${property}:${computed.getPropertyValue(property)};`)
+          .join('');
+
+        targetNode.setAttribute('style', inlineStyles);
+        targetNode.removeAttribute('id');
+        targetNode.removeAttribute('class');
+        [...targetNode.attributes].forEach((attribute) => {
+          if (attribute.name.startsWith('data-') || attribute.name.startsWith('aria-')) {
+            targetNode.removeAttribute(attribute.name);
+          }
+        });
+
+        if (sourceNode instanceof HTMLImageElement && targetNode instanceof HTMLImageElement) {
+          targetNode.removeAttribute('src');
+          targetNode.removeAttribute('srcset');
+          targetNode.removeAttribute('sizes');
+          targetNode.removeAttribute('loading');
+          targetNode.removeAttribute('decoding');
+          const dataIndex = imageIndexByKey.get(sourceNode);
+          const dataUrl = typeof dataIndex === 'number' ? imageDataUrls[dataIndex] : null;
+          if (dataUrl) targetNode.setAttribute('src', dataUrl);
+          targetNode.setAttribute('style', `${inlineStyles}display:block;width:100%;max-width:100%;height:auto;margin-left:auto;margin-right:auto;`);
+        }
+
+        if (sourceNode instanceof HTMLAnchorElement && targetNode instanceof HTMLAnchorElement) {
+          targetNode.setAttribute('href', canonicalizeWechatUrl(sourceNode.getAttribute('href') || sourceNode.href));
+          targetNode.removeAttribute('target');
+          targetNode.removeAttribute('rel');
+        }
+      });
+
+      clone.querySelectorAll('script, style, iframe, button, form, input, textarea, select').forEach((node) => node.remove());
+
+      // 公式块的 class 被上面的清理逻辑摘掉后样式会丢。把计算样式内联回去，
+      // 公式在公众号编辑器里保持居中、衬线、分数横线的正式格式。
+      // inline-flex 的分数结构靠每个子元素的 style 原样复制（flex 方向等
+      // 不在 wechatCopiedProperties 清单里的属性手动补齐）。
+      clone.querySelectorAll('.formula-block').forEach((node) => {
+        const source = article.querySelector('.formula-block');
+        const sourceComputed = source ? getComputedStyle(source) : null;
+        if (!sourceComputed) return;
+        const kept = ['font-family', 'font-size', 'font-style', 'text-align', 'margin-top', 'margin-bottom', 'padding-top', 'padding-bottom'];
+        const inline = kept.map((property) => `${property}:${sourceComputed.getPropertyValue(property)};`).join('');
+        node.setAttribute('style', `${inline}display:block;text-indent:0;overflow-x:auto;`);
+      });
+      clone.querySelectorAll('.formula-frac').forEach((node) => {
+        const source = article.querySelector('.formula-frac');
+        if (!source) return;
+        node.setAttribute('style', 'display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1.25;');
+      });
+      clone.querySelectorAll('.formula-frac .num').forEach((node) => {
+        node.setAttribute('style', 'padding:0 3px 1px;border-bottom:1.5px solid currentColor;');
+      });
+      clone.querySelectorAll('.formula-frac .den').forEach((node) => {
+        node.setAttribute('style', 'padding:1px 3px 0;');
+      });
+
+      // 微信编辑器的内容栏比桌面文章窄。不要保留桌面布局计算出的固定宽高，
+      // 否则图片缩小后父元素仍会占据原高度，文字换行后也可能互相覆盖。
+      clone.querySelectorAll('p').forEach((paragraph) => {
+        const onlyChild = paragraph.children.length === 1 ? paragraph.firstElementChild : null;
+        if (onlyChild instanceof HTMLImageElement && !paragraph.textContent?.trim()) {
+          paragraph.setAttribute('style', 'margin:24px 0 12px;padding:0;line-height:0;');
+        }
+      });
+
+      clone.querySelectorAll('img').forEach((image) => {
+        image.style.display = 'block';
+        image.style.width = '100%';
+        image.style.maxWidth = '100%';
+        image.style.height = 'auto';
+        image.style.marginLeft = 'auto';
+        image.style.marginRight = 'auto';
+      });
+
+      clone.querySelectorAll('pre').forEach((pre) => {
+        pre.style.display = 'block';
+        pre.style.width = 'auto';
+        pre.style.maxWidth = '100%';
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.style.wordBreak = 'break-word';
+        pre.style.overflowWrap = 'anywhere';
+      });
+
+      clone.querySelectorAll('pre code').forEach((code) => {
+        code.style.whiteSpace = 'pre-wrap';
+        code.style.wordBreak = 'break-word';
+        code.style.overflowWrap = 'anywhere';
+      });
+
+      clone.querySelectorAll('table').forEach((table) => {
+        table.style.display = 'table';
+        table.style.width = '100%';
+        table.style.maxWidth = '100%';
+        table.style.tableLayout = 'fixed';
+        table.style.borderCollapse = 'collapse';
+      });
+
+      clone.querySelectorAll('th, td').forEach((cell) => {
+        cell.style.minWidth = '0';
+        cell.style.wordBreak = 'break-word';
+        cell.style.overflowWrap = 'anywhere';
+        cell.style.verticalAlign = 'top';
+      });
+
+      const theme = getComputedStyle(document.documentElement);
+      const palette = { bg: theme.getPropertyValue('--bg').trim(), text: theme.getPropertyValue('--text').trim(), muted: theme.getPropertyValue('--muted').trim(), accent: theme.getPropertyValue('--accent').trim() };
+
+      const wrapper = document.createElement('section');
+      // 微信公众号编辑器在 iPhone（含 13 Pro）上内容栏可用宽度约 677px。
+      // wrapper 内边距左右各 15px（约 4mm），比原来的 26px 每侧加宽约 3mm，
+      // 粘贴后正文更贴合编辑器栏宽，不会整体偏窄。
+      wrapper.setAttribute('style', `box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:32px 15px;background-color:${palette.bg};color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
+
+      const header = document.createElement('header');
+      header.setAttribute('style', `margin:0 0 34px;padding:0 0 24px;border-bottom:2px solid ${palette.accent};`);
+
+      const title = document.createElement('h1');
+      title.textContent = wechatTitle;
+      title.setAttribute('style', `margin:0 0 18px;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:30px;font-weight:800;line-height:1.25;letter-spacing:-0.5px;`);
+
+      const description = document.createElement('p');
+      description.textContent = wechatDescription;
+      description.setAttribute('style', `margin:0 0 16px;color:${palette.muted};font-size:16px;line-height:1.75;`);
+
+      const meta = document.createElement('p');
+      meta.textContent = `${wechatAuthor} · ${wechatDate}`;
+      meta.setAttribute('style', `margin:0;color:${palette.accent};font-size:13px;font-weight:700;line-height:1.6;letter-spacing:0.5px;`);
+
+      header.append(title, description, meta);
+      clone.setAttribute('style', `width:auto;max-width:100%;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
+      wrapper.append(header, clone);
+
+      return {
+        html: wrapper.outerHTML,
+        text: `${wechatTitle}\n\n${wechatDescription}\n\n${wechatAuthor} · ${wechatDate}\n\n${article.innerText}`
+      };
+    };
+
+    const setWechatCopyFeedback = function (button, message, isError = false) {
+      if (!button) return;
+      const original = button.dataset.originalHtml || button.innerHTML;
+      button.dataset.originalHtml = original;
+      button.innerHTML = isError
+        ? `<i class="fas fa-exclamation-circle" aria-hidden="true"></i> ${message}`
+        : `<i class="fas fa-check" aria-hidden="true"></i> ${message}`;
+      button.classList.toggle('copy-error', isError);
+      button.classList.toggle('copied', !isError);
+      window.setTimeout(() => {
+        button.innerHTML = original;
+        button.classList.remove('copied', 'copy-error');
+      }, 2600);
+    };
+
+    window.copyArticleToWechat = async function () {
+      const button = document.querySelector('.wechat-copy-button');
+      try {
+        if (button) {
+          button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> 正在打包图片…';
+          button.disabled = true;
+        }
+        const payload = await window.buildWechatRichText();
+        if (navigator.clipboard?.write && window.ClipboardItem && window.isSecureContext) {
+          await navigator.clipboard.write([new ClipboardItem({
+            'text/html': new Blob([payload.html], { type: 'text/html' }),
+            'text/plain': new Blob([payload.text], { type: 'text/plain' })
+          })]);
+        } else {
+          const holder = document.createElement('div');
+          holder.contentEditable = 'true';
+          holder.style.position = 'fixed';
+          holder.style.left = '-99999px';
+          holder.style.top = '0';
+          holder.innerHTML = payload.html;
+          document.body.appendChild(holder);
+
+          const range = document.createRange();
+          range.selectNodeContents(holder);
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          const copied = document.execCommand('copy');
+          selection?.removeAllRanges();
+          holder.remove();
+          if (!copied) throw new Error('copy command failed');
+        }
+        setWechatCopyFeedback(button, '已复制到公众号（含图）');
+      } catch (error) {
+        console.error('复制公众号富文本失败', error);
+        setWechatCopyFeedback(button, '复制失败', true);
+      } finally {
+        if (button) button.disabled = false;
+      }
+    };
+
+    // 公众号粘贴正文时，微信服务器会去图片源地址抓图转存；本地开发
+    // (localhost) 或占位域名它访问不到，图片就会复制失败。这个助手把
+    // 每张文章图以 PNG 位图写入剪贴板，粘贴时相当于本地上传，不依赖
+    // 图片的可访问性。
+    const imageAssistantState = { images: [], index: 0 };
+
+    window.startImageCopyAssistant = function () {
+      const images = Array.from(document.querySelectorAll('.article-content img'));
+      if (images.length === 0) {
+        window.alert('这篇文章没有插图。');
+        return;
+      }
+      imageAssistantState.images = images;
+      imageAssistantState.index = 0;
+      renderImageAssistant();
+    };
+
+    function renderImageAssistant() {
+      document.querySelector('.image-copy-overlay')?.remove();
+      const { images, index } = imageAssistantState;
+      const overlay = document.createElement('div');
+      overlay.className = 'image-copy-overlay';
+      overlay.setAttribute('style', 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;');
+      overlay.innerHTML = `
+        <div role="dialog" aria-modal="true" aria-label="逐张复制图片" style="box-sizing:border-box;width:min(92vw,460px);max-height:86vh;overflow:auto;background:#fff;color:#1c221f;border-radius:14px;padding:22px 24px;font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:15px;line-height:1.7;">
+          <p style="margin:0 0 6px;font-weight:700;font-size:17px;">第 ${index + 1} / ${images.length} 张</p>
+          <p style="margin:0 0 14px;color:#5b6360;">图片已复制到剪贴板。切到公众号编辑器按 Ctrl+V 粘贴，再回来点下一张。</p>
+          <img src="${images[index].currentSrc || images[index].src}" alt="" style="display:block;width:100%;max-height:300px;object-fit:contain;margin:0 0 16px;border:1px solid #e3e6e2;border-radius:8px;background:#f6f7f5;" />
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button type="button" data-act="close" style="padding:9px 16px;border:1px solid #c9cdc9;border-radius:8px;background:#fff;color:#1c221f;font-size:14px;cursor:pointer;">关闭</button>
+            ${index > 0 ? '<button type="button" data-act="prev" style="padding:9px 16px;border:1px solid #c9cdc9;border-radius:8px;background:#fff;color:#1c221f;font-size:14px;cursor:pointer;">上一张</button>' : ''}
+            ${index < images.length - 1
+              ? '<button type="button" data-act="next" style="padding:9px 16px;border:none;border-radius:8px;background:#2f5443;color:#fff;font-size:14px;cursor:pointer;">复制并下一张</button>'
+              : '<button type="button" data-act="done" style="padding:9px 16px;border:none;border-radius:8px;background:#2f5443;color:#fff;font-size:14px;cursor:pointer;">完成</button>'}
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', (event) => {
+        const target = event.target instanceof Element ? event.target.closest('button[data-act]') : null;
+        if (!target) return;
+        const act = target.getAttribute('data-act');
+        if (act === 'close' || act === 'done') overlay.remove();
+        if (act === 'prev') { imageAssistantState.index -= 1; renderImageAssistant(); }
+        if (act === 'next') { imageAssistantState.index += 1; renderImageAssistant(); }
+      });
+      void copyArticleImage(images[index]);
+    }
+
+    async function copyArticleImage(image) {
+      try {
+        const bitmap = await loadImageBitmap(image.currentSrc || image.src);
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        canvas.getContext('2d').drawImage(bitmap, 0, 0);
+        bitmap.close?.();
+        const blob = await new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      } catch (error) {
+        console.error('复制图片失败', error);
+        window.alert('这张图复制失败，请右键图片手动"复制图片"后继续。');
+      }
+    }
+
+    function loadImageBitmap(url) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error('image load failed: ' + url));
+        image.src = url;
+      });
+    }
+
+  </script>
+
+  <style>
+    :global(body) { background: var(--ink); }
+    .article-page { color: var(--text-on-ink); background: var(--ink); }
+    .article-hero { width: min(100% - 64px, 1440px); margin-inline: auto; padding: 132px 0 62px; border-bottom: 2px solid var(--red); }
+    .article-hero-grid { display: grid; grid-template-columns: 220px minmax(0, 980px) minmax(140px, 1fr); gap: clamp(32px, 4.5vw, 72px); align-items: start; }
+    .article-kind { padding-top: 12px; color: var(--red); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.12em; }
+    .article-heading { grid-column: 2 / -1; }
+    .article-title {
+      max-width: 1120px;
+      margin-bottom: 24px;
+      color: var(--paper);
+      font-family: var(--display);
+      font-size: clamp(2.3rem, 4.6vw, 4.1rem);
+      line-height: 1.15;
+      letter-spacing: -0.06em;
+    }
+    .article-description { max-width: 780px; margin: 0; color: var(--muted-on-ink); font-size: clamp(1rem, 1.3vw, 1.14rem); line-height: 1.72; }
+
+    .reader-grid {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 780px) minmax(180px, 1fr);
+      gap: clamp(32px, 4.5vw, 72px);
+      align-items: start;
+      width: min(100% - 64px, 1440px);
+      margin-inline: auto;
+      padding: 68px 0 110px;
+    }
+    .article-meta, .page-toc { position: sticky; top: 104px; }
+    .rail-title { margin-bottom: 20px; color: var(--paper); font-family: var(--display); font-size: 1rem; letter-spacing: -0.02em; }
+    .meta-list { margin: 0 0 28px; }
+    .meta-row { padding: 13px 0; border-bottom: 1px solid var(--line-on-ink); }
+    .meta-row dt { margin-bottom: 3px; color: var(--muted); font-size: 0.7rem; }
+    .meta-row dd { margin: 0; color: var(--text); font-size: 0.82rem; }
+    .article-tags { display: flex; flex-wrap: wrap; gap: 5px 10px; }
+    .article-tag { color: var(--muted); font-size: 0.75rem; }
+    .article-tag::before { content: "#"; color: var(--red); }
+    .article-actions { display: grid; gap: 9px; }
+    .share-button, .wechat-copy-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 44px;
+      padding: 0 14px;
+      color: var(--paper);
+      background: var(--red);
+      border: 1px solid var(--red);
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 750;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+    .share-button:hover, .share-button.copied { background: var(--red-deep); border-color: var(--red-deep); }
+    .wechat-copy-button { color: var(--paper); background: var(--ink-soft); border-color: var(--line-on-ink); }
+    .wechat-copy-button:hover, .wechat-copy-button.copied { background: var(--surface-strong); border-color: var(--red); }
+    .wechat-copy-button.copy-error { color: var(--danger); border-color: var(--danger); }
+    .share-button:active, .wechat-copy-button:active { transform: translateY(1px); }
+
+    .article-content { min-width: 0; color: var(--text-on-ink); font-size: 1.06rem; line-height: 1.68; }
+    .article-content :global(h2) {
+      margin: 3.5rem 0 1.45rem;
+      padding-bottom: 0.8rem;
+      color: var(--paper);
+      border-bottom: 1px solid var(--line-on-ink);
+      font-family: var(--display);
+      font-size: 2rem;
+      line-height: 1.2;
+      letter-spacing: -0.035em;
+      scroll-margin-top: 100px;
+    }
+    .article-content :global(h2:first-child) { margin-top: 0; }
+    .article-content :global(h3) { margin: 2.4rem 0 1rem; color: var(--paper); font-size: 1.35rem; line-height: 1.35; scroll-margin-top: 100px; }
+    .article-content :global(h4) { margin: 2rem 0 0.8rem; color: var(--paper); font-size: 1.08rem; }
+    .article-content :global(p), .article-content :global(li) { color: var(--text); }
+    .article-content :global(p) { margin-bottom: 1.5rem; text-indent: 2em; }
+    .article-content :global(blockquote p), .article-content :global(li p) { text-indent: 0; }
+    .article-content :global(ul), .article-content :global(ol) { margin-bottom: 1.6rem; padding-left: 1.5rem; }
+    .article-content :global(li) { margin-bottom: 0.65rem; }
+    .article-content :global(strong) { color: var(--paper); }
+    .article-content :global(a) { color: var(--accent-strong); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+    .article-content :global(a:hover) { color: var(--accent); }
+    .article-content :global(code) { padding: 0.16rem 0.42rem; color: var(--accent-strong); background: var(--accent-soft); border-radius: 4px; font-size: 0.9em; }
+    .article-content :global(pre) { margin: 2rem 0; padding: 1.35rem; overflow-x: auto; color: var(--paper); background: var(--surface-strong); border: 1px solid var(--line-on-ink); border-radius: 10px; }
+    .article-content :global(pre code) { padding: 0; color: inherit; background: transparent; }
+    .article-content :global(blockquote) { margin: 2rem 0; padding: 1.1rem 1.35rem; color: var(--text); background: var(--accent-soft); border-left: 3px solid var(--red); }
+    .article-content :global(blockquote p:last-child) { margin-bottom: 0; }
+    /* 正式公式块：居中、衬线字体，配合 .formula-frac 还原横线分数 */
+    .article-content :global(.formula-block) {
+      display: block;
+      margin: 1.6rem auto;
+      padding: 0.4rem 0;
+      text-align: center;
+      text-indent: 0;
+      font-family: 'Times New Roman', 'STIX Two Math', Georgia, 'Songti SC', SimSun, serif;
+      font-size: 1.18em;
+      font-style: italic;
+      letter-spacing: 0.02em;
+      overflow-x: auto;
+    }
+    .article-content :global(.formula-block .op) { font-style: normal; padding: 0 0.28em; }
+    .article-content :global(.formula-block sub) { font-size: 0.62em; }
+    .article-content :global(.formula-block sup) { font-size: 0.62em; }
+    .article-content :global(.formula-frac) {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 0.25em;
+      font-style: inherit;
+      line-height: 1.25;
+    }
+    .article-content :global(.formula-frac .num) { padding: 0 0.3em 0.08em; border-bottom: 1.5px solid currentColor; }
+    .article-content :global(.formula-frac .den) { padding: 0.08em 0.3em 0; }
+    .article-content :global(img) { width: 100%; height: auto; margin: 2.2rem 0; border-radius: 12px; }
+    .article-content :global(table) { display: block; width: 100%; margin: 2rem 0; overflow-x: auto; border-collapse: collapse; color: var(--paper); background: var(--ink-soft); }
+    .article-content :global(th), .article-content :global(td) { min-width: 130px; padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--line-on-ink); }
+    .article-content :global(th) { color: var(--paper); background: var(--surface-strong); }
+    .article-content :global(td) { color: var(--text); }
+    .article-content :global(hr) { margin: 3rem 0; border: 0; border-top: 1px solid var(--line-on-ink); }
+
+    .page-toc { padding-left: 24px; border-left: 1px solid var(--line-on-ink); }
+    .toc-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+    .toc-link { display: block; padding: 9px 0; color: var(--muted); font-size: 0.78rem; line-height: 1.45; border-bottom: 1px solid var(--line); }
+    .toc-link:hover { color: var(--red); }
+    .toc-link.depth-3 { padding-left: 14px; font-size: 0.73rem; }
+    .toc-empty { color: var(--muted); font-size: 0.78rem; }
+    .toc-back { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; color: var(--red); font-size: 0.8rem; }
+
+    .article-navigation { grid-column: 2 / 3; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; padding-top: 34px; border-top: 1px solid var(--line-on-ink); }
+    .article-navigation.single { grid-template-columns: 1fr; }
+    .article-nav-link { display: block; min-height: 118px; padding: 18px; background: var(--ink-soft); border-left: 2px solid var(--line-on-ink); transition: border-color 160ms ease, transform 160ms ease; }
+    .article-nav-link:hover { border-color: var(--red); transform: translateY(-2px); }
+    .article-nav-link:last-child { text-align: right; }
+    .nav-direction { display: block; margin-bottom: 8px; color: var(--red); font-size: 0.72rem; }
+    .nav-title { color: var(--paper); font-family: var(--display); font-size: 1rem; line-height: 1.3; }
+
+    @media (max-width: 1180px) {
+      .article-hero-grid { grid-template-columns: 190px minmax(0, 1fr); }
+      .article-heading { grid-column: 2; }
+      .reader-grid { grid-template-columns: 190px minmax(0, 780px); justify-content: center; }
+      .page-toc { display: none; }
+      .article-navigation { grid-column: 2; }
+    }
+    @media (max-width: 860px) {
+      .article-hero { width: min(100% - 32px, 780px); padding: 108px 0 42px; }
+      .article-hero-grid { grid-template-columns: 1fr; gap: 12px; }
+      .article-kind { padding: 0; }
+      .article-heading { grid-column: 1; }
+      .article-title { font-size: clamp(2.45rem, 10vw, 4rem); }
+      .reader-grid { grid-template-columns: 1fr; width: min(100% - 32px, 780px); padding: 42px 0 76px; }
+      .article-meta { position: static; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 20px; padding-bottom: 28px; border-bottom: 1px solid var(--line-on-ink); }
+      .article-meta .rail-title { display: none; }
+      .meta-list { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0; }
+      .meta-row { padding: 0; border: 0; }
+      .article-actions { grid-template-columns: auto auto; }
+      .share-button, .wechat-copy-button { width: auto; white-space: nowrap; }
+      .article-navigation { grid-column: 1; }
+    }
+    @media (max-width: 560px) {
+      .article-meta { grid-template-columns: 1fr; }
+      .article-actions { grid-template-columns: 1fr; }
+      .share-button, .wechat-copy-button { width: 100%; }
+      .article-content { font-size: 1rem; line-height: 1.62; }
+      .article-content :global(h2) { font-size: 1.65rem; }
+      .article-content :global(pre) { margin-inline: -8px; padding: 1rem; border-radius: 8px; }
+      .article-navigation { grid-template-columns: 1fr; }
+      .article-nav-link:last-child { text-align: left; }
+    }
+  
+    .share-button, .share-card-actions button.is-primary, .filter-button.active { color: #fff; background: #446d59; border-color: #446d59; }
+    .share-button:hover, .share-button.copied, .share-card-actions button.is-primary:hover { color: #fff; background: #325441; border-color: #325441; }
+</style>
+
+  <article class="article-page">
+    <header class="article-hero">
+      <div class="article-hero-grid">
+        <div class="article-kind">{siteConfig.blogTitle}</div>
+        <div class="article-heading">
+          <h1 class="article-title">{post.data.title}</h1>
+          <p class="article-description">{post.data.description}</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="reader-grid">
+      <aside class="article-meta" aria-label="文章信息">
+        <h2 class="rail-title">文章信息</h2>
+        <dl class="meta-list">
+          <div class="meta-row">
+            <dt>发布日期</dt>
+            <dd><time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</time></dd>
+          </div>
+          <div class="meta-row"><dt>作者</dt><dd>{post.data.author}</dd></div>
+          {post.data.updatedAt && <div class="meta-row"><dt>更新日期</dt><dd><time datetime={updatedAt.toISOString()}>{updatedAt.toLocaleDateString('zh-CN')}</time></dd></div>}
+          <div class="meta-row"><dt>预计阅读</dt><dd>{readingMinutes} 分钟</dd></div>
+          <div class="meta-row">
+            <dt>标签</dt>
+            <dd class="article-tags">{post.data.tags.map((tag: string) => <span class="article-tag">{tag}</span>)}</dd>
+          </div>
+        </dl>
+        <div class="article-actions">
+          <a class="share-button" href={markdownPath}>阅读 Markdown</a>
+          <button class="wechat-copy-button" type="button" onclick="copyArticleToWechat()">
+            <i class="fab fa-weixin" aria-hidden="true"></i> 复制到公众号
+          </button>
+          <button class="wechat-copy-button" type="button" onclick="startImageCopyAssistant()">
+            <i class="far fa-images" aria-hidden="true"></i> 逐张复制图片
+          </button>
+          <button class="share-button" type="button" onclick="shareArticle()">
+            <i class="fas fa-share-alt" aria-hidden="true"></i> 分享文章
+          </button>
+        </div>
+      </aside>
+
+      <div class="article-content">
+        <Content />
+      </div>
+
+      <aside class="page-toc" aria-label="页面目录">
+        <h2 class="rail-title">页面目录</h2>
+        {articleHeadings.length > 0 ? (
+          <ol class="toc-list">
+            {articleHeadings.map((heading) => (
+              <li><a class:list={['toc-link', `depth-${heading.depth}`]} href={`#${heading.slug}`}>{heading.text}</a></li>
+            ))}
+          </ol>
+        ) : <p class="toc-empty">本文暂无分节目录。</p>}
+        <a class="toc-back" href="/blog"><i class="fas fa-arrow-left" aria-hidden="true"></i> 返回博客</a>
+      </aside>
+
+      {(newerPost || olderPost) && (
+        <nav class:list={['article-navigation', { single: !(newerPost && olderPost) }]} aria-label="相邻文章">
+          {newerPost && (
+            <a class="article-nav-link" href={`/blog/${newerPost.slug}`}>
+              <span class="nav-direction">较新文章</span>
+              <span class="nav-title">{newerPost.data.title}</span>
+            </a>
+          )}
+          {olderPost && (
+            <a class="article-nav-link" href={`/blog/${olderPost.slug}`}>
+              <span class="nav-direction">较早文章</span>
+              <span class="nav-title">{olderPost.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )}
+    </div>
+  </article>
+
+  <SelectionShare
+    contentSelector=".article-content"
+    title={post.data.title}
+    author={post.data.author}
+    section={siteConfig.name}
+    logo={siteConfig.logo}
+    url={shareUrl}
+  />
+</Layout>

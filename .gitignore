@@ -1,0 +1,12 @@
+node_modules/
+.astro/
+dist/
+release/
+.checks/
+.workbuddy/
+workspace/inbox/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log

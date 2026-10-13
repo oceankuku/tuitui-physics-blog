@@ -1,0 +1,131 @@
+import { createHash } from 'node:crypto';
+import { existsSync, createReadStream } from 'node:fs';
+import { readFile, mkdir, cp } from 'node:fs/promises';
+import { resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const publicDir = resolve(root, 'public');
+// Astro 4 removes its .astro staging directory before build:done. Use a
+// separate persistent cache so derivatives survive until they are copied.
+const cache = resolve(root, 'node_modules/.cache/blog-content-images');
+const work = new Map();
+
+async function variants(src) {
+  if (!src.startsWith('/') || src.startsWith('//')) return null;
+  const filename = resolve(publicDir, '.' + decodeURIComponent(src.split(/[?#]/)[0]));
+  if (!filename.startsWith(publicDir + sep) || !existsSync(filename)) return null;
+  if (!work.has(filename)) work.set(filename, (async () => {
+    const input = await readFile(filename);
+    const meta = await sharp(input).metadata();
+    if (!meta.width || !meta.height || (meta.pages ?? 1) > 1) return null;
+    // Preserve vector art and animated images. Raster derivatives are generated
+    // into the build cache; neither originals nor Markdown sources are changed.
+    if (!['png', 'jpeg', 'webp', 'avif'].includes(meta.format)) return { width: meta.width, height: meta.height };
+    const rotate = [5, 6, 7, 8].includes(meta.orientation);
+    const width = rotate ? meta.height : meta.width;
+    const height = rotate ? meta.width : meta.height;
+    const hash = createHash('sha256').update(input).update('webp-q85-v1').digest('hex').slice(0, 20);
+    const widths = [...new Set([640, 960, 1600].map((w) => Math.min(w, width)))];
+    await mkdir(cache, { recursive: true });
+    const files = [];
+    for (const size of widths) {
+      const name = `${hash}-${size}.webp`;
+      if (!existsSync(resolve(cache, name))) await sharp(input).rotate().resize({ width: size, withoutEnlargement: true }).webp({ quality: 85 }).toFile(resolve(cache, name));
+      files.push({ src: `/_content-images/${name}`, width: size });
+    }
+    return { width, height, files };
+  })());
+  return work.get(filename);
+}
+
+export function contentImages() {
+  return async (tree) => {
+    const images = [];
+    const visit = (node) => {
+      if (node.type === 'element' && node.tagName === 'img') images.push(node);
+      node.children?.forEach(visit);
+    };
+    visit(tree);
+    // Keep concurrency bounded: large hand-drawn illustrations can be expensive.
+    for (const [index, node] of images.entries()) {
+      const p = node.properties ??= {};
+      p.loading = index === 0 ? 'eager' : 'lazy';
+      p.decoding = 'async';
+      if (index === 0) p.fetchPriority = 'high';
+      const image = await variants(String(p.src ?? ''));
+      if (!image) continue;
+      p.width = image.width; p.height = image.height;
+      if (image.files) {
+        p.src = image.files.at(-1).src;
+        p.srcSet = image.files.map((file) => `${file.src} ${file.width}w`).join(', ');
+        p.sizes = '(max-width: 768px) calc(100vw - 32px), (max-width: 1200px) 75vw, 900px';
+      }
+    }
+  };
+}
+
+// 正式公式标记插件。Markdown 里用 :::formula ... ::: 包住公式，
+// 渲染成 div.formula-block；其中的 {a/b} 转成竖式分数（上分子、
+// 下分母、中间横线），符合数理排版惯例，避免斜杠分数的别扭观感。
+// 注意：directive 容器必须在 remark 阶段处理（remarkRehype 会把
+// containerDirective 编译成普通 div，rehype 阶段就认不出了）。
+export function formulaBlocks() {
+  const fracHtml = (match) => ({
+    type: 'element', tagName: 'span',
+    properties: { className: 'formula-frac' },
+    children: [
+      { type: 'element', tagName: 'span', properties: { className: 'num' }, children: [{ type: 'text', value: match[1].trim() }] },
+      { type: 'element', tagName: 'span', properties: { className: 'den' }, children: [{ type: 'text', value: match[2].trim() }] },
+    ],
+  });
+  const transformText = (value) => {
+    const parts = String(value).split(/(\{[^{}]*\/[^{}]*\})/g).filter(Boolean);
+    if (parts.length === 1) return [{ type: 'text', value }];
+    return parts.map((part) => {
+      const match = part.match(/^\{([^{}]*?)\/([^{}]*)\}$/);
+      return match ? fracHtml(match) : { type: 'text', value: part };
+    });
+  };
+  const transformNode = (node) => {
+    if (node.type === 'text') return transformText(node.value);
+    if (node.children?.length) node.children = node.children.flatMap(transformNode);
+    return [node];
+  };
+  return async (tree) => {
+    const visitAny = (node) => {
+      if (node.type === 'containerDirective' && node.name === 'formula') {
+        node.data ??= {};
+        node.data.hName = 'div';
+        node.data.hProperties = { className: ['formula-block'] };
+        node.children = node.children.flatMap(transformNode);
+        return;
+      }
+      node.children?.forEach(visitAny);
+    };
+    visitAny(tree);
+  };
+}
+
+export function contentImageAssets() {
+  return {
+    name: 'content-image-assets',
+    hooks: {
+      'astro:config:setup': ({ updateConfig }) => updateConfig({ vite: { plugins: [{
+        name: 'content-image-dev',
+        configureServer(server) {
+          server.middlewares.use('/_content-images/', (req, res, next) => {
+            const name = (req.url || '').split('?')[0].replace(/^\//, '');
+            if (!/^[a-f0-9]{20}-\d+\.webp$/.test(name) || !existsSync(resolve(cache, name))) return next();
+            res.setHeader('Content-Type', 'image/webp');
+            createReadStream(resolve(cache, name)).pipe(res);
+          });
+        },
+      }] } }),
+      'astro:build:done': async ({ dir }) => {
+        if (existsSync(cache)) await cp(cache, new URL('_content-images/', dir), { recursive: true });
+      },
+    },
+  };
+}

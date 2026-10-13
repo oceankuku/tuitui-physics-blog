@@ -1,0 +1,24 @@
+{
+  "author": "Kenney",
+  "source": "https://kenney.nl/assets/train-kit",
+  "license": "CC0-1.0",
+  "retrieved_at": "2026-09-08",
+  "files": [
+    {
+      "file": "train-electric-bullet-a.glb",
+      "sha256": "523bba3b09d7e6c30d4040316f3f8ecaf8441943cbca82855769438c40c3b2c0"
+    },
+    {
+      "file": "train-electric-city-a.glb",
+      "sha256": "9f63a93e65e530982bf5ac3ad15b3c9f3b2608561b3773164d970c67bd2272bd"
+    },
+    {
+      "file": "railroad-straight.glb",
+      "sha256": "bcbd501f74b754b61f2ddb5cba2d45d5d694bfd25c497fa72af65202a53930d9"
+    },
+    {
+      "file": "Textures/colormap.png",
+      "sha256": "e264660f3fc9ecbd642bdb7fb7b7dc10755a061560a66651baf48274c729af09"
+    }
+  ]
+}

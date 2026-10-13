@@ -19,7 +19,11 @@ try {
   } });
   await symlink(resolve(root, 'node_modules'), resolve(fixture, 'node_modules'), 'dir');
   const content = resolve(fixture, 'src/content/blog');
-  for (let i = 1; i <= 9; i++) await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n---\n\n## Check\n\nFixture body ${i}.\n`);
+  // smoke-1 额外带一个含分数的公式，用于校验公众号复制里的分数结构。
+  for (let i = 1; i <= 9; i++) {
+    const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n:::\n' : `Fixture body ${i}.\n`;
+    await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n---\n\n## Check\n\n${body}`);
+  }
   await writeFile(resolve(content, 'private-fixture.md'), '---\ntitle: "Private fixture"\ndescription: "Must stay private"\npubDate: 2026-10-10\ndraft: true\n---\n\nPrivate body.\n');
   const env = { ...process.env, SITE_URL: 'https://physics.example' };
   // Windows 下 npm 是 npm.cmd，必须走 shell 才能解析。
@@ -142,6 +146,16 @@ try {
   assert(!payload.html.includes('srcset=') && !payload.html.includes('onclick=') && !payload.html.includes('<button'));
   assert(payload.html.includes('table-layout: fixed') || payload.html.includes('table-layout:fixed'));
   assert(payload.text.includes('先把问题留下来'));
+  // 公式里的分数必须保留竖式结构：容器纵向 flex + 分子带分数线。
+  // 公众号复制会摘掉 class，flex-direction 不在默认复制清单里，
+  // 补不回来分数就会变成分子分母左右并排（2026-10-13 修复的回归点）。
+  {
+    const body = await page.goto(`${hosting.origin}/blog/smoke-1/`).then(() => page.evaluate(() => window.buildWechatRichText()));
+    assert(body.html.includes('x₁ + x₂'), '公式内容应进入复制结果');
+    assert(body.html.includes('flex-direction:column'), '分数容器必须保留纵向 flex');
+    assert(/border-bottom:[^;"]*solid/.test(body.html), '分子必须保留分数线');
+    await page.goto(hosting.origin + '/blog/demo/');
+  }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。
   const wechatMainCopy = page.getByRole('button', { name: '复制到公众号' });
   await wechatMainCopy.click();

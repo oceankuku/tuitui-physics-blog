@@ -133,6 +133,11 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       const formulaFractions = Array.from(clone.querySelectorAll('.formula-frac'));
       const formulaNumerators = Array.from(clone.querySelectorAll('.formula-frac .num'));
       const formulaDenominators = Array.from(clone.querySelectorAll('.formula-frac .den'));
+      // 根号节点同样要在 class 摘掉前抓引用：根号符号 + 上划线盖住被开方数，
+      // 被开方数内的分数复用 formula-frac 竖式（2026-10-14 根号格式修复）。
+      const formulaRadicals = Array.from(clone.querySelectorAll('.formula-radical'));
+      const formulaRadicalSymbols = Array.from(clone.querySelectorAll('.formula-radical-symbol'));
+      const formulaRadicalBodies = Array.from(clone.querySelectorAll('.formula-radical-body'));
       const formulaBlockSource = article.querySelector('.formula-block');
 
       const imageIndexByKey = new Map();
@@ -227,6 +232,18 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       });
       formulaDenominators.forEach((node) => {
         node.setAttribute('style', 'display:block;padding:2px 6px 0;text-align:center;');
+      });
+      // 根号：公众号粘贴会剥 div，根号必须由自带样式的 span 承载。根号线是
+      // 被开方数 span 的 border-top，颜色写具体值（currentColor 会被洗掉）。
+      // 不用 flex；inline-block + border-top 是粘贴安全做法，与分数同一思路。
+      formulaRadicals.forEach((node) => {
+        node.setAttribute('style', 'display:inline-block;white-space:nowrap;vertical-align:baseline;');
+      });
+      formulaRadicalSymbols.forEach((node) => {
+        node.setAttribute('style', `font-style:normal;padding:0 2px;color:${palette.text};`);
+      });
+      formulaRadicalBodies.forEach((node) => {
+        node.setAttribute('style', `display:inline-block;border-top:2px solid ${palette.text};padding:1px 5px 0;text-align:center;`);
       });
 
       // 微信编辑器的内容栏比桌面文章窄。不要保留桌面布局计算出的固定宽高，
@@ -561,6 +578,24 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     }
     .article-content :global(.formula-frac .num) { padding: 0 0.45em 0.14em; border-bottom: 1.6px solid currentColor; }
     .article-content :global(.formula-frac .den) { padding: 0.14em 0.45em 0; }
+    /* 根号：√ 符号 + 上边线盖住整个被开方数（2026-10-14 原老师反馈的
+       “根号没包住内容”）。被开方数内的 {a/b} 复用同一套竖式分数。 */
+    .article-content :global(.formula-radical) {
+      display: inline-block;
+      white-space: nowrap;
+      vertical-align: baseline;
+      font-style: inherit;
+    }
+    .article-content :global(.formula-radical-symbol) {
+      font-style: normal;
+      padding: 0 0.06em;
+      vertical-align: baseline;
+    }
+    .article-content :global(.formula-radical-body) {
+      display: inline-block;
+      border-top: 1.6px solid currentColor;
+      padding: 0.12em 0.3em 0;
+    }
     .article-content :global(img) { width: 100%; height: auto; margin: 2.2rem 0; border-radius: 12px; }
     .article-content :global(table) { display: block; width: 100%; margin: 2rem 0; overflow-x: auto; border-collapse: collapse; color: var(--paper); background: var(--ink-soft); }
     .article-content :global(th), .article-content :global(td) { min-width: 130px; padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--line-on-ink); }

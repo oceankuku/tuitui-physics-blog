@@ -19,10 +19,11 @@ try {
   } });
   await symlink(resolve(root, 'node_modules'), resolve(fixture, 'node_modules'), 'dir');
   const content = resolve(fixture, 'src/content/blog');
-  // smoke-1 额外带一个含分数的公式，用于校验公众号复制里的分数结构；
+  // smoke-1 额外带一个含分数的公式（校验分数结构）和根号公式（校验根号
+  // 上划线盖住被开方数、根号内分数走竖式）；
   // smoke-2 额外带表格和代码块，用于校验 table-layout 固定布局与代码选区行为。
   for (let i = 1; i <= 9; i++) {
-    const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n:::\n'
+    const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n\nv(x/2) = √({v₀² + v² / 2})\n:::\n'
       : i === 2 ? 'Fixture body 2.\n\n| 列甲 | 列乙 |\n| --- | --- |\n| 甲一 | 乙一 |\n\n```text\nfixture code block\n```\n'
       : `Fixture body ${i}.\n`;
     await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n---\n\n## Check\n\n${body}`);
@@ -175,6 +176,18 @@ try {
           assert(carrier.includes('text-align:center'), '载体 p 必须自带居中');
         }
       }
+    }
+    // 根号回归断言（2026-10-14 原老师反馈）：根号必须是结构化 span（符号 +
+    // 上划线盖住整个被开方数），不能是裸 √ 字符 + 括号；根号下的分数与
+    // 外部一致用竖式（inline-block + 块级分子分母 + 具体色值分数线）。
+    assert(!body.html.includes('√('), '禁止裸 √( 括号写法，根号必须结构化');
+    {
+      // 富文本里 class 已摘除，改从样式签名断言：被开方数 span 带 border-top（根号上划线）
+      const radicalBodies = body.html.match(/<span style="display:inline-block;border-top:2px solid [^"]*">[\s\S]*?<\/span>/g) || [];
+      assert(radicalBodies.length > 0, '根号被开方数必须带 border-top 上划线（具体色值）');
+      // 根号内分数：border-top（根号）内部应包含 border-bottom（分数线）的竖式分数
+      const hasFracInRadical = radicalBodies.some((radicalBody) => radicalBody.includes('border-bottom'));
+      assert(hasFracInRadical, '根号内的分数必须沿用竖式（分子带 border-bottom 分数线）');
     }
     await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
   }

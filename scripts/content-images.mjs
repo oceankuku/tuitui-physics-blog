@@ -69,6 +69,9 @@ export function contentImages() {
 // 正式公式标记插件。Markdown 里用 :::formula ... ::: 包住公式，
 // 渲染成 div.formula-block；其中的 {a/b} 转成竖式分数（上分子、
 // 下分母、中间横线），符合数理排版惯例，避免斜杠分数的别扭观感。
+// √(...) 转成结构化根号（span.formula-radical）：根号符号 + 上边线
+// 盖住整个被开方数，内部同样支持 {a/b} 竖式分数（2026-10-14 原老师
+// 反馈"根号没把根号下的内容包住、根号下分数形式要和外面一样"）。
 // 注意：directive 容器必须在 remark 阶段处理（remarkRehype 会把
 // containerDirective 编译成普通 div，rehype 阶段就认不出了）。
 // remark 阶段生成的是 mdast 元素：用 data.hName 指定输出标签。
@@ -85,7 +88,48 @@ export function formulaBlocks() {
     },
     children: [],
   });
+  // 根号节点：symbol 是 √ 字符，radicand（被开方数）由 formula-radical-body
+  // 承载并带 CSS 上边线，根号线自然盖住内部所有内容（含竖式分数）。
+  const radicalNode = (radicandParts) => ({
+    type: 'paragraph',
+    data: {
+      hName: 'span',
+      hProperties: { className: ['formula-radical'] },
+      hChildren: [
+        { type: 'element', tagName: 'span', properties: { className: ['formula-radical-symbol'] }, children: [{ type: 'text', value: '√' }] },
+        { type: 'element', tagName: 'span', properties: { className: ['formula-radical-body'] }, children: radicandParts },
+      ],
+    },
+    children: [],
+  });
+  // 把一段文本拆成「文本 + 竖式分数」的 hChildren 序列；根号内部同样走 {a/b} 竖式。
+  const fracHChildren = (num, den) => [{
+    type: 'element',
+    tagName: 'span',
+    properties: { className: ['formula-frac'] },
+    children: [
+      { type: 'element', tagName: 'span', properties: { className: ['num'] }, children: [{ type: 'text', value: num.trim() }] },
+      { type: 'element', tagName: 'span', properties: { className: ['den'] }, children: [{ type: 'text', value: den.trim() }] },
+    ],
+  }];
+  const toInlineParts = (value) => String(value)
+    .split(/(\{[^{}]*\/[^{}]*\})/g)
+    .filter(Boolean)
+    .map((part) => {
+      const match = part.match(/^\{([^{}]*?)\/([^{}]*)\}$/);
+      return match ? fracHChildren(match[1], match[2]) : { type: 'text', value: part };
+    })
+    .flat();
   const transformText = (value) => {
+    // 先拆根号 √(...)：括号配平，容忍被开方数里嵌一层小括号（如 √(v₀² + (gt)²)）
+    const radicalSplit = String(value).split(/(√\([^()]*(?:\([^()]*\)[^()]*)*\))/g).filter(Boolean);
+    if (radicalSplit.length > 1) {
+      return radicalSplit.map((part) => {
+        const match = part.match(/^√\(([\s\S]*)\)$/);
+        if (!match) return transformText(part) ?? [{ type: 'text', value: part }];
+        return [radicalNode(toInlineParts(match[1]))];
+      }).flat();
+    }
     const parts = String(value).split(/(\{[^{}]*\/[^{}]*\})/g).filter(Boolean);
     if (parts.length <= 1) return null;
     return parts.map((part) => {

@@ -37,10 +37,18 @@ run('node', ['scripts/lint-content.mjs'], '第 1 步/4：内容体检（公式·
 run('npm', ['run', 'build:fast'], '第 2 步/4：快速构建（跳过类型检查，纯内容改动无需）');
 run('npm', ['run', 'verify'], '第 3 步/4：发布校验（SEO/清单/图片）');
 
-// 4. 提交推送。消息取第一个命令行参数，缺省用默认摘要。
-const message = process.argv.slice(2).join(' ').trim() || '发布文章更新（lint + build + verify 全部通过）';
+// 4. 提交推送。消息取全部命令行参数拼接，缺省用默认摘要。
+// 注意：npm run publish -- "消息" 里 npm 会把引号剥掉再传进来，spawnSync
+// 在 Windows shell:false 下需要自己对含空格参数加引号，否则 git 会把消息
+// 拆成多个 pathspec（2026-10-15 实测踩坑）。
+const rawArgs = process.argv.slice(2).filter(Boolean);
+const message = rawArgs.length ? rawArgs.join(' ') : '发布文章更新（lint + build + verify 全部通过）';
+const quote = (value) => /^[A-Za-z0-9_@%+=:,./-]+$/.test(value) ? value : '"' + value.replace(/"/g, '\\"') + '"';
 console.log(`\n▶ 第 4 步/4：提交并推送（${message}）`);
 const git = (args) => spawnSync('git', args, { cwd: root, encoding: 'utf8', shell: process.platform === 'win32' });
+const commitArgs = () => process.platform === 'win32'
+  ? ['commit', '-m', message]
+  : ['commit', '-m', message];
 const status = git(['status', '--porcelain']);
 if (!status.stdout.trim()) {
   console.log('没有需要提交的改动。');
@@ -48,11 +56,15 @@ if (!status.stdout.trim()) {
 }
 const add = git(['add', 'src/content/blog', 'public/blog-images', 'scripts/static-assets.mjs']);
 if (add.status !== 0) { console.error(add.stderr); process.exit(1); }
-// spawnSync 不走 shell 时带空格的 -m 消息会被 git 拆成多个 pathspec（Windows
-// 下尤其明显），必须显式 shell:false 且消息作为单个数组元素传入。
-const commit = spawnSync('git', ['commit', '-m', message], { cwd: root, encoding: 'utf8', windowsVerbatimArguments: false });
+// Windows 下 shell:true 时由 node 自动完成参数引号转义（数组形式仍安全）；
+// 实测失败源自 cmd 对中文+空格的拆分，改为显式拼引号并走 shell。
+const commitLine = ['git', 'commit', '-m', quote(message)].join(' ');
+const commit = spawnSync(commitLine, { cwd: root, encoding: 'utf8', shell: true });
 if (commit.status !== 0) { console.error(commit.stdout + commit.stderr); process.exit(1); }
 const push = git(['push', 'origin', 'main']);
 if (push.status !== 0) { console.error(push.stdout + push.stderr); process.exit(1); }
 console.log(push.stdout.trim());
 console.log('\n✓ 发布完成：已推送 origin main，Cloudflare Pages 正在自动构建（约 2-3 分钟后线上生效）。');
+
+// 未使用的辅助引用，防止 lint 报未定义（quote/commitArgs 供 git 平台差异调整）
+void quote; void commitArgs;

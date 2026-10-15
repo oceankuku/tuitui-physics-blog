@@ -22,9 +22,12 @@ try {
   // smoke-1 额外带一个含分数的公式（校验分数结构）和根号公式（校验根号
   // 上划线盖住被开方数、根号内分数走竖式）；
   // smoke-2 额外带表格和代码块，用于校验 table-layout 固定布局与代码选区行为。
+  // 表格首行数据含紧贴冒号比例 1:3:5（2026-10-15 回归）：micromark 会把
+  // :3 误解析成 textDirective、remark-rehype 默认输出空 <div></div> 吞字，
+  // plainDirectives 兜底插件必须把它还原成源文本。
   for (let i = 1; i <= 9; i++) {
     const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n\nv(x/2) = √({v₀² + v² / 2})\n:::\n'
-      : i === 2 ? 'Fixture body 2.\n\n| 列甲 | 列乙 |\n| --- | --- |\n| 甲一 | 乙一 |\n\n```text\nfixture code block\n```\n'
+      : i === 2 ? 'Fixture body 2.\n\n| 列甲 | 列乙 |\n| --- | --- |\n| 比例 | 位移 1:3:5、速度 1:2:3 |\n\n```text\nfixture code block\n```\n'
       : `Fixture body ${i}.\n`;
     await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n---\n\n## Check\n\n${body}`);
   }
@@ -195,6 +198,14 @@ try {
   {
     const tableBody = await page.goto(`${hosting.origin}/blog/smoke-2/`).then(() => page.evaluate(() => window.buildWechatRichText()));
     assert(tableBody.html.includes('table-layout: fixed') || tableBody.html.includes('table-layout:fixed'), '表格必须带固定布局');
+    // 冒号比例回归（2026-10-15）：1:3:5 里的 :3/:5 若被 textDirective 吞掉，
+    // 页面会缺失「：3」「：5」并多出空 div（remark-rehype 对未处理指令
+    // 的默认输出）。完整比例必须存在，且不得出现空 div。
+    const page2 = await page.goto(`${hosting.origin}/blog/smoke-2/`);
+    const tableHtml = await page2.text();
+    assert(tableHtml.includes('位移 1:3:5'), '紧贴冒号比例 1:3:5 必须完整渲染（plainDirectives 兜底）');
+    assert(tableHtml.includes('速度 1:2:3'), '紧贴冒号比例 1:2:3 必须完整渲染');
+    assert(!tableHtml.includes('<div></div>'), '禁止出现未处理指令产生的空 <div></div>');
     await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
   }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。

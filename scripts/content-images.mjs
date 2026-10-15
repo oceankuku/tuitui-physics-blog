@@ -173,6 +173,36 @@ export function formulaBlocks() {
   };
 }
 
+// 兜底还原未被消费的指令（2026-10-15 踩坑修复）。micromark 的指令语法
+// 是「冒号 + 标识符」，正文里紧贴的时间/比例写法（如 1:3:5 里的 :5）
+// 会被 remark-directive 误解析成 textDirective，而 remark-rehype 默认把
+// 未处理的指令编译成空 <div></div>，导致「：5」「：9」这类文字被吞、
+// 表格工整性被破坏。站点正文只使用 :::formula 容器指令，其余 text/leaf
+// 指令一律视为误触发，按源文本（position 精确切片）原样还原，保证
+// 以后写 1:2:3、1:√2:√3 这类比例不再踩坑。
+export function plainDirectives() {
+  return (tree, file) => {
+    const source = String(file?.value ?? '');
+    const walk = (node) => {
+      if (!node.children?.length) return;
+      const next = [];
+      for (const child of node.children) {
+        if ((child.type === 'textDirective' || child.type === 'leafDirective') && !child.data?.hName) {
+          const slice = child.position && source
+            ? source.slice(child.position.start.offset, child.position.end.offset)
+            : ':' + child.name;
+          next.push({ type: 'text', value: slice });
+          continue;
+        }
+        walk(child);
+        next.push(child);
+      }
+      node.children = next;
+    };
+    walk(tree);
+  };
+}
+
 export function contentImageAssets() {
   return {
     name: 'content-image-assets',

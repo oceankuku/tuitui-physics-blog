@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #fff; }
+  .stage { display: flex; flex-direction: column; gap: 40px; padding: 20px; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+<!-- 图一：2019 全国Ⅰ卷 起跳 H 四等分 -->
+<svg id="fig-jump" xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arrR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="640" fill="#ffffff"/>
+
+  <!-- 地面 -->
+  <rect x="80" y="560" width="700" height="10" fill="#8d6e63"/>
+  <line x1="80" y1="570" x2="780" y2="570" stroke="#5d4037" stroke-width="2"/>
+  <!-- 地面斜线纹 -->
+  <g stroke="#a1887f" stroke-width="2">
+    <line x1="120" y1="570" x2="105" y2="588"/><line x1="180" y1="570" x2="165" y2="588"/>
+    <line x1="240" y1="570" x2="225" y2="588"/><line x1="300" y1="570" x2="285" y2="588"/>
+    <line x1="360" y1="570" x2="345" y2="588"/><line x1="420" y1="570" x2="405" y2="588"/>
+    <line x1="480" y1="570" x2="465" y2="588"/><line x1="540" y1="570" x2="525" y2="588"/>
+    <line x1="600" y1="570" x2="585" y2="588"/><line x1="660" y1="570" x2="645" y2="588"/>
+    <line x1="720" y1="570" x2="705" y2="588"/>
+  </g>
+
+  <!-- H 总高双箭头 -->
+  <line x1="130" y1="560" x2="130" y2="80" stroke="#1a1a1a" stroke-width="2.5" marker-start="url(#arr)" marker-end="url(#arr)"/>
+  <text x="105" y="330" font-size="30" font-weight="bold" fill="#1a1a1a">H</text>
+
+  <!-- 四等分虚线 -->
+  <g stroke="#90a4ae" stroke-width="1.5" stroke-dasharray="7 6">
+    <line x1="120" y1="440" x2="770" y2="440"/>
+    <line x1="120" y1="320" x2="770" y2="320"/>
+    <line x1="120" y1="200" x2="770" y2="200"/>
+  </g>
+  <g font-size="20" fill="#607d8b">
+    <text x="782" y="447">H/4</text>
+    <text x="782" y="327">2H/4</text>
+    <text x="782" y="207">3H/4</text>
+  </g>
+
+  <!-- 上升箭头轨迹 -->
+  <line x1="430" y1="560" x2="430" y2="80" stroke="#c0392b" stroke-width="3" marker-end="url(#arrR)"/>
+  <text x="442" y="300" font-size="22" fill="#c0392b">重心上升</text>
+
+  <!-- 篮球运动员简笔（三个姿态）-->
+  <g stroke="#1565c0" stroke-width="5" fill="none" stroke-linecap="round">
+    <!-- 地面起跳：屈膝 -->
+    <circle cx="430" cy="522" r="13" fill="#1565c0" stroke="none"/>
+    <path d="M430 535 L430 545 M430 545 L415 558 M430 545 L447 556 M430 538 L410 530 M430 538 L452 532"/>
+  </g>
+  <g stroke="#1565c0" stroke-width="5" fill="none" stroke-linecap="round">
+    <!-- 中途伸展 -->
+    <circle cx="430" cy="292" r="13" fill="#1565c0" stroke="none"/>
+    <path d="M430 305 L430 520 M415 340 L430 308 L447 342 M418 430 L430 400 L444 430" opacity="0"/>
+    <path d="M430 305 L418 330 M430 305 L444 330 M418 330 L410 348 M444 330 L452 348"/>
+  </g>
+  <g stroke="#1565c0" stroke-width="5" fill="none" stroke-linecap="round">
+    <!-- 最高点伸臂扣篮 -->
+    <circle cx="430" cy="72" r="13" fill="#1565c0" stroke="none"/>
+    <path d="M430 85 L430 118 M430 90 L412 62 M430 90 L448 60 M430 118 L416 138 M430 118 L444 138"/>
+  </g>
+
+  <!-- 篮板与篮筐 -->
+  <rect x="820" y="60" width="14" height="240" fill="#546e7a"/>
+  <rect x="700" y="120" width="120" height="90" fill="none" stroke="#546e7a" stroke-width="5"/>
+  <path d="M700 210 L716 246 L744 246 L760 210" fill="none" stroke="#ef6c00" stroke-width="6"/>
+  <line x1="834" y1="80" x2="834" y2="570" stroke="#90a4ae" stroke-width="4"/>
+
+  <!-- 时间标注 -->
+  <g font-size="21" fill="#1a1a1a">
+    <text x="255" y="505">上升第一个 H/4：t₁</text>
+    <text x="255" y="140">上升第四个 H/4：t₂</text>
+  </g>
+
+  <!-- 标题 -->
+  <text x="500" y="625" font-size="26" fill="#455a64" text-anchor="middle">起跳扣篮：重心上升的最大高度为 H，四等分标注</text>
+</svg>
+
+<!-- 图二：2023 广东卷 四选项图像 -->
+<svg id="fig-cs" xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640">
+  <rect width="1000" height="640" fill="#ffffff"/>
+  <style>
+    .ax { stroke:#455a64; stroke-width:2.5; fill:none; }
+    .lab { font-size:24px; fill:#1a1a1a; font-family:"Times New Roman", serif; font-style:italic; }
+    .opt { font-size:26px; fill:#1a1a1a; font-weight:bold; }
+    .curve { stroke:#1565c0; stroke-width:4; fill:none; stroke-linecap:round; }
+    .curveBad { stroke:#c0392b; stroke-width:4; fill:none; stroke-linecap:round; }
+    .origin { font-size:20px; fill:#455a64; }
+  </style>
+
+  <!-- A：v-t 向上倾斜直线 -->
+  <g transform="translate(20,20)">
+    <text x="45" y="30" class="opt">A</text>
+    <line x1="80" y1="30" x2="80" y2="240" class="ax" marker-end="url(#arr)"/>
+    <line x1="80" y1="240" x2="300" y2="240" class="ax" marker-end="url(#arr)"/>
+    <text x="52" y="60" class="lab">v</text>
+    <text x="288" y="272" class="lab">t</text>
+    <text x="66" y="258" class="origin">O</text>
+    <line x1="95" y1="225" x2="270" y2="60" class="curveBad"/>
+  </g>
+
+  <!-- B：v-t 向下倾斜直线（正确形状之一，但题目要求选一个，实际正确为 D）-->
+  <g transform="translate(500,20)">
+    <text x="45" y="30" class="opt">B</text>
+    <line x1="80" y1="30" x2="80" y2="240" class="ax" marker-end="url(#arr)"/>
+    <line x1="80" y1="240" x2="300" y2="240" class="ax" marker-end="url(#arr)"/>
+    <text x="52" y="60" class="lab">v</text>
+    <text x="288" y="272" class="lab">t</text>
+    <text x="66" y="258" class="origin">O</text>
+    <line x1="95" y1="60" x2="275" y2="230" class="curve"/>
+  </g>
+
+  <!-- C：a-t 带正值的水平线（错误：a 应为负）-->
+  <g transform="translate(20,330)">
+    <text x="45" y="30" class="opt">C</text>
+    <line x1="80" y1="30" x2="80" y2="240" class="ax" marker-end="url(#arr)"/>
+    <line x1="80" y1="240" x2="300" y2="240" class="ax" marker-end="url(#arr)"/>
+    <text x="48" y="60" class="lab">a</text>
+    <text x="288" y="272" class="lab">t</text>
+    <text x="66" y="258" class="origin">O</text>
+    <line x1="95" y1="110" x2="275" y2="110" class="curveBad"/>
+  </g>
+
+  <!-- D：a-t 横轴下方水平直线（正确答案）-->
+  <g transform="translate(500,330)">
+    <text x="45" y="30" class="opt">D</text>
+    <line x1="80" y1="30" x2="80" y2="240" class="ax" marker-end="url(#arr)"/>
+    <line x1="80" y1="240" x2="300" y2="240" class="ax" marker-end="url(#arr)"/>
+    <text x="48" y="60" class="lab">a</text>
+    <text x="288" y="272" class="lab">t</text>
+    <text x="66" y="258" class="origin">O</text>
+    <line x1="95" y1="170" x2="275" y2="170" class="curve"/>
+    <text x="150" y="205" font-size="19" fill="#1565c0">−g（恒定）</text>
+  </g>
+
+  <text x="500" y="625" font-size="26" fill="#455a64" text-anchor="middle">2023 广东卷选项示意：铯原子团关闭激光后的 v-t 与 a-t 图像</text>
+</svg>
+
+</div>
+</body>
+</html>

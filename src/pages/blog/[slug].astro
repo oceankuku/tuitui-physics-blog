@@ -198,11 +198,12 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
         const kept = ['font-family', 'font-size', 'font-style', 'line-height', 'text-align', 'margin-top', 'margin-bottom', 'padding-top', 'padding-bottom'];
         const inline = kept.map((property) => `${property}:${sourceComputed.getPropertyValue(property)};`).join('');
         node.setAttribute('style', `${inline}display:block;text-indent:0;overflow-x:auto;`);
-        // 公众号粘贴时会剥掉 div 标签本身：内容保留、div 上的样式全丢。
+        // 公众号粘贴会剥掉 div 标签本身：内容保留、div 上的样式全丢。
+        // 把所有裸露内容包进带完整公式样式的 p，让样式跟着 p 走；
+        // 循环结束后（见下方 formulaBlocks 替换段）外层 div 还会整体
+        // 换成 section——section 在微信粘贴白名单里，容器样式能活下来。
         // 含分数的公式被拆平后内容裸露在 div 里（没有内层 p），粘贴后就
         // 失去居中和衬线字体——“公式不居中、字体不统一”就是这个原因。
-        // 把所有裸露内容包进带完整公式样式的 p，让样式跟着 p 走，
-        // div 只当外层容器，剥不剥都不影响。
         const carrierStyle = `${inline}text-indent:0;margin:0;`;
         let bareRun = [];
         const flushBare = () => {
@@ -218,6 +219,18 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
           else bareRun.push(child);
         });
         flushBare();
+      });
+      // p 包裹完成后，把公式块外层 div 整体换成 section：微信粘贴白名单
+      // 没有 div，标签会被剥掉、容器样式（text-indent/overflow）全丢；
+      // section 是公众号编辑器原生容器（各家排版工具也全用 section），
+      // 粘贴安全（2026-10-17 修复，配合 smoke 的禁 div 断言）。
+      formulaBlocks.forEach((node) => {
+        if (node.parentNode && node.tagName === 'DIV') {
+          const sectionCarrier = document.createElement('section');
+          sectionCarrier.setAttribute('style', node.getAttribute('style') || '');
+          while (node.firstChild) sectionCarrier.appendChild(node.firstChild);
+          node.replaceWith(sectionCarrier);
+        }
       });
       // 分数容器：分子在上、横线、分母在下。这里刻意不用 flex——公众号
       // 网页编辑器的粘贴清洗器会把 inline-flex/flex-direction 剥掉，粘贴
@@ -294,13 +307,30 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
         cell.style.verticalAlign = 'top';
       });
 
+      // 兜底（2026-10-17）：公众号粘贴白名单没有 div，任何残留的 div
+      // 都会被剥壳。文章容器（.article-content 本身是 div）和内层残留
+      // div 一律换成 section。注意 clone 是游离树根、没有父节点，
+      // replaceWith 对它是静默空操作——根节点分支必须用 while 搬子
+      // 节点后把 wechatClone 指到新 section，之后统一用 wechatClone。
+      let wechatClone = clone;
+      const divCarriers = clone.tagName === 'DIV' ? [clone, ...clone.querySelectorAll('div')] : [...clone.querySelectorAll('div')];
+      divCarriers.forEach((node) => {
+        const sectionCarrier = document.createElement('section');
+        sectionCarrier.setAttribute('style', node.getAttribute('style') || '');
+        while (node.firstChild) sectionCarrier.appendChild(node.firstChild);
+        if (node === clone) wechatClone = sectionCarrier;
+        else node.replaceWith(sectionCarrier);
+      });
+
       const wrapper = document.createElement('section');
       // 微信公众号编辑器在 iPhone（含 13 Pro）上内容栏可用宽度约 677px。
-      // wrapper 内边距左右各 15px（约 4mm），比原来的 26px 每侧加宽约 3mm，
-      // 粘贴后正文更贴合编辑器栏宽，不会整体偏窄。
       wrapper.setAttribute('style', `box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:32px 15px;background-color:${palette.bg};color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
 
-      const header = document.createElement('header');
+      // 标题块必须用 section 承载：微信编辑器粘贴白名单里没有 <header>，
+      // header 标签会被整个剥壳，身上的下边框分隔线和间距全部丢失——
+      // 「每次粘贴标题区都错位」就是它（2026-10-17 修复）。section 是
+      // 公众号编辑器原生容器（各家排版工具也全用 section），粘贴安全。
+      const header = document.createElement('section');
       header.setAttribute('style', `margin:0 0 34px;padding:0 0 24px;border-bottom:2px solid ${palette.accent};`);
 
       const title = document.createElement('h1');
@@ -309,15 +339,17 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
 
       const description = document.createElement('p');
       description.textContent = wechatDescription;
-      description.setAttribute('style', `margin:0 0 16px;color:${palette.muted};font-size:16px;line-height:1.75;`);
+      // 摘要与作者行也要自带 font-family：粘贴后微信会给没写字体的文本套
+      // 编辑器默认字体，和正文视觉不统一。
+      description.setAttribute('style', `margin:0 0 16px;color:${palette.muted};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;`);
 
       const meta = document.createElement('p');
       meta.textContent = `${wechatAuthor} · ${wechatDate}`;
-      meta.setAttribute('style', `margin:0;color:${palette.accent};font-size:13px;font-weight:700;line-height:1.6;letter-spacing:0.5px;`);
+      meta.setAttribute('style', `margin:0;color:${palette.accent};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:13px;font-weight:700;line-height:1.6;letter-spacing:0.5px;`);
 
       header.append(title, description, meta);
-      clone.setAttribute('style', `width:auto;max-width:100%;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
-      wrapper.append(header, clone);
+      wechatClone.setAttribute('style', `width:auto;max-width:100%;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
+      wrapper.append(header, wechatClone);
 
       return {
         html: wrapper.outerHTML,

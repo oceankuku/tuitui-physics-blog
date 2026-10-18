@@ -152,6 +152,11 @@ try {
   assert(payload.html.includes('https://physics.example/blog/'));
   assert(!payload.html.includes('srcset=') && !payload.html.includes('onclick=') && !payload.html.includes('<button'));
   assert(payload.text.includes('布满小点的纸'));
+  // 2026-10-17 回归：微信粘贴白名单没有 <header>/<div> 标签，会被整个剥壳。
+  // 复制产物里禁止出现这两种标签（外层 wrapper 的 section 是公众号原生
+  // 容器，粘贴安全）。标题分隔线丢失、header 区错位的根因就是 header 标签。
+  assert(!/<header[\s>]/.test(payload.html), '禁止 <header>：微信粘贴会剥壳，标题区样式全丢（改用 section）');
+  assert(!/<div[\s>]/.test(payload.html), '禁止顶层 <div>：微信粘贴会剥 div 标签');
   // 公式里的分数必须保留竖式结构：inline-block 容器 + 分子带分数线。
   // 公众号网页编辑器的粘贴清洗器会剥掉 flex 系样式（inline-flex /
   // flex-direction 粘贴后消失，分子分母变左右并排），所以复制实现刻意
@@ -166,10 +171,12 @@ try {
     assert(!body.html.includes('inline-flex'), '分数容器禁止用 flex 系（公众号粘贴会被洗掉）');
     assert(/border-bottom:[^;"]*solid\s+(#|rgb)/.test(body.html), '分数线必须是具体色值，禁止 currentColor');
     {
-      const blocks = body.html.match(/<div[^>]*Times New Roman[^>]*>[\s\S]*?<\/div>/g) || [];
-      assert(blocks.length > 0, '应存在衬线公式块');
+      // 2026-10-17：公式块外层容器已由 div 换成 section（微信粘贴剥 div），
+      // 断言改为匹配带衬线字体的 section 公式块。
+      const blocks = body.html.match(/<section[^>]*Times New Roman[^>]*>[\s\S]*?<\/section>/g) || [];
+      assert(blocks.length > 0, '应存在衬线公式块（section 容器）');
       for (const block of blocks) {
-        const inner = block.replace(/^<div[^>]*>/, '').replace(/<\/div>$/, '');
+        const inner = block.replace(/^<section[^>]*>/, '').replace(/<\/section>$/, '');
         const bare = inner.replace(/<p style="[^"]*">[\s\S]*?<\/p>/g, '').replace(/<[^>]+>/g, '').trim();
         assert(!bare, `公式块内容必须全部由带样式 p 承载，发现裸露: ${bare.slice(0, 30)}`);
         const carriers = inner.match(/<p style="([^"]*)">/g) || [];

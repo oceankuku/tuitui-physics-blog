@@ -249,14 +249,16 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       // 根号：公众号粘贴会剥 div，根号必须由自带样式的 span 承载。根号线是
       // 被开方数 span 的 border-top，颜色写具体值（currentColor 会被洗掉）。
       // 不用 flex；inline-block + border-top 是粘贴安全做法，与分数同一思路。
+      // 2026-10-15 衔接修复与页面 CSS 同步：√ 放大抬升去够上划线、被开方
+      // 数行高压到 1.16 让划线贴住内容、负 margin 让划线压住 √ 右侧连成一笔。
       formulaRadicals.forEach((node) => {
         node.setAttribute('style', 'display:inline-block;white-space:nowrap;vertical-align:baseline;');
       });
       formulaRadicalSymbols.forEach((node) => {
-        node.setAttribute('style', `font-style:normal;padding:0 2px;color:${palette.text};`);
+        node.setAttribute('style', `font-style:normal;display:inline-block;font-size:1.22em;line-height:1;vertical-align:-0.18em;padding:0 0.02em 0 0.05em;margin-right:-0.08em;color:${palette.text};`);
       });
       formulaRadicalBodies.forEach((node) => {
-        node.setAttribute('style', `display:inline-block;border-top:2px solid ${palette.text};padding:1px 5px 0;text-align:center;`);
+        node.setAttribute('style', `display:inline-block;border-top:2px solid ${palette.text};padding:0.05em 0.3em 0;line-height:1.16;text-align:center;`);
       });
 
       // 微信编辑器的内容栏比桌面文章窄。不要保留桌面布局计算出的固定宽高，
@@ -580,6 +582,51 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     .article-content :global(pre code) { padding: 0; color: inherit; background: transparent; }
     .article-content :global(blockquote) { margin: 2rem 0; padding: 1.1rem 1.35rem; color: var(--text); background: var(--accent-soft); border-left: 3px solid var(--red); }
     .article-content :global(blockquote p:last-child) { margin-bottom: 0; }
+    /* 例题/练习题干卡片（2026-10-18 原老师要求：例题字体和文章字体区分开）。
+       楷体 + 浅底色 + 左侧深边，一眼认出"这是题"。blockquote 载体在微信
+       粘贴白名单里，公众号复制不受影响。 */
+    .article-content :global(.problem-card) {
+      margin: 2rem 0;
+      padding: 1.15rem 1.4rem;
+      background: var(--surface-strong);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      font-family: 'Kaiti SC', KaiTi, STKaiti, 'PingFang SC', 'Microsoft YaHei', serif;
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+    .article-content :global(.problem-card p) { margin-bottom: 0.85rem; color: var(--text); }
+    .article-content :global(.problem-card p:last-child) { margin-bottom: 0; }
+    .article-content :global(.problem-card strong) { color: var(--accent-strong); }
+    /* 答案+解析卡片（2026-10-18 原老师要求：答案与题目同一套字体格式）。
+       同款楷体，底色偏绿与题干灰底区分，"答案"行天然醒目。 */
+    .article-content :global(.answer-card) {
+      margin: 2rem 0;
+      padding: 1.15rem 1.4rem;
+      background: var(--accent-soft);
+      border-left: 4px solid var(--accent-strong);
+      border-radius: 0 10px 10px 0;
+      font-family: 'Kaiti SC', KaiTi, STKaiti, 'PingFang SC', 'Microsoft YaHei', serif;
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+    .article-content :global(.answer-card p) { margin-bottom: 0.85rem; color: var(--text); }
+    .article-content :global(.answer-card p:last-child) { margin-bottom: 0; }
+    .article-content :global(.answer-card strong) { color: var(--accent-strong); }
+    /* 备注/深度理解提示卡：琥珀左边线 + 浅底，与题干/答案三色分明。
+       底部附注定位，字号再缩半档。 */
+    .article-content :global(.note-card) {
+      margin: 1.6rem 0 2.2rem;
+      padding: 0.95rem 1.3rem;
+      background: var(--surface);
+      border-left: 4px solid #b08a3e;
+      border-radius: 0 10px 10px 0;
+      font-size: 0.94rem;
+      line-height: 1.75;
+    }
+    .article-content :global(.note-card p) { margin-bottom: 0.7rem; color: var(--muted-on-ink); }
+    .article-content :global(.note-card p:last-child) { margin-bottom: 0; }
+    .article-content :global(.note-card strong) { color: var(--accent-strong); }
     /* 正式公式块：居中、衬线字体，配合 .formula-frac 还原横线分数 */
     .article-content :global(.formula-block) {
       display: block;
@@ -611,7 +658,10 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     .article-content :global(.formula-frac .num) { padding: 0 0.45em 0.14em; border-bottom: 1.6px solid currentColor; }
     .article-content :global(.formula-frac .den) { padding: 0.14em 0.45em 0; }
     /* 根号：√ 符号 + 上边线盖住整个被开方数（2026-10-14 原老师反馈的
-       “根号没包住内容”）。被开方数内的 {a/b} 复用同一套竖式分数。 */
+       “根号没包住内容”；2026-10-15 二次修复衔接：√ 用大号字形并抬升
+       顶臂去够上划线，被开方数行高压回 1.16 让上划线贴住内容顶部，
+       负 margin 让划线左端压住 √ 符号右侧、视觉连成一笔）。被开方数
+       内的 {a/b} 复用同一套竖式分数。 */
     .article-content :global(.formula-radical) {
       display: inline-block;
       white-space: nowrap;
@@ -619,14 +669,19 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       font-style: inherit;
     }
     .article-content :global(.formula-radical-symbol) {
+      display: inline-block;
       font-style: normal;
-      padding: 0 0.06em;
-      vertical-align: baseline;
+      font-size: 1.22em;
+      line-height: 1;
+      vertical-align: -0.18em;
+      padding: 0 0.02em 0 0.05em;
+      margin-right: -0.08em;
     }
     .article-content :global(.formula-radical-body) {
       display: inline-block;
       border-top: 1.6px solid currentColor;
-      padding: 0.12em 0.3em 0;
+      padding: 0.05em 0.3em 0;
+      line-height: 1.16;
     }
     .article-content :global(img) { width: 100%; height: auto; margin: 2.2rem 0; border-radius: 12px; }
     .article-content :global(table) { display: block; width: 100%; margin: 2rem 0; overflow-x: auto; border-collapse: collapse; color: var(--paper); background: var(--ink-soft); }

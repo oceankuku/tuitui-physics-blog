@@ -39,18 +39,19 @@ function splitFrontmatter(text) {
   return { meta, body: match[2], metaLines: match[1].split(/\r?\n/).length + 1 };
 }
 
-// 正文按行分类：code fence / formula 围栏内外，便于做"块外"规则。
+// 正文按行分类：code fence / 围栏（formula、problem、answer、note）内外，便于做"块外"规则。
 function classifyLines(body) {
   const lines = body.split(/\r?\n/);
-  const state = { code: false, formula: false };
+  const state = { code: false, fenced: false };
   return lines.map((line, index) => {
-    let startCode = false, endCode = false, startFormula = false, endFormula = false;
+    let startCode = false, endCode = false, startFenced = false, endFenced = false;
     if (/^\s*```/.test(line)) {
       if (!state.code) { startCode = true; state.code = true; } else { endCode = true; state.code = false; }
     }
-    if (!state.code && /^:::formula\s*$/.test(line)) { startFormula = true; state.formula = true; }
-    else if (!state.code && state.formula && /^:::\s*$/.test(line)) { endFormula = true; state.formula = false; }
-    return { line, number: index + 1, inCode: state.code && !endCode, inFormula: state.formula && !endFormula };
+    // :::formula / :::problem / :::answer / :::note 都开围栏；裸 ::: 关围栏
+    if (!state.code && /^:::(formula|problem|answer|note)\s*$/.test(line)) { startFenced = true; state.fenced = true; }
+    else if (!state.code && state.fenced && /^:::\s*$/.test(line)) { endFenced = true; state.fenced = false; }
+    return { line, number: index + 1, inCode: state.code && !endCode, inFormula: state.fenced && !endFenced };
   });
 }
 
@@ -108,11 +109,18 @@ for (const file of targets) {
     }
   }
 
-  // 公式围栏配平
+  // 围栏配平（formula/problem/answer/note 四种容器都是合法围栏）
   const fences = rows.filter((r) => /^:::/.test(r.line) && !r.inCode);
   if (fences.length % 2 !== 0) push(rel, fences.at(-1).number + fm.metaLines, 'error', `::: 围栏不配平（共 ${fences.length} 个）`);
   for (let i = 0; i + 1 < fences.length; i += 2) {
-    if (!/^:::formula/.test(fences[i].line)) push(rel, fences[i].number + fm.metaLines, 'error', `第 ${i / 2 + 1} 个围栏不是 :::formula 开头`);
+    if (!/^:::(formula|problem|answer|note)/.test(fences[i].line)) push(rel, fences[i].number + fm.metaLines, 'error', `第 ${i / 2 + 1} 个围栏不是 :::formula/:::problem/:::answer/:::note 开头`);
+  }
+
+  // 每篇文章至少 3 张配图（2026-10-18 原老师定稿，硬性要求）。
+  // 数正文里的 Markdown 图片（![alt](path)），草稿豁免（可能还在攒图）。
+  const imageCount = fm.body.match(/!\[[^\]]*\]\([^)]+\)/g)?.length ?? 0;
+  if (!isDraft && imageCount < 3) {
+    push(rel, 0, 'error', `配图只有 ${imageCount} 张，要求每篇至少 3 张（2026-10-18 原老师定稿）`);
   }
 
   // 表格：每行列数必须一致

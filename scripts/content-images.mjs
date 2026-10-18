@@ -158,13 +158,69 @@ export function formulaBlocks() {
     }
     return [node];
   };
+  // 选择题选项自动分段（2026-10-15 原老师反馈"选项没写工整"）。markdown
+  // 软换行会把「A. …」到「D. …」合并进同一个 <p>，渲染成挤成一坨的一行。
+  // 这里把段落文本按行扫描：以 A./B./C./D./E./F. 开头的选项行各自拆成独立
+  // 段落，写作时一行一个选项即可，不依赖行尾双空格。仅处理普通文本节点，
+  // 不碰加粗/链接等富文本（选项行通常是纯文本）。
+  const optionLine = /^([A-F])[.、．]\s*/;
+  const splitOptionLines = (node) => {
+    if (node.type !== 'paragraph' || node.data?.hName) return [node];
+    const lines = node.children?.every((child) => child.type === 'text') ? node.children.flatMap((child) => String(child.value).split('\n')) : null;
+    if (!lines) return [node];
+    const groups = [[]];
+    for (const line of lines) {
+      if (optionLine.test(line.trim()) && groups.length) groups.push([]);
+      groups.at(-1).push(line);
+    }
+    if (groups.length <= 1) return [node];
+    return groups.map((group) => ({
+      type: 'paragraph',
+      children: [{ type: 'text', value: group.join('\n') }],
+      position: node.position,
+    }));
+  };
+  const applyOptionSplit = (node) => {
+    if (!node.children?.length) return;
+    node.children = node.children.flatMap(splitOptionLines);
+    node.children.forEach(applyOptionSplit);
+  };
   return async (tree) => {
+    // 选项分段先于所有节点处理：题干/答案卡与正文里的选择题选项统一在
+    // 此拆成独立段落（2026-10-15 原老师反馈"选项没写工整"），写一行一个
+    // 选项即可，后续 formula 分数转换拿到的是已分段的结构。
+    applyOptionSplit(tree);
     const visitAny = (node) => {
       if (node.type === 'containerDirective' && node.name === 'formula') {
         node.data ??= {};
         node.data.hName = 'div';
         node.data.hProperties = { className: ['formula-block'] };
         node.children = node.children.flatMap(transformNode);
+        return;
+      }
+      // 例题/练习题干卡片（2026-10-18 原老师要求：例题字体要和正文区分）。
+      // 渲染成 blockquote.problem-card：blockquote 在微信粘贴白名单里，
+      // 复制管线零改动；卡片内字号缩一档、楷体，与正文视觉分离。
+      if (node.type === 'containerDirective' && node.name === 'problem') {
+        node.data ??= {};
+        node.data.hName = 'blockquote';
+        node.data.hProperties = { className: ['problem-card'] };
+        return;
+      }
+      // 答案+解析卡片（2026-10-18 原老师要求：答案也用题目同款字体格式）。
+      // 同走 blockquote 白名单载体，绿色系区分题干（答案底色偏绿、题干偏灰）。
+      if (node.type === 'containerDirective' && node.name === 'answer') {
+        node.data ??= {};
+        node.data.hName = 'blockquote';
+        node.data.hProperties = { className: ['answer-card'] };
+        return;
+      }
+      // 备注/深度理解提示卡（2026-10-18 原老师要求：给有深度理解的内容
+      // 一个醒目去处）。琥珀色左边线 + 浅底，与题干/答案三色分明。
+      if (node.type === 'containerDirective' && node.name === 'note') {
+        node.data ??= {};
+        node.data.hName = 'blockquote';
+        node.data.hProperties = { className: ['note-card'] };
         return;
       }
       node.children?.forEach(visitAny);
@@ -177,9 +233,9 @@ export function formulaBlocks() {
 // 是「冒号 + 标识符」，正文里紧贴的时间/比例写法（如 1:3:5 里的 :5）
 // 会被 remark-directive 误解析成 textDirective，而 remark-rehype 默认把
 // 未处理的指令编译成空 <div></div>，导致「：5」「：9」这类文字被吞、
-// 表格工整性被破坏。站点正文只使用 :::formula 容器指令，其余 text/leaf
-// 指令一律视为误触发，按源文本（position 精确切片）原样还原，保证
-// 以后写 1:2:3、1:√2:√3 这类比例不再踩坑。
+// 表格工整性被破坏。站点正文使用 :::formula 与 :::problem 两种容器指令，
+// 其余 text/leaf 指令一律视为误触发，按源文本（position 精确切片）原样
+// 还原，保证以后写 1:2:3、1:√2:√3 这类比例不再踩坑。
 export function plainDirectives() {
   return (tree, file) => {
     const source = String(file?.value ?? '');

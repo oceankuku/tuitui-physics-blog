@@ -25,9 +25,12 @@ try {
   // 表格首行数据含紧贴冒号比例 1:3:5（2026-10-15 回归）：micromark 会把
   // :3 误解析成 textDirective、remark-rehype 默认输出空 <div></div> 吞字，
   // plainDirectives 兜底插件必须把它还原成源文本。
+  // smoke-3 额外带软换行选择题选项（2026-10-15 回归）：选项行必须被拆成
+  // 独立段落，不能合并进同一个 <p>。
   for (let i = 1; i <= 9; i++) {
     const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n\nv(x/2) = √({v₀² + v² / 2})\n:::\n'
       : i === 2 ? 'Fixture body 2.\n\n| 列甲 | 列乙 |\n| --- | --- |\n| 比例 | 位移 1:3:5、速度 1:2:3 |\n\n```text\nfixture code block\n```\n'
+      : i === 3 ? ':::problem\n下列说法正确的是（　）\n\nA. 选项甲\nB. 选项乙\nC. 选项丙\nD. 选项丁\n:::\n'
       : `Fixture body ${i}.\n`;
     await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n---\n\n## Check\n\n${body}`);
   }
@@ -113,8 +116,10 @@ try {
 
   await page.goto(hosting.origin + '/blog/');
   // 公开文章数 = 9 篇 fixture + 站点已发布文章；按 PAGE_SIZE=8 动态计算第二页数量。
+  // 第二页数量不是简单的 totalPosts - 8：文章数超过 16 时会出现第三页，
+  // 第二页仍然是满 8 张（2026-10-15 文章数到 17 时踩到）。
   const totalPosts = await page.locator('.post-card').count();
-  const expectedSecondPage = totalPosts - 8;
+  const expectedSecondPage = Math.min(8, totalPosts - 8);
   assert.equal(await page.locator('.post-card:visible').count(), Math.min(8, totalPosts));
   await page.locator('#nextPage').click();
   assert.equal(await page.locator('.post-card:visible').count(), expectedSecondPage);
@@ -190,6 +195,8 @@ try {
     // 根号回归断言（2026-10-14 原老师反馈）：根号必须是结构化 span（符号 +
     // 上划线盖住整个被开方数），不能是裸 √ 字符 + 括号；根号下的分数与
     // 外部一致用竖式（inline-block + 块级分子分母 + 具体色值分数线）。
+    // 2026-10-15 衔接回归：√ 符号与被开方数上划线要连成一笔——符号放大
+    // （font-size:1.22em）且划线贴住内容（行高 1.16），样式签名必须同时在。
     assert(!body.html.includes('√('), '禁止裸 √( 括号写法，根号必须结构化');
     {
       // 富文本里 class 已摘除，改从样式签名断言：被开方数 span 带 border-top（根号上划线）
@@ -198,8 +205,24 @@ try {
       // 根号内分数：border-top（根号）内部应包含 border-bottom（分数线）的竖式分数
       const hasFracInRadical = radicalBodies.some((radicalBody) => radicalBody.includes('border-bottom'));
       assert(hasFracInRadical, '根号内的分数必须沿用竖式（分子带 border-bottom 分数线）');
+      // 衔接三要素：符号放大抬升、划线贴内容、划线压住符号右侧
+      assert(body.html.includes('font-size:1.22em'), '根号符号必须放大（font-size:1.22em）才能顶住上划线');
+      const connectedBody = radicalBodies.find((radicalBody) => radicalBody.includes('line-height:1.16'));
+      assert(connectedBody, '根号被开方数行高必须是 1.16，上划线才能贴住内容');
+      assert(/font-size:1\.22em[^>]*margin-right:-0\.08em|margin-right:-0\.08em[^>]*font-size:1\.22em/.test(body.html), '根号符号必须带负右 margin 让划线压住顶臂');
     }
-    await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+    // 选项分段回归（2026-10-15 原老师反馈"选项没写工整"）：软换行的
+    // A./B./C./D. 选项行必须各自拆成独立 <p>，不能合并进同一个段落。
+    {
+      const optionPage = await page.goto(`${hosting.origin}/blog/smoke-3/`);
+      const optionHtml = await optionPage.text();
+      const problemCard = optionHtml.match(/<blockquote class="problem-card">[\s\S]*?<\/blockquote>/)?.[0] || '';
+      assert(problemCard, 'smoke-3 应渲染出题干卡');
+      const optionParagraphs = problemCard.match(/<p>A\. 选项甲<\/p>/) && problemCard.match(/<p>B\. 选项乙<\/p>/) && problemCard.match(/<p>C\. 选项丙<\/p>/) && problemCard.match(/<p>D\. 选项丁<\/p>/);
+      assert(optionParagraphs, '四个选项必须各自独立成段（<p>A. …</p> 形式）');
+      assert(!/A\. 选项甲\s+B\./.test(problemCard), '选项不得合并在同一个 <p> 内');
+      await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+    }
   }
   // 表格复制校验：公众号编辑器里表格列宽必须固定，防止被粘贴清洗器压扁。
   {

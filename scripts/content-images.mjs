@@ -90,18 +90,24 @@ export function formulaBlocks() {
   });
   // 根号节点：symbol 是 √ 字符，radicand（被开方数）由 formula-radical-body
   // 承载并带 CSS 上边线，根号线自然盖住内部所有内容（含竖式分数）。
-  const radicalNode = (radicandParts) => ({
-    type: 'paragraph',
-    data: {
-      hName: 'span',
-      hProperties: { className: ['formula-radical'] },
-      hChildren: [
-        { type: 'element', tagName: 'span', properties: { className: ['formula-radical-symbol'] }, children: [{ type: 'text', value: '√' }] },
-        { type: 'element', tagName: 'span', properties: { className: ['formula-radical-body'] }, children: radicandParts },
-      ],
-    },
-    children: [],
-  });
+  // 被开方数含竖式分数时加 formula-radical-tall（高根号立骨构造 2026-10-18）：
+  // √ 字形只有一行高，够不到两行高的上划线，页面 CSS 与公众号复制管线
+  // 都按此标记切换成「√ 沉底 + 被开方数左边线立骨」的画法。
+  const radicalNode = (radicandParts) => {
+    const isTall = radicandParts.some((part) => part.type === 'element' && (part.properties?.className ?? []).includes('formula-frac'));
+    return {
+      type: 'paragraph',
+      data: {
+        hName: 'span',
+        hProperties: { className: isTall ? ['formula-radical', 'formula-radical-tall'] : ['formula-radical'] },
+        hChildren: [
+          { type: 'element', tagName: 'span', properties: { className: ['formula-radical-symbol'] }, children: [{ type: 'text', value: '√' }] },
+          { type: 'element', tagName: 'span', properties: { className: ['formula-radical-body'] }, children: radicandParts },
+        ],
+      },
+      children: [],
+    };
+  };
   // 把一段文本拆成「文本 + 竖式分数」的 hChildren 序列；根号内部同样走 {a/b} 竖式。
   const fracHChildren = (num, den) => [{
     type: 'element',

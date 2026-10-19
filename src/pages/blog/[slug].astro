@@ -135,7 +135,11 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       const formulaDenominators = Array.from(clone.querySelectorAll('.formula-frac .den'));
       // 根号节点同样要在 class 摘掉前抓引用：根号符号 + 上划线盖住被开方数，
       // 被开方数内的分数复用 formula-frac 竖式（2026-10-14 根号格式修复）。
+      // 含分数的高根号在 class 还在时就把元素存进 tall 集合——不能用
+      // data-* 属性中转，下面的通用清理循环会剥掉所有 data-* 属性；
+      // Set 存在内存里不受清理影响。后面补样式按集合成员切换立骨画法。
       const formulaRadicals = Array.from(clone.querySelectorAll('.formula-radical'));
+      const radicalTallSet = new Set(formulaRadicals.filter((node) => (node.getAttribute('class') || '').includes('formula-radical-tall')));
       const formulaRadicalSymbols = Array.from(clone.querySelectorAll('.formula-radical-symbol'));
       const formulaRadicalBodies = Array.from(clone.querySelectorAll('.formula-radical-body'));
       const formulaBlockSource = article.querySelector('.formula-block');
@@ -251,14 +255,25 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       // 不用 flex；inline-block + border-top 是粘贴安全做法，与分数同一思路。
       // 2026-10-15 衔接修复与页面 CSS 同步：√ 放大抬升去够上划线、被开方
       // 数行高压到 1.16 让划线贴住内容、负 margin 让划线压住 √ 右侧连成一笔。
+      // 2026-10-18 两处更新（与页面 CSS 双端同步）：
+      // ① 常规根号加 0.28em 顶垫，消掉 √ 顶臂与划线之间的天然豁口；
+      // ② 被开方数含竖式分数的高根号（抓引用时已存入 radicalTallSet）
+      //    换立骨画法——√ 常规字号沉底、被开方数加左边线撑满全高，
+      //    否则 1.22em 的 √ 够不到两行高的划线，视觉上"根号没包住"。
       formulaRadicals.forEach((node) => {
         node.setAttribute('style', 'display:inline-block;white-space:nowrap;vertical-align:baseline;');
       });
-      formulaRadicalSymbols.forEach((node) => {
-        node.setAttribute('style', `font-style:normal;display:inline-block;font-size:1.22em;line-height:1;vertical-align:-0.18em;padding:0 0.02em 0 0.05em;margin-right:-0.08em;color:${palette.text};`);
+      formulaRadicalSymbols.forEach((node, index) => {
+        const tall = radicalTallSet.has(formulaRadicals[index]);
+        node.setAttribute('style', tall
+          ? `font-style:normal;display:inline-block;font-size:1em;line-height:1;vertical-align:-0.08em;padding:0;margin-right:-0.06em;color:${palette.text};`
+          : `font-style:normal;display:inline-block;font-size:1.22em;line-height:1;vertical-align:-0.18em;padding:0 0.02em 0 0.05em;margin-right:-0.08em;color:${palette.text};`);
       });
-      formulaRadicalBodies.forEach((node) => {
-        node.setAttribute('style', `display:inline-block;border-top:2px solid ${palette.text};padding:0.05em 0.3em 0;line-height:1.16;text-align:center;`);
+      formulaRadicalBodies.forEach((node, index) => {
+        const tall = radicalTallSet.has(formulaRadicals[index]);
+        node.setAttribute('style', tall
+          ? `display:inline-block;border-top:2px solid ${palette.text};border-left:2px solid ${palette.text};padding:0.05em 0.3em 0 0.3em;margin-left:0;line-height:1.16;text-align:center;`
+          : `display:inline-block;border-top:2px solid ${palette.text};padding:0.28em 0.3em 0;line-height:1.16;text-align:center;`);
       });
 
       // 微信编辑器的内容栏比桌面文章窄。不要保留桌面布局计算出的固定宽高，
@@ -325,8 +340,11 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       });
 
       const wrapper = document.createElement('section');
-      // 微信公众号编辑器在 iPhone（含 13 Pro）上内容栏可用宽度约 677px。
-      wrapper.setAttribute('style', `box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:32px 15px;background-color:${palette.bg};color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
+      // 微信公众号编辑器内容栏自带左右安全内边距，wrapper 再叠水平 padding
+      // 就是两层相加——粘贴后正文比正常文章窄一圈、和公众号原生版式对不齐
+      // （2026-10-18 原老师反馈）。wrapper 只留上下节奏，左右归零让正文
+      // 占满编辑器内容宽；行内元素自身的间距不受影响。
+      wrapper.setAttribute('style', `box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:24px 0;background-color:${palette.bg};color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
 
       // 标题块必须用 section 承载：微信编辑器粘贴白名单里没有 <header>，
       // header 标签会被整个剥壳，身上的下边框分隔线和间距全部丢失——
@@ -682,6 +700,31 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       border-top: 1.6px solid currentColor;
       padding: 0.05em 0.3em 0;
       line-height: 1.16;
+    }
+    /* 常规根号的顶垫：√ 字形右上臂与上划线之间天然有 3~7px 豁口
+       （字形本身不含顶臂上方的空隙），少量顶部 padding 把划线抬高，
+       让符号顶臂与划线贴住（2026-10-18 显示不完整反馈的纯文本部分）。 */
+    .article-content :global(.formula-radical:not(.formula-radical-tall) .formula-radical-body) {
+      padding-top: 0.28em;
+    }
+    /* 高根号（2026-10-18 原老师反馈"部分根号显示不完整"）：被开方数含竖式
+       分数时内容有 2 行多高，√ 字形只有一行高，固定放大 1.22em 也够不到
+       上划线，符号和划线脱节、视觉上根号"没包住"。改用立骨构造：√ 保持
+       常规字号沉到底部当钩，被开方数加左边线当根号立骨（随分数撑满全高），
+       上划线照旧——立骨上端接头、下端接钩，三段连成一笔。与公众号复制
+       管线（[slug].astro 内 formulaRadicals 分支）双端同步，全部使用粘贴
+       白名单属性（inline-block/border/vertical-align），不用 flex/transform。 */
+    .article-content :global(.formula-radical-tall .formula-radical-symbol) {
+      font-size: 1em;
+      vertical-align: -0.08em;
+      padding: 0;
+      margin-right: -0.06em;
+    }
+    .article-content :global(.formula-radical-tall .formula-radical-body) {
+      border-top: 1.6px solid currentColor;
+      border-left: 1.6px solid currentColor;
+      padding: 0.05em 0.3em 0 0.3em;
+      margin-left: 0;
     }
     .article-content :global(img) { width: 100%; height: auto; margin: 2.2rem 0; border-radius: 12px; }
     .article-content :global(table) { display: block; width: 100%; margin: 2rem 0; overflow-x: auto; border-collapse: collapse; color: var(--paper); background: var(--ink-soft); }

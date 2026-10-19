@@ -162,6 +162,9 @@ try {
   // 容器，粘贴安全）。标题分隔线丢失、header 区错位的根因就是 header 标签。
   assert(!/<header[\s>]/.test(payload.html), '禁止 <header>：微信粘贴会剥壳，标题区样式全丢（改用 section）');
   assert(!/<div[\s>]/.test(payload.html), '禁止顶层 <div>：微信粘贴会剥 div 标签');
+  // 2026-10-18 偏小一圈回归：编辑器自带内边距，wrapper 不得再叠水平 padding，
+  // 否则粘贴后正文比正常文章窄一圈、和公众号原生版式对不齐。
+  assert(/box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:24px 0;/.test(payload.html), 'wrapper 禁止水平 padding（公众号编辑器自带内边距，叠加会窄一圈）');
   // 公式里的分数必须保留竖式结构：inline-block 容器 + 分子带分数线。
   // 公众号网页编辑器的粘贴清洗器会剥掉 flex 系样式（inline-flex /
   // flex-direction 粘贴后消失，分子分母变左右并排），所以复制实现刻意
@@ -205,11 +208,18 @@ try {
       // 根号内分数：border-top（根号）内部应包含 border-bottom（分数线）的竖式分数
       const hasFracInRadical = radicalBodies.some((radicalBody) => radicalBody.includes('border-bottom'));
       assert(hasFracInRadical, '根号内的分数必须沿用竖式（分子带 border-bottom 分数线）');
-      // 衔接三要素：符号放大抬升、划线贴内容、划线压住符号右侧
-      assert(body.html.includes('font-size:1.22em'), '根号符号必须放大（font-size:1.22em）才能顶住上划线');
-      const connectedBody = radicalBodies.find((radicalBody) => radicalBody.includes('line-height:1.16'));
-      assert(connectedBody, '根号被开方数行高必须是 1.16，上划线才能贴住内容');
-      assert(/font-size:1\.22em[^>]*margin-right:-0\.08em|margin-right:-0\.08em[^>]*font-size:1\.22em/.test(body.html), '根号符号必须带负右 margin 让划线压住顶臂');
+      // 2026-10-18 显示不完整回归：fixture 里 √({v₀² + v² / 2}) 是含分数的
+      // 高根号，必须走立骨画法——√ 常规字号（1em）+ 被开方数带左边线撑满
+      // 全高；否则 1.22em 的 √ 够不到两行高的上划线（原老师反馈的根因）。
+      // 注意：smoke-1 fixture 只有这一个根号，全部断言按立骨画法设计；
+      // 常规根号（纯文本被开方数）走放大+顶垫画法，断言在站点文章页补查。
+      const tallBody = radicalBodies.find((radicalBody) => radicalBody.includes('border-left'));
+      assert(tallBody, '含分数的高根号被开方数必须带 border-left 立骨（√ 沉底 + 左边线撑满全高）');
+      assert(tallBody.includes('line-height:1.16'), '高根号被开方数行高必须是 1.16，上划线贴住内容');
+      const tallSymbol = body.html.match(/<span style="font-style:normal;display:inline-block;font-size:1em;line-height:1;vertical-align:-0\.08em[^"]*">√<\/span>/);
+      assert(tallSymbol, '高根号符号必须沉底（font-size:1em + vertical-align:-0.08em）');
+      assert(!body.html.includes('font-size:1.22em'), 'fixture 只有高根号：禁止任何根号沿用放大画法（√ 字形够不到两行高划线）');
+      // 常规根号分支（放大 1.22em + 0.28em 顶垫）在站点真实文章页验证
     }
     // 选项分段回归（2026-10-15 原老师反馈"选项没写工整"）：软换行的
     // A./B./C./D. 选项行必须各自拆成独立 <p>，不能合并进同一个段落。
@@ -224,7 +234,7 @@ try {
       await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
     }
   }
-  // 表格复制校验：公众号编辑器里表格列宽必须固定，防止被粘贴清洗器压扁。
+    // 表格复制校验：公众号编辑器里表格列宽必须固定，防止被粘贴清洗器压扁。
   {
     const tableBody = await page.goto(`${hosting.origin}/blog/smoke-2/`).then(() => page.evaluate(() => window.buildWechatRichText()));
     assert(tableBody.html.includes('table-layout: fixed') || tableBody.html.includes('table-layout:fixed'), '表格必须带固定布局');
@@ -236,6 +246,15 @@ try {
     assert(tableHtml.includes('位移 1:3:5'), '紧贴冒号比例 1:3:5 必须完整渲染（plainDirectives 兜底）');
     assert(tableHtml.includes('速度 1:2:3'), '紧贴冒号比例 1:2:3 必须完整渲染');
     assert(!tableHtml.includes('<div></div>'), '禁止出现未处理指令产生的空 <div></div>');
+    await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+  }
+  // 常规根号分支回归（2026-10-18 显示不完整修复的另一侧）：纯文本被开方数
+  // 的根号走「放大 1.22em + 0.28em 顶垫」画法。K001 有 √(v²+v²) 纯文本根号。
+  {
+    const regularBody = await page.goto(`${hosting.origin}/blog/k001-mass-point-reference-frame/`).then(() => page.evaluate(() => window.buildWechatRichText()));
+    assert(regularBody.html.includes('font-size:1.22em'), '常规根号符号必须放大（font-size:1.22em）顶住上划线');
+    assert(regularBody.html.includes('padding:0.28em'), '常规根号被开方数必须带 0.28em 顶垫，√ 顶臂才能贴住划线');
+    assert(/font-size:1\.22em[^>]*margin-right:-0\.08em|margin-right:-0\.08em[^>]*font-size:1\.22em/.test(regularBody.html), '常规根号符号必须带负右 margin 让划线压住顶臂');
     await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
   }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。

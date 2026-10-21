@@ -169,6 +169,8 @@ A. 3 m/s
 B. 2 m/s
 C. 1 m/s
 D. 0.5 m/s
+
+![公交车匀减速依次经过 R、S、T 三点示意图](/blog-images/k003-velocity/bus-rst-question.png)
 :::
 :::answer
 **答案：C（1 m/s）。**
@@ -257,6 +259,8 @@ v = {dx/dt} ≈ {Δx/Δt}（图线某点斜率）
 
 :::problem
 **（2024-2025学年山东枣庄期中，改编）**如图所示 x–t 图像中，物体在前 2 s 内从 x = 0 到 x = 4 m，在 2 s 到 5 s 内停在 x = 4 m，在 5 s 到 8 s 内回到 x = 0。求各段的平均速度大小，并判断 2 s 到 5 s 内是否运动。
+
+![题目 x–t 图像：先匀速、再静止、后匀速返回](/blog-images/k003-velocity/xt-segments-question.png)
 :::
 :::answer
 **答案：0–2 s 平均速度 2 m/s；2–5 s 平均速度 0（静止）；5–8 s 平均速度大小约 1.33 m/s（方向负）。**

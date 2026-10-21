@@ -219,6 +219,8 @@ A. 10 m/s
 B. 约 8.3 m/s
 C. 5 m/s
 D. 约 6.7 m/s
+
+![公交车匀减速依次经过 R、S、T 三点示意图](/blog-images/k006-displacement-time-formula/bus-rst-question.png)
 :::
 :::answer
 **答案：B。**
@@ -419,6 +421,8 @@ A. 36 m
 B. 54 m
 C. 72 m
 D. 108 m
+
+![先匀加速后匀减速的大三角形 v–t 图像](/blog-images/k006-displacement-time-formula/vt-2014-triangle.png)
 :::
 :::answer
 **答案：B。**

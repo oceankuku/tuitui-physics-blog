@@ -4,8 +4,10 @@
 // 前置成一轮检查：
 //   error（阻断发布）：Unicode 分数、公式块外的 {a/b}、公式围栏不配平、
 //                     表格列数不齐、图片文件缺失/无 alt、内链 404、
-//                     正文出现 H1、frontmatter 缺项、结尾三段缺失
+//                     正文出现 H1、frontmatter 缺项
 //   warning（提示不阻断）：正文叙述里的斜杠分数、公式块外的裸 √(
+// 2026-10-21 规范改版：移除「每篇至少 3 图」与「固定结尾三段」检查——
+// 配图按教学需要配（主规范第八节），固定收尾改为可选（主规范第十节）。
 // 用法：node scripts/lint-content.mjs [文件...]（缺省检查全部文章）
 import { existsSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
@@ -116,13 +118,6 @@ for (const file of targets) {
     if (!/^:::(formula|problem|answer|note)/.test(fences[i].line)) push(rel, fences[i].number + fm.metaLines, 'error', `第 ${i / 2 + 1} 个围栏不是 :::formula/:::problem/:::answer/:::note 开头`);
   }
 
-  // 每篇文章至少 3 张配图（2026-10-18 原老师定稿，硬性要求）。
-  // 数正文里的 Markdown 图片（![alt](path)），草稿豁免（可能还在攒图）。
-  const imageCount = fm.body.match(/!\[[^\]]*\]\([^)]+\)/g)?.length ?? 0;
-  if (!isDraft && imageCount < 3) {
-    push(rel, 0, 'error', `配图只有 ${imageCount} 张，要求每篇至少 3 张（2026-10-18 原老师定稿）`);
-  }
-
   // 表格：每行列数必须一致
   let table = [];
   const flushTable = () => {
@@ -142,14 +137,6 @@ for (const file of targets) {
   }
   flushTable();
 
-  // 结尾三段（草稿跳过；2026-10-13 前发布的存量老文豁免——三段式
-  // 结尾规范自 2026-10-13 定稿，老文不做追溯）。
-  const legacy = !isDraft && fm.meta.pubDate < '2026-10-13';
-  if (!isDraft && !legacy) {
-    if (!fm.body.includes('## 下期预告（先想 10 秒，别急着滑）')) push(rel, 0, 'error', '缺固定结尾段「## 下期预告（先想 10 秒，别急着滑）」');
-    if (!fm.body.includes('## 最后碎碎念')) push(rel, 0, 'error', '缺固定结尾段「## 最后碎碎念」');
-    if (!fm.body.trimEnd().endsWith('物理不秃，颓颓守护。下期见！')) push(rel, 0, 'error', '文章最后一句必须是「物理不秃，颓颓守护。下期见！」');
-  }
 }
 
 const errors = problems.filter((p) => p.level === 'error');

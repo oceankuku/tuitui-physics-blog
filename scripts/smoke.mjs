@@ -125,18 +125,18 @@ try {
   assert.equal(await page.locator('.post-card:visible').count(), expectedSecondPage);
   assert(page.url().includes('page=2'));
   await page.reload(); assert.equal(await page.locator('#currentPage').innerText(), '2');
-  await page.locator('#searchInput').fill('布满小点');
+  await page.locator('#searchInput').fill('缩成一个点');
   assert.equal(await page.locator('.post-card:visible').count(), 1);
   await page.locator('#searchInput').fill('no-matching-article');
   assert(await page.locator('#emptyState').isVisible());
   await page.locator('#searchInput').fill('');
-  await page.locator('.filter-button').filter({ hasText: '纸带问题' }).click();
-  assert.equal(await page.locator('.post-card:visible').count(), 1);
+  await page.locator('.filter-button').filter({ hasText: '题型方法' }).click();
+  assert.equal(await page.locator('.post-card:visible').count(), 7);
   await page.locator('#clearTags').click();
   assert.equal(await page.locator('.post-card:visible').count(), Math.min(8, totalPosts));
 
   // Reader links stay on the current host and export the selected article.
-  for (const [slug, expected] of [['paper-tape-analysis', '布满小点的纸'], ['smoke-1', 'Fixture body 1.']]) {
+  for (const [slug, expected] of [['k001-mass-point-reference-frame', '缩成一个点'], ['smoke-1', 'Fixture body 1.']]) {
     await page.goto(`${hosting.origin}/blog/${slug}/`);
     const href = await page.getByRole('link', { name: '阅读 Markdown', exact: true }).getAttribute('href');
     assert.equal(href, `/blog/${slug}/index.md`);
@@ -144,7 +144,7 @@ try {
     assert.equal(response.status(), 200);
     assert((await response.text()).includes(expected));
   }
-  await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+  await page.goto(hosting.origin + '/blog/k001-mass-point-reference-frame/');
   assert((await page.locator('.article-nav-link').count()) > 0);
   assert((await page.locator('.toc-link').count()) >= 3);
   const image = page.locator('.article-content img').first();
@@ -156,7 +156,7 @@ try {
   assert(payload.html.includes('data:image/') || payload.html.includes('https://physics.example/_content-images/'));
   assert(payload.html.includes('https://physics.example/blog/'));
   assert(!payload.html.includes('srcset=') && !payload.html.includes('onclick=') && !payload.html.includes('<button'));
-  assert(payload.text.includes('布满小点的纸'));
+  assert(payload.text.includes('缩成一个点'));
   // 2026-10-17 回归：微信粘贴白名单没有 <header>/<div> 标签，会被整个剥壳。
   // 复制产物里禁止出现这两种标签（外层 wrapper 的 section 是公众号原生
   // 容器，粘贴安全）。标题分隔线丢失、header 区错位的根因就是 header 标签。
@@ -231,7 +231,7 @@ try {
       const optionParagraphs = problemCard.match(/<p>A\. 选项甲<\/p>/) && problemCard.match(/<p>B\. 选项乙<\/p>/) && problemCard.match(/<p>C\. 选项丙<\/p>/) && problemCard.match(/<p>D\. 选项丁<\/p>/);
       assert(optionParagraphs, '四个选项必须各自独立成段（<p>A. …</p> 形式）');
       assert(!/A\. 选项甲\s+B\./.test(problemCard), '选项不得合并在同一个 <p> 内');
-      await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+      await page.goto(hosting.origin + '/blog/k001-mass-point-reference-frame/');
     }
   }
     // 表格复制校验：公众号编辑器里表格列宽必须固定，防止被粘贴清洗器压扁。
@@ -246,7 +246,7 @@ try {
     assert(tableHtml.includes('位移 1:3:5'), '紧贴冒号比例 1:3:5 必须完整渲染（plainDirectives 兜底）');
     assert(tableHtml.includes('速度 1:2:3'), '紧贴冒号比例 1:2:3 必须完整渲染');
     assert(!tableHtml.includes('<div></div>'), '禁止出现未处理指令产生的空 <div></div>');
-    await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+    await page.goto(hosting.origin + '/blog/k001-mass-point-reference-frame/');
   }
   // 常规根号分支回归（2026-10-18 显示不完整修复的另一侧）：纯文本被开方数
   // 的根号走「放大 1.22em + 0.28em 顶垫」画法。K001 有 √(v²+v²) 纯文本根号。
@@ -255,15 +255,15 @@ try {
     assert(regularBody.html.includes('font-size:1.22em'), '常规根号符号必须放大（font-size:1.22em）顶住上划线');
     assert(regularBody.html.includes('padding:0.28em'), '常规根号被开方数必须带 0.28em 顶垫，√ 顶臂才能贴住划线');
     assert(/font-size:1\.22em[^>]*margin-right:-0\.08em|margin-right:-0\.08em[^>]*font-size:1\.22em/.test(regularBody.html), '常规根号符号必须带负右 margin 让划线压住顶臂');
-    await page.goto(hosting.origin + '/blog/paper-tape-analysis/');
+    await page.goto(hosting.origin + '/blog/k001-mass-point-reference-frame/');
   }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。
   const wechatMainCopy = page.getByRole('button', { name: '复制到公众号' });
   await wechatMainCopy.click();
-  await page.waitForFunction(() => window.__clipboard.at(-1)?.['text/html']?.includes('布满小点的纸'));
-  assert((await page.evaluate(() => window.__clipboard.at(-1)['text/html'])).includes('布满小点的纸'));
+  await page.waitForFunction(() => window.__clipboard.at(-1)?.['text/html']?.includes('缩成一个点'));
+  assert((await page.evaluate(() => window.__clipboard.at(-1)['text/html'])).includes('缩成一个点'));
   await page.locator('button.share-button').click();
-  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('https://physics.example/blog/paper-tape-analysis/'));
+  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('https://physics.example/blog/k001-mass-point-reference-frame/'));
 
   const select = async (selector) => {
     await page.locator(selector).first().scrollIntoViewIfNeeded();
@@ -278,7 +278,7 @@ try {
   };
   await select('.article-content p');
   await page.locator('[data-selection-action="copy"]').click();
-  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('丢分'));
+  assert((await page.evaluate(() => window.__clipboard.at(-1).text)).includes('孩子放学回家'));
   await select('.article-content p');
   await page.locator('[data-selection-action="quote"]').click();
   await page.waitForFunction(() => window.__clipboard.at(-1)?.['text/plain']?.includes('出处：'));
@@ -317,10 +317,10 @@ try {
 
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 950 });
-    for (const path of ['/', '/blog/', '/blog/paper-tape-analysis/', '/materials/']) {
+    for (const path of ['/', '/blog/', '/blog/k001-mass-point-reference-frame/', '/materials/']) {
       await page.goto(hosting.origin + path); await page.evaluate(() => document.fonts.ready);
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Overflow: ${path} @ ${width}`);
-      await page.screenshot({ path: resolve(root, `.checks/${width}-${path === '/' ? 'home' : path.includes('paper-tape') ? 'article' : path.includes('materials') ? 'materials' : 'blog'}.png`), fullPage: true });
+      await page.screenshot({ path: resolve(root, `.checks/${width}-${path === '/' ? 'home' : path.includes('k001') ? 'article' : path.includes('materials') ? 'materials' : 'blog'}.png`), fullPage: true });
     }
   }
   await page.locator('.menu-toggle').click(); assert(await page.locator('.site-links').isVisible());

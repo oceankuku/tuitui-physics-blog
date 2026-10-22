@@ -137,7 +137,13 @@ try {
   assert(await page.locator('#emptyState').isVisible());
   await page.locator('#searchInput').fill('');
   await page.locator('.filter-button').filter({ hasText: '题型方法' }).click();
-  assert.equal(await page.locator('.post-card:visible').count(), 7);
+  // 标签文章数随发稿增长（2026-10-23 实验题型篇入列后 7→8），改为与首页标签徽标数对账。
+  const expectedTagged = await page.locator('.filter-button').filter({ hasText: '题型方法' }).locator('.filter-count, .count, span').first().innerText().then((t) => parseInt(t, 10)).catch(() => null);
+  if (expectedTagged) {
+    assert.equal(await page.locator('.post-card:visible').count(), expectedTagged, '题型方法标签数应与徽标一致');
+  } else {
+    assert((await page.locator('.post-card:visible').count()) >= 7, '题型方法标签至少应有既有文章数');
+  }
   await page.locator('#clearTags').click();
   assert.equal(await page.locator('.post-card:visible').count(), Math.min(8, totalPosts));
 

@@ -85,13 +85,12 @@ for (const file of targets) {
   const slugs = new Set((await readdir(contentDir)).filter((f) => f.endsWith('.md')).map((f) => f.replace(/\.md$/, '')));
 
   for (const { line, number, inCode, inFormula } of rows) {
-    if (UNICODE_FRACTIONS.test(line)) push(rel, number + fm.metaLines, 'error', '出现 Unicode 分数字符（½ 等），必须写 {1/2} 竖式');
-    if (!inFormula && !inCode && /\{[^{}]+\/[^{}]+\}/.test(line)) push(rel, number + fm.metaLines, 'error', '公式块外出现 {a/b}——段落里不会转竖式，必须移入 :::formula 块');
-    if (!inFormula && !inCode && /√\(/.test(line)) push(rel, number + fm.metaLines, 'warn', '公式块外出现 √(——不会被转成结构化根号，含根号算式应放入 :::formula 块');
-    if (!inCode && !inFormula && !/https?:\/\/|]\(|^\s*[-|>:]|^\s*\d+\.\s|显示|url/i.test(line)) {
-      const slashFrac = line.match(/[0-9a-zA-zα-ωΔ₀-₉²³()）][ ]*\/[ ]*[0-9a-zA-Zα-ω₀-₉²³(（]/g);
-      if (slashFrac) push(rel, number + fm.metaLines, 'warn', `正文疑似斜杠分数「${slashFrac[0]}」，叙述里也要求竖式，建议移入公式块`);
-    }
+    if (UNICODE_FRACTIONS.test(line)) push(rel, number + fm.metaLines, 'error', '出现 Unicode 分数字符（½ 等），应写成 1/2 或 {1/2} 竖式');
+    // 自 2026-10-22 起，{a/b}、√( )、裸斜杠分数（安全子集：数字/变量/√ 组合，
+    // 单位 m/s、km/h、kg/m³ 等除外）均会在正文/答案/备注/公式块内自动渲染为
+    // 竖式分数与结构化根号，不再局限于 :::formula 块。故不再对公式块外的
+    // {a/b} / √( / 斜杠分数报错或警告。下面只保留 URL、图片、链接等其它检查。
+
     if (/^#\s/.test(line)) push(rel, number + fm.metaLines, 'error', '正文出现 H1，标题由 frontmatter title 渲染，不得重复');
 
     // 图片：文件必须存在、alt 必须非空、禁止引用构建产物路径

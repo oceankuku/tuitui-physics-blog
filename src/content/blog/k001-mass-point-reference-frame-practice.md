@@ -4,6 +4,7 @@ description: "质点与参考系分层练习篇：30 道题按基础理解、典
 pubDate: 2026-10-17
 draft: false
 tags: ["力学", "练习", "运动学"]
+mathjax: true
 ---
 
 上一篇题型方法讲完了，这篇是本单元的练习场。

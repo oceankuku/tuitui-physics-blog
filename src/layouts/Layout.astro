@@ -2,6 +2,7 @@
 import { canonicalUrl, jsonLd, SITE_NAME, SITE } from '../lib/site-content';
 import { siteConfig } from '../../site.config.mjs';
 import '../styles/theme.css';
+import '../styles/noto-symbols2.css';
 
 interface Props {
   title?: string;
@@ -13,11 +14,13 @@ interface Props {
   markdownUrl?: string;
   article?: { publishedAt?: string; updatedAt?: string; author?: string };
   structuredData?: Record<string, unknown>[];
+  mathjax?: boolean;
 }
 const {
   title = `${siteConfig.name} · ${siteConfig.role}`,
   description = siteConfig.description,
   image, imageWidth, imageHeight, noindex = false, markdownUrl, article, structuredData = [],
+  mathjax = false,
 } = Astro.props;
 const ogImage = new URL(image || siteConfig.ogImage, SITE).href;
 const ogUrl = canonicalUrl(Astro.url.pathname);
@@ -86,6 +89,17 @@ const siteSchema = [
             }).catch((error) => console.error('wx-sign failed', error));
         })();
       </script>
+    </>}
+    {mathjax && <>
+      <script is:inline>
+        window.MathJax = {
+          tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']], processEscapes: true },
+          chtml: { fontURL: '/vendor/mathjax/output/chtml/fonts/woff-v2', scale: 1 },
+          startup: { typeset: true },
+        };
+      </script>
+      <script is:inline src="/vendor/mathjax/tex-mml-chtml.js" async></script>
+      <script is:inline src="/vendor/html-to-image/html-to-image.js" async></script>
     </>}
   </head>
   <body>

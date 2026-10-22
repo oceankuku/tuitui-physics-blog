@@ -41,6 +41,7 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
   imageWidth={post.data.image ? undefined : 1200}
   imageHeight={post.data.image ? undefined : 630}
   markdownUrl={markdownUrl}
+  mathjax={post.data.mathjax}
   article={{ author: post.data.author, publishedAt: post.data.pubDate.toISOString(), updatedAt: updatedAt.toISOString() }}
   structuredData={[
     articleSchema({ title: post.data.title, description: post.data.description, url: shareUrl, author: post.data.author, image: post.data.image, publishedAt: post.data.pubDate, updatedAt, section: siteConfig.blogTitle }),
@@ -188,6 +189,39 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
 
       clone.querySelectorAll('script, style, iframe, button, form, input, textarea, select').forEach((node) => node.remove());
 
+      // MathJax 公式（tex-mml-chtml 的 chtml 输出）依赖动态 CSS，直接粘贴到
+      // 公众号会被清洗器剥掉样式而错乱。这里把每个已渲染的 mjx-container 栅格化
+      // 为 PNG 图片（html-to-image：把 MathJax 字体内嵌为 data URI，避免跨域
+      // 污染），公众号里公式以图片显示，粘贴安全。旧 .formula-block 分支保留，
+      // 兼容尚未改版的旧文。
+      const liveMath = Array.from(article.querySelectorAll('mjx-container'));
+      if (liveMath.length && typeof window.htmlToImage !== 'undefined') {
+        try {
+          if (window.MathJax && MathJax.startup && MathJax.startup.promise) await MathJax.startup.promise;
+          await document.fonts.ready;
+        } catch {}
+        const cloneMath = Array.from(clone.querySelectorAll('mjx-container'));
+        await Promise.all(liveMath.map(async (liveNode, index) => {
+          const cloneNode = cloneMath[index];
+          if (!cloneNode) return;
+          let dataUrl;
+          try {
+            dataUrl = await window.htmlToImage.toPng(liveNode, { pixelRatio: 2, backgroundColor: null, cacheBust: false });
+          } catch (error) { console.error('公式转图片失败', error); return; }
+          if (!dataUrl) return;
+          const display = liveNode.getAttribute('display') === 'true';
+          const img = document.createElement('img');
+          img.setAttribute('src', dataUrl);
+          img.setAttribute('alt', liveNode.getAttribute('aria-label') || '公式');
+          img.style.display = display ? 'block' : 'inline-block';
+          img.style.margin = display ? '10px auto' : '0 2px';
+          img.style.verticalAlign = 'middle';
+          img.style.maxWidth = '100%';
+          img.style.height = 'auto';
+          cloneNode.replaceWith(img);
+        }));
+      }
+
       // 公式块的 class 已被上面的清理逻辑摘掉，样式需要手动补回。用循环前
       // 抓好的引用操作（此时已按 class 选不中元素）。
       // 主题色要在公式补样式前取好：分数线的颜色必须写死成具体色值，
@@ -253,27 +287,25 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       // 根号：公众号粘贴会剥 div，根号必须由自带样式的 span 承载。根号线是
       // 被开方数 span 的 border-top，颜色写具体值（currentColor 会被洗掉）。
       // 不用 flex；inline-block + border-top 是粘贴安全做法，与分数同一思路。
-      // 2026-10-15 衔接修复与页面 CSS 同步：√ 放大抬升去够上划线、被开方
-      // 数行高压到 1.16 让划线贴住内容、负 margin 让划线压住 √ 右侧连成一笔。
-      // 2026-10-18 两处更新（与页面 CSS 双端同步）：
-      // ① 常规根号加 0.28em 顶垫，消掉 √ 顶臂与划线之间的天然豁口；
-      // ② 被开方数含竖式分数的高根号（抓引用时已存入 radicalTallSet）
-      //    换立骨画法——√ 常规字号沉底、被开方数加左边线撑满全高，
-      //    否则 1.22em 的 √ 够不到两行高的划线，视觉上"根号没包住"。
+      // 与页面 CSS 双端同步（2026-10-22 重画）：符号与被开方数 vertical-align:top
+      // 对齐到同一顶线、√ 竖臂顶端接住上边线，负 margin 让横线左端压住 √ 右臂
+      // 连成一笔；去掉旧版 1.22em 放大 + 0.28em 顶垫的脱节补丁。高根号仍用
+      // 立骨（被开方数加左边线撑满全高），√ 沉底当钩。√ 给衬线字体兜底，
+      // 公众号里退化成系统衬线 √ 也能保证横线与钩衔接。
       formulaRadicals.forEach((node) => {
-        node.setAttribute('style', 'display:inline-block;white-space:nowrap;vertical-align:baseline;');
+        node.setAttribute('style', 'display:inline-block;white-space:nowrap;vertical-align:middle;');
       });
       formulaRadicalSymbols.forEach((node, index) => {
         const tall = radicalTallSet.has(formulaRadicals[index]);
         node.setAttribute('style', tall
-          ? `font-style:normal;display:inline-block;font-size:1em;line-height:1;vertical-align:-0.08em;padding:0;margin-right:-0.06em;color:${palette.text};`
-          : `font-style:normal;display:inline-block;font-size:1.22em;line-height:1;vertical-align:-0.18em;padding:0 0.02em 0 0.05em;margin-right:-0.08em;color:${palette.text};`);
+          ? `font-style:normal;display:inline-block;font-size:1em;line-height:1;vertical-align:-0.08em;padding:0;margin-right:-0.08em;color:${palette.text};font-family:'Times New Roman',serif;`
+          : `font-style:normal;display:inline-block;font-size:1.08em;line-height:1;vertical-align:top;padding:0 0.01em 0 0.04em;margin-right:-0.12em;color:${palette.text};font-family:'Times New Roman',serif;`);
       });
       formulaRadicalBodies.forEach((node, index) => {
         const tall = radicalTallSet.has(formulaRadicals[index]);
         node.setAttribute('style', tall
-          ? `display:inline-block;border-top:2px solid ${palette.text};border-left:2px solid ${palette.text};padding:0.05em 0.3em 0 0.3em;margin-left:0;line-height:1.16;text-align:center;`
-          : `display:inline-block;border-top:2px solid ${palette.text};padding:0.28em 0.3em 0;line-height:1.16;text-align:center;`);
+          ? `display:inline-block;border-top:2px solid ${palette.text};border-left:2px solid ${palette.text};padding:0.05em 0.3em 0 0.28em;margin-left:0;line-height:1.16;text-align:center;`
+          : `display:inline-block;border-top:2px solid ${palette.text};padding:0.06em 0.3em 0;line-height:1.18;vertical-align:top;text-align:center;`);
       });
 
       // 微信编辑器的内容栏比桌面文章窄。不要保留桌面布局计算出的固定宽高，
@@ -344,7 +376,7 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       // 就是两层相加——粘贴后正文比正常文章窄一圈、和公众号原生版式对不齐
       // （2026-10-18 原老师反馈）。wrapper 只留上下节奏，左右归零让正文
       // 占满编辑器内容宽；行内元素自身的间距不受影响。
-      wrapper.setAttribute('style', `box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:24px 0;background-color:${palette.bg};color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
+      wrapper.setAttribute('style', `box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:24px 0;background-color:${palette.bg};color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,Roboto,Segoe UI Symbol,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
 
       // 标题块必须用 section 承载：微信编辑器粘贴白名单里没有 <header>，
       // header 标签会被整个剥壳，身上的下边框分隔线和间距全部丢失——
@@ -355,20 +387,20 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
 
       const title = document.createElement('h1');
       title.textContent = wechatTitle;
-      title.setAttribute('style', `margin:0 0 18px;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:30px;font-weight:800;line-height:1.25;letter-spacing:-0.5px;`);
+      title.setAttribute('style', `margin:0 0 18px;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,Roboto,Segoe UI Symbol,sans-serif;font-size:30px;font-weight:800;line-height:1.25;letter-spacing:-0.5px;`);
 
       const description = document.createElement('p');
       description.textContent = wechatDescription;
       // 摘要与作者行也要自带 font-family：粘贴后微信会给没写字体的文本套
       // 编辑器默认字体，和正文视觉不统一。
-      description.setAttribute('style', `margin:0 0 16px;color:${palette.muted};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;`);
+      description.setAttribute('style', `margin:0 0 16px;color:${palette.muted};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,Roboto,Segoe UI Symbol,sans-serif;font-size:16px;line-height:1.75;`);
 
       const meta = document.createElement('p');
       meta.textContent = `${wechatAuthor} · ${wechatDate}`;
-      meta.setAttribute('style', `margin:0;color:${palette.accent};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:13px;font-weight:700;line-height:1.6;letter-spacing:0.5px;`);
+      meta.setAttribute('style', `margin:0;color:${palette.accent};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,Roboto,Segoe UI Symbol,sans-serif;font-size:13px;font-weight:700;line-height:1.6;letter-spacing:0.5px;`);
 
       header.append(title, description, meta);
-      wechatClone.setAttribute('style', `width:auto;max-width:100%;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
+      wechatClone.setAttribute('style', `width:auto;max-width:100%;color:${palette.text};font-family:PingFang SC,Microsoft YaHei,Helvetica Neue,Arial,Roboto,Segoe UI Symbol,sans-serif;font-size:16px;line-height:1.75;overflow-wrap:anywhere;word-break:break-word;`);
       wrapper.append(header, wechatClone);
 
       return {
@@ -652,7 +684,7 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       padding: 1.2rem 0.6rem;
       text-align: center;
       text-indent: 0;
-      font-family: 'Times New Roman', 'STIX Two Math', Georgia, 'Songti SC', SimSun, serif;
+      font-family: 'Times New Roman', 'STIX Two Math', Georgia, 'Songti SC', SimSun, 'Noto Sans Symbols 2', serif;
       font-size: 1.22em;
       font-style: italic;
       letter-spacing: 0.03em;
@@ -660,6 +692,20 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
       line-height: 2;
     }
     .article-content :global(.formula-block p) { margin: 0; text-indent: 0; }
+    /* MathJax（tex-mml-chtml）渲染的公式：引擎自带字体与样式，这里只补
+       间距、居中、移动端不溢出。公众号复制会把公式转成图片，与此处网页
+       样式无关。行内公式与周围文字中线对齐。 */
+    .article-content :global(.mathjax-display) { margin: 0; text-indent: 0; }
+    .article-content :global(.mathjax-display p) { margin: 0; text-indent: 0; }
+    .article-content :global(mjx-container) { text-indent: 0; }
+    .article-content :global(mjx-container[display="true"]) {
+      display: block;
+      margin: 1.8rem auto;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.1em 0;
+    }
+    .article-content :global(mjx-container:not([display])) { margin: 0 0.1em; vertical-align: middle; }
     .article-content :global(.formula-block .op) { font-style: normal; padding: 0 0.32em; }
     .article-content :global(.formula-block sub) { font-size: 0.62em; }
     .article-content :global(.formula-block sup) { font-size: 0.62em; }
@@ -675,56 +721,51 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     }
     .article-content :global(.formula-frac .num) { padding: 0 0.45em 0.14em; border-bottom: 1.6px solid currentColor; }
     .article-content :global(.formula-frac .den) { padding: 0.14em 0.45em 0; }
-    /* 根号：√ 符号 + 上边线盖住整个被开方数（2026-10-14 原老师反馈的
-       “根号没包住内容”；2026-10-15 二次修复衔接：√ 用大号字形并抬升
-       顶臂去够上划线，被开方数行高压回 1.16 让上划线贴住内容顶部，
-       负 margin 让划线左端压住 √ 符号右侧、视觉连成一笔）。被开方数
-       内的 {a/b} 复用同一套竖式分数。 */
+    /* 根号：统一「√ 作钩 + 上边线作根号横线(vinculum)」的书面画法。
+       关键修复（原老师反馈"根号不好看/横线与 √ 脱节"）：
+       ① 改用衬线/数学字体（Cambria Math / STIX Two Math / Times）渲染 √
+          与数字，字形更接近教材印刷体，不再是系统默认那支又粗又方的 √；
+       ② 符号与被开方数都 vertical-align:top 对齐到同一顶线，√ 的竖臂顶端
+          正好接住上边线，再借负 margin 让横线左端压住 √ 右臂，连成一笔；
+       ③ 去掉原先 1.22em 放大抬升 + 0.28em 顶垫的"去够横线"补丁——那种
+          画法在不同字体下横线常与 √ 脱节，显得断裂；现在用对齐取代补丁。 */
     .article-content :global(.formula-radical) {
       display: inline-block;
       white-space: nowrap;
-      vertical-align: baseline;
+      vertical-align: middle;
       font-style: inherit;
+      font-family: 'Cambria Math', 'STIX Two Math', 'Times New Roman', 'Songti SC', SimSun, 'Noto Sans Symbols 2', serif;
     }
     .article-content :global(.formula-radical-symbol) {
       display: inline-block;
       font-style: normal;
-      font-size: 1.22em;
+      font-size: 1.08em;
       line-height: 1;
-      vertical-align: -0.18em;
-      padding: 0 0.02em 0 0.05em;
-      margin-right: -0.08em;
+      vertical-align: top;
+      padding: 0 0.01em 0 0.04em;
+      margin-right: -0.12em;
     }
     .article-content :global(.formula-radical-body) {
       display: inline-block;
-      border-top: 1.6px solid currentColor;
-      padding: 0.05em 0.3em 0;
-      line-height: 1.16;
+      border-top: 1.5px solid currentColor;
+      padding: 0.06em 0.3em 0;
+      line-height: 1.18;
+      vertical-align: top;
     }
-    /* 常规根号的顶垫：√ 字形右上臂与上划线之间天然有 3~7px 豁口
-       （字形本身不含顶臂上方的空隙），少量顶部 padding 把划线抬高，
-       让符号顶臂与划线贴住（2026-10-18 显示不完整反馈的纯文本部分）。 */
-    .article-content :global(.formula-radical:not(.formula-radical-tall) .formula-radical-body) {
-      padding-top: 0.28em;
-    }
-    /* 高根号（2026-10-18 原老师反馈"部分根号显示不完整"）：被开方数含竖式
-       分数时内容有 2 行多高，√ 字形只有一行高，固定放大 1.22em 也够不到
-       上划线，符号和划线脱节、视觉上根号"没包住"。改用立骨构造：√ 保持
-       常规字号沉到底部当钩，被开方数加左边线当根号立骨（随分数撑满全高），
-       上划线照旧——立骨上端接头、下端接钩，三段连成一笔。与公众号复制
-       管线（[slug].astro 内 formulaRadicals 分支）双端同步，全部使用粘贴
-       白名单属性（inline-block/border/vertical-align），不用 flex/transform。 */
+    /* 高根号（被开方数含竖式分数，内容 2 行多高）：√ 常规字号沉底当钩，
+       被开方数加左边线当根号立骨（随分数撑满全高），上划线照旧——立骨上端
+       接头、下端接钩，三段连成一笔。全部用粘贴白名单属性（inline-block/
+       border/vertical-align），不用 flex/transform，与公众号复制管线同步。 */
     .article-content :global(.formula-radical-tall .formula-radical-symbol) {
       font-size: 1em;
       vertical-align: -0.08em;
       padding: 0;
-      margin-right: -0.06em;
+      margin-right: -0.08em;
     }
     .article-content :global(.formula-radical-tall .formula-radical-body) {
-      border-top: 1.6px solid currentColor;
-      border-left: 1.6px solid currentColor;
-      padding: 0.05em 0.3em 0 0.3em;
-      margin-left: 0;
+      border-top: 1.5px solid currentColor;
+      border-left: 1.5px solid currentColor;
+      padding: 0.05em 0.3em 0 0.28em;
     }
     .article-content :global(img) { width: 100%; height: auto; margin: 2.2rem 0; border-radius: 12px; }
     .article-content :global(table) { display: block; width: 100%; margin: 2rem 0; overflow-x: auto; border-collapse: collapse; color: var(--paper); background: var(--ink-soft); }

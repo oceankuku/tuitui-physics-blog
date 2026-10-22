@@ -76,99 +76,102 @@ export function contentImages() {
 // containerDirective 编译成普通 div，rehype 阶段就认不出了）。
 // remark 阶段生成的是 mdast 元素：用 data.hName 指定输出标签。
 export function formulaBlocks() {
-  const fracNode = (num, den) => ({
-    type: 'paragraph',
-    data: {
-      hName: 'span',
-      hProperties: { className: ['formula-frac'] },
-      hChildren: [
-        { type: 'element', tagName: 'span', properties: { className: ['num'] }, children: [{ type: 'text', value: num.trim() }] },
-        { type: 'element', tagName: 'span', properties: { className: ['den'] }, children: [{ type: 'text', value: den.trim() }] },
-      ],
-    },
-    children: [],
-  });
-  // 根号节点：symbol 是 √ 字符，radicand（被开方数）由 formula-radical-body
-  // 承载并带 CSS 上边线，根号线自然盖住内部所有内容（含竖式分数）。
-  // 被开方数含竖式分数时加 formula-radical-tall（高根号立骨构造 2026-10-18）：
-  // √ 字形只有一行高，够不到两行高的上划线，页面 CSS 与公众号复制管线
-  // 都按此标记切换成「√ 沉底 + 被开方数左边线立骨」的画法。
-  const radicalNode = (radicandParts) => {
-    const isTall = radicandParts.some((part) => part.type === 'element' && (part.properties?.className ?? []).includes('formula-frac'));
-    return {
-      type: 'paragraph',
-      data: {
-        hName: 'span',
-        hProperties: { className: isTall ? ['formula-radical', 'formula-radical-tall'] : ['formula-radical'] },
-        hChildren: [
-          { type: 'element', tagName: 'span', properties: { className: ['formula-radical-symbol'] }, children: [{ type: 'text', value: '√' }] },
-          { type: 'element', tagName: 'span', properties: { className: ['formula-radical-body'] }, children: radicandParts },
-        ],
-      },
-      children: [],
-    };
+  // 单位黑名单：避免把 m/s、km/h、kg/m³ 等单位的斜杠误当成分数转竖式。
+  const UNIT_TOKENS = new Set(['m', 's', 'h', 'km', 'kg', 'cm', 'mm', 'nm', 'N', 'J', 'W', 'C', 'A', 'V', 'Pa', 'Hz', 'K', 'min', 'g', 'mg', 'mol', 'L', 'mL', 'Ω', 'T', 'rad', 'rev', 'dB', '°C']);
+  const stripSuperSub = (t) => t.replace(/[₀-₉²³⁰¹⁴⁵⁶⁷⁸⁹]/g, '');
+  // 数学原子：数字(带上下标)、单字母(带下标)、括号组、√()、√token。
+  // 注意：数字重复类必须同时包含 ASCII 数字 0-9 与下标数字 ₀₉²³，否则
+  // 「20/10」会被拆成 2 + 0/1 + 0（只认了 2 和 1，漏掉 ASCII 的 0），
+  // 分数渲染错位。这里用 [0-9₀-₉²³]* 同时覆盖两类数字。
+  const ATOM = '(?:\\d[0-9₀-₉²³]*[A-Za-zα-ωΔ]?|[A-Za-zα-ωΔ][₀-₉²³]*|√\\([^)]*\\)|√[0-9A-Za-zα-ωΔ₀-₉²³]+|\\([^)]*\\))';
+  const isUnit = (tok) => UNIT_TOKENS.has(stripSuperSub(tok));
+
+  // 内联公式统一渲染为「HTML 字符串节点」（type:'html'，交由 rehype-raw 解析
+  // 为真实 <span>），而不是 mdast 节点——因为 remark 阶段处理的是 mdast，把
+  // 自定义 <span> 作为「段落内的行内子节点」插回去时，mdast 没有内联元素节点
+  // 类型：用 element 节点会被 mdast-util-to-hast 当成未知节点退化为 <div> 并
+  // 丢 class；用 paragraph+hName 节点又会触发「Cannot compile paragraph node」
+  // （块级节点不能嵌在行内上下文）。只有 html 节点 + rehype-raw 能在正文/答案/
+  // 备注/公式块内任意嵌套地还原出带 class 的 <span>（含根号里套竖式分数、分数
+  // 里套根号），且与 [slug].astro 复制管线按 class 抓取完全兼容。
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const spanHTML = (cls, inner) => `<span class="${cls}">${inner}</span>`;
+  const SYM = '√';
+  // 根号 HTML：symbol 是 √ 字符，被开方数由 formula-radical-body 承载，其 CSS
+  // 上边线即根号横线（vinculum）。被开方数含竖式分数时加 formula-radical-tall
+  // （高根号：复制管线切立骨画法，见 [slug].astro）。
+  const radicalHTML = (radicandHTML) => {
+    const tall = radicandHTML.includes('class="formula-frac"');
+    const cls = tall ? 'formula-radical formula-radical-tall' : 'formula-radical';
+    return spanHTML(cls, spanHTML('formula-radical-symbol', SYM) + spanHTML('formula-radical-body', radicandHTML));
   };
-  // 把一段文本拆成「文本 + 竖式分数」的 hChildren 序列；根号内部同样走 {a/b} 竖式。
-  const fracHChildren = (num, den) => [{
-    type: 'element',
-    tagName: 'span',
-    properties: { className: ['formula-frac'] },
-    children: [
-      { type: 'element', tagName: 'span', properties: { className: ['num'] }, children: [{ type: 'text', value: num.trim() }] },
-      { type: 'element', tagName: 'span', properties: { className: ['den'] }, children: [{ type: 'text', value: den.trim() }] },
-    ],
-  }];
-  const toInlineParts = (value) => String(value)
-    .split(/(\{[^{}]*\/[^{}]*\})/g)
-    .filter(Boolean)
-    .map((part) => {
-      const match = part.match(/^\{([^{}]*?)\/([^{}]*)\}$/);
-      return match ? fracHChildren(match[1], match[2]) : { type: 'text', value: part };
-    })
-    .flat();
-  const transformText = (value) => {
-    // 先拆根号 √(...)：括号配平，容忍被开方数里嵌一层小括号（如 √(v₀² + (gt)²)）
-    const radicalSplit = String(value).split(/(√\([^()]*(?:\([^()]*\)[^()]*)*\))/g).filter(Boolean);
-    if (radicalSplit.length > 1) {
-      return radicalSplit.map((part) => {
-        const match = part.match(/^√\(([\s\S]*)\)$/);
-        if (!match) return transformText(part) ?? [{ type: 'text', value: part }];
-        return [radicalNode(toInlineParts(match[1]))];
-      }).flat();
-    }
-    const parts = String(value).split(/(\{[^{}]*\/[^{}]*\})/g).filter(Boolean);
-    if (parts.length <= 1) return null;
-    return parts.map((part) => {
-      const match = part.match(/^\{([^{}]*?)\/([^{}]*)\}$/);
-      return match ? fracNode(match[1], match[2]) : { type: 'text', value: part };
-    });
-  };
-  const transformNode = (node) => {
-    // 文本节点：拆出分数
-    if (node.type === 'text') return transformText(node.value) ?? [node];
-    // 段落：若其中混有分数，拆成兄弟节点序列
-    if (node.type === 'paragraph') {
-      const pieces = [];
-      for (const child of node.children ?? []) {
-        const out = transformNode(child);
-        for (const piece of (out ?? [child])) pieces.push(piece);
+  // 竖式分数：分子(.num) + 分母(.den)。分子分母先经 parseMath，使 1/√6 的分母
+  // 自动渲染成根号、2L/(g·sin²θ) 的分母保留括号组。
+  const fracHTML = (numHTML, denHTML) => spanHTML('formula-frac', spanHTML('num', numHTML) + spanHTML('den', denHTML));
+
+  // 递归把一段文本转成内联 HTML 字符串：√(...) → √token → {a/b} → 裸斜杠分数
+  // （安全子集）。始终返回字符串，正文/答案/备注/公式块内统一生效。
+  const parseSlash = (value) => {
+    // 局部正则：每次调用新建一个带 g 标志的正则对象，lastIndex 互不干扰，
+    // 避免嵌套递归（parseSlash→parseMath→parseSlash）共享同一 lastIndex
+    // 导致复位、重复匹配同一子串、陷入死循环并耗尽内存（历史 OOM 根因）。
+    const SLASH_FRAC = new RegExp('(' + ATOM + ')\\s*/\\s*(' + ATOM + ')', 'g');
+    SLASH_FRAC.lastIndex = 0;
+    let out = '';
+    let last = 0;
+    let m;
+    while ((m = SLASH_FRAC.exec(value))) {
+      const [full, num, den] = m;
+      if (isUnit(num) || isUnit(den)) {
+        // 单位斜杠（m/s、km/h、kg/m³）保留原样，仅作为文本输出并转义。
+        out += esc(value.slice(last, m.index + full.length));
+        last = m.index + full.length;
+        continue;
       }
-      const hasFrac = pieces.some((piece) => piece.type === 'paragraph' && piece.data?.hName === 'span');
-      if (!hasFrac) return [node];
-      // 纯文本段落整体变分数时，直接替换；否则拍平为同级序列
-      return pieces;
+      out += esc(value.slice(last, m.index));
+      out += fracHTML(parseMath(num), parseMath(den));
+      last = m.index + full.length;
     }
-    // 其他节点（emphasis 等）：递归处理子节点
-    if (node.children?.length) {
-      node.children = node.children.flatMap((child) => transformNode(child) ?? [child]);
-    }
-    return [node];
+    out += esc(value.slice(last));
+    return out;
   };
-  // 选择题选项自动分段（2026-10-15 原老师反馈"选项没写工整"）。markdown
-  // 软换行会把「A. …」到「D. …」合并进同一个 <p>，渲染成挤成一坨的一行。
-  // 这里把段落文本按行扫描：以 A./B./C./D./E./F. 开头的选项行各自拆成独立
-  // 段落，写作时一行一个选项即可，不依赖行尾双空格。仅处理普通文本节点，
-  // 不碰加粗/链接等富文本（选项行通常是纯文本）。
+  const parseBrace = (value) => {
+    const bSplit = String(value).split(/(\{[^{}]*\/[^{}]*\})/g).filter(Boolean);
+    if (bSplit.length > 1) {
+      return bSplit.map((part) => {
+        const m = part.match(/^\{([^{}]*?)\/([^{}]*)\}$/);
+        if (m) return fracHTML(parseMath(m[1]), parseMath(m[2]));
+        return parseSlash(part);
+      }).join('');
+    }
+    return parseSlash(value);
+  };
+  const parseRest = (value) => {
+    // 裸根号 √token（如 √2、√h、√g 这类无括号简写也渲染成根号）。
+    const tokSplit = String(value).split(/(√[0-9A-Za-zα-ωΔ₀-₉²³]+)/g).filter(Boolean);
+    if (tokSplit.length > 1) {
+      return tokSplit.map((part) => {
+        const m = part.match(/^√([0-9A-Za-zα-ωΔ₀-₉²³]+)$/);
+        if (m) return radicalHTML(esc(m[1]));
+        return parseBrace(part);
+      }).join('');
+    }
+    return parseBrace(value);
+  };
+  const parseMath = (value) => {
+    // 1) 带括号根号 √(...)
+    const radSplit = String(value).split(/(√\([^()]*(?:\([^()]*\)[^()]*)*\))/g).filter(Boolean);
+    if (radSplit.length > 1) {
+      return radSplit.map((part) => {
+        const m = part.match(/^√\(([\s\S]*)\)$/);
+        if (m) return radicalHTML(parseMath(m[1]));
+        return parseRest(part);
+      }).join('');
+    }
+    return parseRest(value);
+  };
+
+  // 选择题选项自动分段（2026-10-15 原老师反馈"选项没写工整"）。
   const optionLine = /^([A-F])[.、．]\s*/;
   const splitOptionLines = (node) => {
     if (node.type !== 'paragraph' || node.data?.hName) return [node];
@@ -191,43 +194,66 @@ export function formulaBlocks() {
     node.children = node.children.flatMap(splitOptionLines);
     node.children.forEach(applyOptionSplit);
   };
+
+  // 收集一个节点下全部文本（含后代），用于判断 :::formula 块是否为 LaTeX。
+  const collectText = (node) => {
+    if (node.type === 'text') return node.value;
+    if (!node.children) return '';
+    return node.children.map(collectText).join('');
+  };
+
   return async (tree) => {
-    // 选项分段先于所有节点处理：题干/答案卡与正文里的选择题选项统一在
-    // 此拆成独立段落（2026-10-15 原老师反馈"选项没写工整"），写一行一个
-    // 选项即可，后续 formula 分数转换拿到的是已分段的结构。
+    // 选项分段先于数学解析：题干/答案卡与正文里的选择题选项先拆成独立段落。
     applyOptionSplit(tree);
     const visitAny = (node) => {
+      // 四类围栏容器：formula 转 div.formula-block，其余转白名单 blockquote。
       if (node.type === 'containerDirective' && node.name === 'formula') {
         node.data ??= {};
-        node.data.hName = 'div';
-        node.data.hProperties = { className: ['formula-block'] };
-        node.children = node.children.flatMap(transformNode);
-        return;
+        const raw = collectText(node);
+        // LaTeX 判定：含反斜杠命令（\frac 等）、$ 定界符、或 LaTeX 下标
+        // 标记（v_0、x_max 这类裸下标，2026-10-23 修复——全站 MathJax 化后
+        // 公式块可能只有下标没有命令）。旧语法 {a/b}、√( ) 不含这些特征。
+        if (/([\\$])|([A-Za-zΔα-ω]_[A-Za-z0-9{])/.test(raw)) {
+          // LaTeX 公式：交给 MathJax 自动排版（文章页加载时扫描 $$...$$ / $...$）。
+          // 每个公式段独立包 $$...$$：块内多段（公式间空行）各自成为独立的
+          // 显示容器——若合并进同一 $$，换行只是空白，两个公式会连排成一行
+          // （2026-10-23 修复，smoke-5 抓到）。
+          const lines = node.children
+            .map((child) => collectText(child).trim())
+            .filter(Boolean);
+          node.data.hName = 'div';
+          node.data.hProperties = { className: ['mathjax-display'] };
+          node.children = [{ type: 'paragraph', children: [{ type: 'text', value: lines.map((line) => `$$\n${line}\n$$`).join('\n\n') }] }];
+        } else {
+          node.data.hName = 'div';
+          node.data.hProperties = { className: ['formula-block'] };
+        }
+      } else if (node.type === 'containerDirective' && node.name === 'problem') {
+        node.data ??= {}; node.data.hName = 'blockquote'; node.data.hProperties = { className: ['problem-card'] };
+      } else if (node.type === 'containerDirective' && node.name === 'answer') {
+        node.data ??= {}; node.data.hName = 'blockquote'; node.data.hProperties = { className: ['answer-card'] };
+      } else if (node.type === 'containerDirective' && node.name === 'note') {
+        node.data ??= {}; node.data.hName = 'blockquote'; node.data.hProperties = { className: ['note-card'] };
       }
-      // 例题/练习题干卡片（2026-10-18 原老师要求：例题字体要和正文区分）。
-      // 渲染成 blockquote.problem-card：blockquote 在微信粘贴白名单里，
-      // 复制管线零改动；卡片内字号缩一档、楷体，与正文视觉分离。
-      if (node.type === 'containerDirective' && node.name === 'problem') {
-        node.data ??= {};
-        node.data.hName = 'blockquote';
-        node.data.hProperties = { className: ['problem-card'] };
-        return;
-      }
-      // 答案+解析卡片（2026-10-18 原老师要求：答案也用题目同款字体格式）。
-      // 同走 blockquote 白名单载体，绿色系区分题干（答案底色偏绿、题干偏灰）。
-      if (node.type === 'containerDirective' && node.name === 'answer') {
-        node.data ??= {};
-        node.data.hName = 'blockquote';
-        node.data.hProperties = { className: ['answer-card'] };
-        return;
-      }
-      // 备注/深度理解提示卡（2026-10-18 原老师要求：给有深度理解的内容
-      // 一个醒目去处）。琥珀色左边线 + 浅底，与题干/答案三色分明。
-      if (node.type === 'containerDirective' && node.name === 'note') {
-        node.data ??= {};
-        node.data.hName = 'blockquote';
-        node.data.hProperties = { className: ['note-card'] };
-        return;
+      // 每个文本子节点都做数学解析：√( )、√token、{a/b}、裸斜杠分数，
+      // 正文/答案/备注/公式块内统一渲染，不再局限于 :::formula 块。
+      // 仅当本段确实含公式结构时换成 html 节点（交由 rehype-raw 解析成
+      // 真实 <span>）；纯文本保持原样，避免把含 < > & 的普通文字无故转成
+      // html 节点（不等式 1 < t₂/t₁ < 2 里的 < 会在 html 串里被转义）。
+      if (node.children) {
+        node.children = node.children.map((child) => {
+          if (child.type === 'text') {
+            // 含 $ 的文本是 MathJax 行内公式（$...$），保留原样交给 MathJax
+            // 自动排版，不走旧版 {a/b}/√( ) 解析（否则会破坏 LaTeX 语法）。
+            if (child.value.includes('$')) return child;
+            const html = parseMath(child.value);
+            if (/class="formula-(frac|radical)/.test(html)) {
+              return { type: 'html', value: html };
+            }
+            return child;
+          }
+          return child;
+        });
       }
       node.children?.forEach(visitAny);
     };

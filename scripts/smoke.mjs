@@ -27,12 +27,18 @@ try {
   // plainDirectives 兜底插件必须把它还原成源文本。
   // smoke-3 额外带软换行选择题选项（2026-10-15 回归）：选项行必须被拆成
   // 独立段落，不能合并进同一个 <p>。
+  // smoke-4 常规根号 fixture（2026-10-22）：K001–K007 已全站转 MathJax，
+  // 旧自建公式渲染的「常规根号（纯文本被开方数）」在真实文章里不再出现，
+  // 断言迁移到本 fixture（旧渲染双轨保留，分支必须继续工作）。
+  // smoke-5 MathJax fixture（2026-10-22）：验证 LaTeX 公式块渲染与行内公式。
   for (let i = 1; i <= 9; i++) {
     const body = i === 1 ? 'Fixture body 1.\n\n:::formula\nv(B) = {x₁ + x₂ / 2T′}\n\nv(x/2) = √({v₀² + v² / 2})\n:::\n'
       : i === 2 ? 'Fixture body 2.\n\n| 列甲 | 列乙 |\n| --- | --- |\n| 比例 | 位移 1:3:5、速度 1:2:3 |\n\n```text\nfixture code block\n```\n'
       : i === 3 ? ':::problem\n下列说法正确的是（　）\n\nA. 选项甲\nB. 选项乙\nC. 选项丙\nD. 选项丁\n:::\n'
+      : i === 4 ? 'Fixture body 4.\n\n:::formula\nx = √(2gh)\n:::\n'
+      : i === 5 ? 'Fixture body 5.\n\n:::formula\nv = v_0 + at\n\nx = \\frac{1}{2} a t^2\n:::\n\n行内公式 $\\Delta t \\to 0$ 与 $\\frac{1200}{5400} \\approx 1.07$ 应渲染。\n'
       : `Fixture body ${i}.\n`;
-    await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n---\n\n## Check\n\n${body}`);
+    await writeFile(resolve(content, `smoke-${i}.md`), `---\ntitle: "Smoke note ${i}"\ndescription: "Pagination fixture ${i}"\npubDate: 2026-10-0${i}\ntags: ["测试"]\n${i === 5 ? 'mathjax: true\n' : ''}---\n\n## Check\n\n${body}`);
   }
   await writeFile(resolve(content, 'private-fixture.md'), '---\ntitle: "Private fixture"\ndescription: "Must stay private"\npubDate: 2026-10-10\ndraft: true\n---\n\nPrivate body.\n');
   const env = { ...process.env, SITE_URL: 'https://physics.example' };
@@ -198,8 +204,9 @@ try {
     // 根号回归断言（2026-10-14 原老师反馈）：根号必须是结构化 span（符号 +
     // 上划线盖住整个被开方数），不能是裸 √ 字符 + 括号；根号下的分数与
     // 外部一致用竖式（inline-block + 块级分子分母 + 具体色值分数线）。
-    // 2026-10-15 衔接回归：√ 符号与被开方数上划线要连成一笔——符号放大
-    // （font-size:1.22em）且划线贴住内容（行高 1.16），样式签名必须同时在。
+    // 2026-10-22 重画：常规根号改用「对齐画法」——符号与被开方数都
+    // vertical-align:top 对齐到同一顶线（√ 竖臂顶端接住上边线、负 margin
+    // 让横线压住右臂连成一笔），不再用旧版 1.22em 放大 + 0.28em 顶垫补丁。
     assert(!body.html.includes('√('), '禁止裸 √( 括号写法，根号必须结构化');
     {
       // 富文本里 class 已摘除，改从样式签名断言：被开方数 span 带 border-top（根号上划线）
@@ -209,17 +216,18 @@ try {
       const hasFracInRadical = radicalBodies.some((radicalBody) => radicalBody.includes('border-bottom'));
       assert(hasFracInRadical, '根号内的分数必须沿用竖式（分子带 border-bottom 分数线）');
       // 2026-10-18 显示不完整回归：fixture 里 √({v₀² + v² / 2}) 是含分数的
-      // 高根号，必须走立骨画法——√ 常规字号（1em）+ 被开方数带左边线撑满
-      // 全高；否则 1.22em 的 √ 够不到两行高的上划线（原老师反馈的根因）。
-      // 注意：smoke-1 fixture 只有这一个根号，全部断言按立骨画法设计；
-      // 常规根号（纯文本被开方数）走放大+顶垫画法，断言在站点文章页补查。
+      // 高根号，必须走立骨画法——√ 常规字号（1em）沉底 + 被开方数带左边线撑满
+      // 全高；否则放大的 √ 字形只有一行高，够不到两行高的上划线（原老师反馈
+      // 的根因）。注意：smoke-1 fixture 只有这一个根号，全部断言按立骨画法
+      // 设计；常规根号（纯文本被开方数）走对齐画法，断言在站点文章页补查。
       const tallBody = radicalBodies.find((radicalBody) => radicalBody.includes('border-left'));
       assert(tallBody, '含分数的高根号被开方数必须带 border-left 立骨（√ 沉底 + 左边线撑满全高）');
       assert(tallBody.includes('line-height:1.16'), '高根号被开方数行高必须是 1.16，上划线贴住内容');
       const tallSymbol = body.html.match(/<span style="font-style:normal;display:inline-block;font-size:1em;line-height:1;vertical-align:-0\.08em[^"]*">√<\/span>/);
       assert(tallSymbol, '高根号符号必须沉底（font-size:1em + vertical-align:-0.08em）');
-      assert(!body.html.includes('font-size:1.22em'), 'fixture 只有高根号：禁止任何根号沿用放大画法（√ 字形够不到两行高划线）');
-      // 常规根号分支（放大 1.22em + 0.28em 顶垫）在站点真实文章页验证
+      assert(!body.html.includes('font-size:1.22em'), '禁止任何根号沿用旧版放大画法（1.22em 已废止）');
+      assert(!body.html.includes('font-size:1.08em'), 'fixture 只有高根号：不应出现常规根号的 1.08em 对齐画法');
+      // 常规根号分支（1.08em 对齐 + vertical-align:top）在站点真实文章页验证
     }
     // 选项分段回归（2026-10-15 原老师反馈"选项没写工整"）：软换行的
     // A./B./C./D. 选项行必须各自拆成独立 <p>，不能合并进同一个段落。
@@ -248,13 +256,35 @@ try {
     assert(!tableHtml.includes('<div></div>'), '禁止出现未处理指令产生的空 <div></div>');
     await page.goto(hosting.origin + '/blog/k001-mass-point-reference-frame/');
   }
-  // 常规根号分支回归（2026-10-18 显示不完整修复的另一侧）：纯文本被开方数
-  // 的根号走「放大 1.22em + 0.28em 顶垫」画法。K001 有 √(v²+v²) 纯文本根号。
+  // 常规根号分支回归（2026-10-22 重画 + fixture 迁移）：纯文本被开方数的根号
+  // 走「对齐画法」——符号 1.08em + vertical-align:top，与被开方数同一顶线，
+  // 横线压臂连成一笔。K001–K007 已全站转 MathJax，此分支由 smoke-4 承载。
   {
-    const regularBody = await page.goto(`${hosting.origin}/blog/k001-mass-point-reference-frame/`).then(() => page.evaluate(() => window.buildWechatRichText()));
-    assert(regularBody.html.includes('font-size:1.22em'), '常规根号符号必须放大（font-size:1.22em）顶住上划线');
-    assert(regularBody.html.includes('padding:0.28em'), '常规根号被开方数必须带 0.28em 顶垫，√ 顶臂才能贴住划线');
-    assert(/font-size:1\.22em[^>]*margin-right:-0\.08em|margin-right:-0\.08em[^>]*font-size:1\.22em/.test(regularBody.html), '常规根号符号必须带负右 margin 让划线压住顶臂');
+    const regularBody = await page.goto(`${hosting.origin}/blog/smoke-4/`).then(() => page.evaluate(() => window.buildWechatRichText()));
+    assert(regularBody.html.includes('font-size:1.08em'), '常规根号符号必须用 1.08em 对齐画法（2026-10-22 重画）');
+    assert(regularBody.html.includes('vertical-align:top'), '常规根号符号与被开方数必须 vertical-align:top 同顶线对齐');
+    assert(/font-size:1\.08em[^>]*margin-right:-0\.12em|margin-right:-0\.12em[^>]*font-size:1\.08em/.test(regularBody.html), '常规根号符号必须带负右 margin 让横线压住右臂');
+    assert(!regularBody.html.includes('font-size:1.22em'), '常规根号禁止沿用废止的 1.22em 放大画法');
+    await page.goto(hosting.origin + '/blog/k001-mass-point-reference-frame/');
+  }
+  // MathJax 渲染回归（2026-10-22 全站切换）：LaTeX 公式块输出 mjx-container，
+  // 行内公式同样渲染；未开 mathjax 的页面不加载引擎脚本。
+  {
+    await page.goto(`${hosting.origin}/blog/smoke-5/`);
+    await page.waitForFunction(() => document.querySelectorAll('mjx-container').length > 0, null, { timeout: 20000 }).catch(() => {});
+    const mathjaxState = await page.evaluate(() => ({
+      mjx: document.querySelectorAll('mjx-container').length,
+      display: document.querySelectorAll('mjx-container[display="true"]').length,
+      rawTeX: document.body.textContent.includes('\\frac'),
+    }));
+    assert(mathjaxState.mjx >= 3, 'smoke-5 应渲染出至少 3 个 mjx-container（2 显示 + 2 行内），实际 ' + JSON.stringify(mathjaxState));
+    assert(mathjaxState.display >= 2, '两个 :::formula 块必须是显示公式，实际 ' + JSON.stringify(mathjaxState));
+    assert(!mathjaxState.rawTeX, '页面不得残留未渲染的 \\frac 源码');
+    const vendorLoaded = await page.evaluate(() => Array.from(document.querySelectorAll('script[src]')).some((s) => (s.getAttribute('src') || '').includes('/vendor/mathjax/')));
+    assert(vendorLoaded, 'mathjax: true 的页面必须加载自托管引擎脚本');
+    // 全站 MathJax 化后所有真实文章都开着 mathjax，用无公式的 smoke-9 验证按需加载。
+    const plainScripts = await page.goto(`${hosting.origin}/blog/smoke-9/`).then(() => page.evaluate(() => Array.from(document.querySelectorAll('script[src]')).map((s) => s.getAttribute('src') || '').filter((src) => src.includes('/vendor/mathjax/')).length));
+    assert.equal(plainScripts, 0, '未开 mathjax 的页面不得加载 MathJax 引擎脚本（按需加载）');
     await page.goto(hosting.origin + '/blog/k001-mass-point-reference-frame/');
   }
   // 「一键复制」与「逐张复制图片」两个按钮共用 wechat-copy-button 类，需按文字精确定位。

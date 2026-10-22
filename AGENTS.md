@@ -14,6 +14,27 @@
 - 公众号复制、选段复制/引用、分享图片、文章目录和相邻文章由组件维护。写文章时不要修改这些实现。
 - 原始材料放在 `workspace/inbox/`，只读处理。用户只要求写一篇文章时，不顺带重写其他文章或改变站点主题。
 
+## 公式与数学符号渲染标准（MathJax 方案）
+
+**2026-10-22 起公式渲染切换为自托管 MathJax（`tex-mml-chtml.js` 3.2.2），LaTeX 语法，全站 21 篇已改造完毕。** 本节为唯一公式标准，旧 `{a/b}`/`√( )` 语法废止。
+
+- **渲染管线**：文章 frontmatter 加 `mathjax: true` 后，页面加载自托管 MathJax（`public/vendor/mathjax/tex-mml-chtml.js` + CHTML 字体）自动排版 `$$...$$` / `$...$`。`scripts/content-images.mjs` 的 `formulaBlocks` 插件双轨分发：`:::formula` 块含 `\`/`$` 时输出 MathJax 显示公式（`div.mathjax-display`），否则走旧 `.formula-block` 渲染（存量兼容用）。
+- **公众号复制**：`buildWechatRichText` 里每个 `mjx-container` 用 `html-to-image`（自托管 `public/vendor/html-to-image/`）栅格化为 2x PNG 内嵌——公众号里公式以图片显示，粘贴安全。
+- **Noto Sans Symbols 2 字体兜底保留**：正文叙述里的裸符号（≈、→、²、希腊字母）仍靠它保证跨设备字形一致（`public/fonts/`、`src/styles/noto-symbols2.css`）。
+
+写法约定（完整规则见 `AI_WRITING_GUIDE.md` 第九节）：
+
+- **frontmatter 必须加 `mathjax: true`**；独立公式用 `:::formula` 块直接写 LaTeX（不需 `$`），行内公式用 `$...$`；
+- **分数一律竖式 `\frac{分子}{分母}`**，禁斜杠算式（`1200 / 5400` 不许出现在正文）、禁 Unicode 分数（½ 等）、禁旧语法 `{a/b}`、`√( )`；
+- 常用语法：下标 `v_0`、上标 `v^2`、中文下标 `v_{\text{末}}`、根号 `\sqrt{2gh}`、极限 `\lim_{\Delta t \to 0}`、乘 `\times`、约等 `\approx`、希腊字母 `\Delta`/`\theta`/`\pi`、三角函数 `\sin^2\theta`；
+- **单位不进公式**：m/s、km/h、m/s² 保持纯文本写在 `$...$` 外（`$v = 20$ m/s`）；
+- 公式块内不嵌 HTML 标签；变量下标用 `v_R`、中文用 `v_{\text{甲}}`。
+
+硬约束：
+
+- `:::formula` / `:::problem` / `:::answer` / `:::note` 均为围栏容器，**禁止互相嵌套**（尤其 `:::formula` 不能放进 `:::answer`）——这是公众号复制管线（白名单只认 section / p / span / blockquote，剥离 div / flex / currentColor）的前提；改复制逻辑前必读 `docs/wechat.md` 并跑 `npm run test:smoke`。
+- **tsconfig.json 的 exclude 必须保留 `public` 与 `workspace`**——否则 `astro check` 会诊断 public/vendor 里的 1.17MB 压缩 JS 导致构建 OOM。
+
 ## 完成检查
 
 1. 按自然写作规范通读全文，核对引用、事实、日期、图片路径。

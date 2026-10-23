@@ -527,6 +527,36 @@
   <text x="568" y="440" font-size="22" fill="#1a1a1a">此刻仅速度相同，位置一般不同</text>
 </svg>
 
+<!-- 16. 2017 浙江4月选考 T6：刹车礼让 v–t 图 -->
+<svg id="fig-brake-courtesy" xmlns="http://www.w3.org/2000/svg" width="900" height="460" viewBox="0 0 900 460">
+  <defs>
+    <marker id="brkArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="900" height="460" fill="#ffffff"/>
+  <text x="450" y="40" font-size="24" fill="#1a1a1a" text-anchor="middle">刹车礼让的 v–t 图：反应段匀速，随后匀减速到恰好停在斑马线前</text>
+  <line x1="120" y1="360" x2="830" y2="360" stroke="#1a1a1a" stroke-width="3" marker-end="url(#brkArr)"/>
+  <line x1="120" y1="360" x2="120" y2="70" stroke="#1a1a1a" stroke-width="3" marker-end="url(#brkArr)"/>
+  <text x="842" y="368" font-size="25" font-style="italic" fill="#1a1a1a">t</text>
+  <text x="84" y="82" font-size="25" font-style="italic" fill="#1a1a1a">v</text>
+  <!-- 匀速段 + 减速段 -->
+  <polyline points="120,120 220,120 620,360" fill="none" stroke="#c0392b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="220" y1="120" x2="220" y2="360" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 6"/>
+  <line x1="120" y1="120" x2="220" y2="120" stroke="#90a4ae" stroke-width="2" stroke-dasharray="0"/>
+  <text x="66" y="128" font-size="24" fill="#1a1a1a">10</text>
+  <text x="238" y="112" font-size="22" fill="#1565c0">反应段：匀速（0.5 s）</text>
+  <text x="430" y="180" font-size="22" fill="#c0392b">匀减速段</text>
+  <text x="596" y="398" font-size="23" fill="#1a1a1a">2.5</text>
+  <text x="208" y="398" font-size="23" fill="#1a1a1a">0.5</text>
+  <text x="106" y="398" font-size="23" fill="#1a1a1a">0</text>
+  <!-- 位移标注：两段距离 -->
+  <line x1="120" y1="428" x2="220" y2="428" stroke="#1565c0" stroke-width="2.5" marker-start="url(#brkArr)" marker-end="url(#brkArr)"/>
+  <text x="128" y="452" font-size="21" fill="#1565c0">5 m</text>
+  <line x1="220" y1="428" x2="620" y2="428" stroke="#c0392b" stroke-width="2.5" marker-start="url(#brkArr)" marker-end="url(#brkArr)"/>
+  <text x="398" y="452" font-size="21" fill="#c0392b">10 m（减速段位移）</text>
+</svg>
+
 </div>
 </body>
 </html>

@@ -24,6 +24,7 @@ const jobs = [
   ['#fig-graph-compare', 'motion-graphs', 'graph-compare.png'],
   ['#fig-graph-shapes', 'motion-graphs', 'graph-shapes.png'],
   ['#fig-graph-intersect', 'motion-graphs', 'graph-intersection.png'],
+  ['#fig-brake-courtesy', 'motion-graphs', 'brake-courtesy-vt.png'],
 ];
 
 // K006 的 RST 图复用 K003 同一张 SVG 源（选择器再渲染一份独立输出）

@@ -328,6 +328,9 @@ D. 1 : 2
 
 :::problem
 14.（2019·全国Ⅰ卷 T18 同型题，改编）篮球架下的运动员原地垂直起跳扣篮，离地后重心上升的最大高度为 H。上升第一个 $\frac{H}{4}$ 所用的时间为 $t_1$，第四个 $\frac{H}{4}$ 所用的时间为 $t_2$。不计空气阻力，则 $t_1 : t_2$ 为：
+
+![起跳扣籾示意图：重心上升的最大高度为 H，按 H/4 四等分，标出第一段与第四段](/blog-images/k006-displacement-time-formula/basketball-jump-h-quarters.png)
+
 A. 1 : 1
 B. $(2 + \sqrt{3}) : 1$
 C. $(\sqrt{3} + 1) : (\sqrt{3} - 1)$

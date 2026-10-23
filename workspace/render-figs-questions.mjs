@@ -16,6 +16,14 @@ const jobs = [
   ['#fig-cart-ball', 'k007-free-fall', 'cart-ball-2015-beijing.png'],
   ['#fig-dive', 'k007-free-fall', 'dive-10m-segments.png'],
   ['#fig-incline', 'k007-free-fall', 'incline-2021-jiaban-t18.png'],
+  // 2026-10-23 图像专题与补图
+  ['#fig-basketball-h4', 'k007-free-fall', 'basketball-jump-h-quarters.png'],
+  ['#fig-basketball-h4', 'k006-displacement-time-formula', 'basketball-jump-h-quarters.png'],
+  ['#fig-g331', 'k001-mass-point-reference-frame', 'g331-route-question.png'],
+  ['#fig-g331', 'k003-velocity', 'g331-route-question.png'],
+  ['#fig-graph-compare', 'motion-graphs', 'graph-compare.png'],
+  ['#fig-graph-shapes', 'motion-graphs', 'graph-shapes.png'],
+  ['#fig-graph-intersect', 'motion-graphs', 'graph-intersection.png'],
 ];
 
 // K006 的 RST 图复用 K003 同一张 SVG 源（选择器再渲染一份独立输出）

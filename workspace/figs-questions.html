@@ -343,6 +343,190 @@
   <text x="700" y="340" font-size="22" fill="#1a1a1a">挡板</text>
 </svg>
 
+<!-- 11. 2019 全国Ⅰ卷 T18 扣篮：重心上升 H 按 H/4 四等分 -->
+<svg id="fig-basketball-h4" xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+  <defs>
+    <marker id="bsktArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="900" height="560" fill="#ffffff"/>
+  <text x="450" y="46" font-size="24" fill="#1a1a1a" text-anchor="middle">原地起跳扣篮：重心上升的最大高度为 H（按 H/4 四等分）</text>
+  <!-- 地面 -->
+  <line x1="80" y1="500" x2="840" y2="500" stroke="#1a1a1a" stroke-width="3"/>
+  <g stroke="#90a4ae" stroke-width="2">
+    <line x1="540" y1="500" x2="522" y2="520"/><line x1="610" y1="500" x2="592" y2="520"/>
+    <line x1="680" y1="500" x2="662" y2="520"/><line x1="750" y1="500" x2="732" y2="520"/>
+  </g>
+  <!-- 篮球架 -->
+  <line x1="800" y1="500" x2="800" y2="120" stroke="#1a1a1a" stroke-width="6"/>
+  <rect x="740" y="90" width="60" height="80" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+  <line x1="700" y1="150" x2="740" y2="150" stroke="#1a1a1a" stroke-width="4"/>
+  <ellipse cx="700" cy="150" rx="26" ry="7" fill="none" stroke="#c0392b" stroke-width="4"/>
+  <!-- 运动员（起跳前，双臂上举） -->
+  <circle cx="260" cy="382" r="22" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+  <line x1="260" y1="404" x2="260" y2="500" stroke="#1a1a1a" stroke-width="3.5"/>
+  <line x1="260" y1="428" x2="238" y2="466" stroke="#1a1a1a" stroke-width="3.5"/>
+  <line x1="260" y1="428" x2="282" y2="466" stroke="#1a1a1a" stroke-width="3.5"/>
+  <line x1="260" y1="418" x2="240" y2="380" stroke="#1a1a1a" stroke-width="3.5"/>
+  <line x1="260" y1="418" x2="280" y2="380" stroke="#1a1a1a" stroke-width="3.5"/>
+  <text x="196" y="545" font-size="22" fill="#1a1a1a">运动员（重心用点标出）</text>
+  <!-- 重心轨迹：起跳点 → 最高点 -->
+  <circle cx="320" cy="440" r="8" fill="#1565c0"/>
+  <line x1="320" y1="428" x2="320" y2="152" stroke="#90a4ae" stroke-width="3" stroke-dasharray="9 7"/>
+  <circle cx="320" cy="140" r="10" fill="#c0392b"/>
+  <text x="348" y="132" font-size="22" fill="#c0392b">最高点（速度为 0）</text>
+  <text x="348" y="452" font-size="22" fill="#1565c0">起跳时重心</text>
+  <!-- 左侧高度标尺：H 四等分 -->
+  <line x1="150" y1="440" x2="150" y2="140" stroke="#1a1a1a" stroke-width="2.5" marker-start="url(#bsktArr)" marker-end="url(#bsktArr)"/>
+  <line x1="138" y1="440" x2="320" y2="440" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="138" y1="365" x2="320" y2="365" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="138" y1="290" x2="320" y2="290" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="138" y1="215" x2="320" y2="215" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="138" y1="140" x2="320" y2="140" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="96" y="300" font-size="30" font-style="italic" fill="#1a1a1a">H</text>
+  <text x="348" y="415" font-size="21" fill="#1a1a1a">第 1 个 H/4（用时 <tspan font-style="italic">t</tspan>₁）</text>
+  <text x="348" y="340" font-size="21" fill="#1a1a1a">第 2 个</text>
+  <text x="348" y="265" font-size="21" fill="#1a1a1a">第 3 个</text>
+  <text x="348" y="190" font-size="21" fill="#c0392b">第 4 个 H/4（用时 <tspan font-style="italic">t</tspan>₂）</text>
+</svg>
+
+<!-- 12. 2026 黑吉辽蒙卷 T1：G331 公路里程 vs 直线距离 -->
+<svg id="fig-g331" xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430">
+  <defs>
+    <marker id="g331Arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="900" height="430" fill="#ffffff"/>
+  <text x="450" y="42" font-size="24" fill="#1a1a1a" text-anchor="middle">沿"最美边境公路"G331 自驾：丹东 → 额济纳旗（示意图）</text>
+  <!-- 海岸线（右下，渤海/黄海示意） -->
+  <path d="M 860,240 C 830,280 840,330 800,370 C 780,395 790,410 800,428" fill="none" stroke="#64b5f6" stroke-width="4"/>
+  <text x="812" y="415" font-size="20" fill="#64b5f6">海</text>
+  <!-- 蜿蜒公路 -->
+  <path d="M 790,400 C 730,370 750,340 690,320 C 630,300 650,270 580,260 C 510,250 530,225 460,215 C 390,205 410,175 340,165 C 270,155 290,125 220,115 C 185,110 150,95 120,80" fill="none" stroke="#78909c" stroke-width="6" stroke-linecap="round"/>
+  <text x="430" y="128" font-size="22" fill="#455a64" transform="rotate(-7 430 128)">G331 沿边境蜿蜒，公路里程约 7500 km</text>
+  <!-- 直线距离（虚线） -->
+  <line x1="790" y1="400" x2="120" y2="80" stroke="#c0392b" stroke-width="3" stroke-dasharray="10 8" marker-start="url(#g331Arr)" marker-end="url(#g331Arr)"/>
+  <text x="470" y="330" font-size="22" fill="#c0392b" transform="rotate(23 470 330)">直线距离约 2000 km</text>
+  <!-- 起点/终点 -->
+  <circle cx="790" cy="400" r="9" fill="#1a1a1a"/>
+  <text x="700" y="380" font-size="24" fill="#1a1a1a">丹东</text>
+  <circle cx="120" cy="80" r="9" fill="#1a1a1a"/>
+  <text x="34" y="132" font-size="24" fill="#1a1a1a">额济纳旗</text>
+</svg>
+
+<!-- 13. 图像专题：同一个匀加速运动的 x–t 与 v–t 对比 -->
+<svg id="fig-graph-compare" xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540">
+  <defs>
+    <marker id="cmpArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="900" height="540" fill="#ffffff"/>
+  <text x="450" y="40" font-size="24" fill="#1a1a1a" text-anchor="middle">同一个运动（从静止开始匀加速，a 恒定）：两张图，两副面孔</text>
+  <!-- 左：x–t 抛物线 -->
+  <line x1="120" y1="460" x2="420" y2="460" stroke="#1a1a1a" stroke-width="3" marker-end="url(#cmpArr)"/>
+  <line x1="120" y1="460" x2="120" y2="90" stroke="#1a1a1a" stroke-width="3" marker-end="url(#cmpArr)"/>
+  <text x="432" y="468" font-size="24" font-style="italic" fill="#1a1a1a">t</text>
+  <text x="80" y="100" font-size="24" font-style="italic" fill="#1a1a1a">x</text>
+  <text x="270" y="520" font-size="24" fill="#1a1a1a" text-anchor="middle">x–t 图：位移–时间</text>
+  <polyline points="120,460 146,457 172,447 198,432 224,410 250,382 276,347 302,307 328,260 354,207" fill="none" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <!-- 两条切线：t=2（缓）与 t=4（陡） -->
+  <line x1="188" y1="436" x2="262" y2="390" stroke="#1565c0" stroke-width="3"/>
+  <line x1="296" y1="320" x2="366" y2="212" stroke="#1565c0" stroke-width="3"/>
+  <text x="132" y="150" font-size="21" fill="#1565c0">切线斜率＝速度</text>
+  <text x="132" y="180" font-size="21" fill="#1565c0">越来越陡 → 越来越快</text>
+  <!-- 右：v–t 直线 + 面积 -->
+  <line x1="540" y1="460" x2="840" y2="460" stroke="#1a1a1a" stroke-width="3" marker-end="url(#cmpArr)"/>
+  <line x1="540" y1="460" x2="540" y2="90" stroke="#1a1a1a" stroke-width="3" marker-end="url(#cmpArr)"/>
+  <text x="852" y="468" font-size="24" font-style="italic" fill="#1a1a1a">t</text>
+  <text x="500" y="100" font-size="24" font-style="italic" fill="#1a1a1a">v</text>
+  <text x="690" y="520" font-size="24" fill="#1a1a1a" text-anchor="middle">v–t 图：速度–时间</text>
+  <polygon points="540,460 748,460 748,252" fill="#e3f2fd" stroke="none"/>
+  <line x1="540" y1="460" x2="800" y2="200" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <line x1="748" y1="252" x2="748" y2="460" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="596" y="404" font-size="22" fill="#1565c0">面积＝位移</text>
+  <text x="596" y="434" font-size="22" fill="#1565c0">（三角形）</text>
+  <text x="596" y="170" font-size="21" fill="#1a1a1a">直线 → a 恒定</text>
+  <text x="596" y="140" font-size="21" fill="#1a1a1a">过原点 → 初速为 0</text>
+</svg>
+
+<!-- 14. 图像专题：三种基础运动在两图中的形状（六格） -->
+<svg id="fig-graph-shapes" xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700">
+  <rect width="900" height="700" fill="#ffffff"/>
+  <text x="450" y="38" font-size="24" fill="#1a1a1a" text-anchor="middle">三种基础运动：x–t 图（左列）与 v–t 图（右列）形状对照</text>
+  <text x="262" y="76" font-size="24" fill="#1565c0" text-anchor="middle" font-weight="bold">x–t 图</text>
+  <text x="712" y="76" font-size="24" fill="#1565c0" text-anchor="middle" font-weight="bold">v–t 图</text>
+  <!-- 行 1：静止 -->
+  <text x="46" y="180" font-size="23" fill="#1a1a1a">静止</text>
+  <line x1="110" y1="200" x2="410" y2="200" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="110" y1="200" x2="110" y2="100" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="110" y1="130" x2="400" y2="130" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <line x1="560" y1="200" x2="860" y2="200" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="560" y1="200" x2="560" y2="100" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="560" y1="200" x2="850" y2="200" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <text x="640" y="182" font-size="20" fill="#c0392b">v = 0（贴着 t 轴）</text>
+  <!-- 行 2：匀速直线 -->
+  <text x="20" y="390" font-size="23" fill="#1a1a1a">匀速直线</text>
+  <line x1="110" y1="410" x2="410" y2="410" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="110" y1="410" x2="110" y2="310" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="110" y1="410" x2="400" y2="330" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <line x1="560" y1="410" x2="860" y2="410" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="560" y1="410" x2="560" y2="310" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="560" y1="340" x2="850" y2="340" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <text x="620" y="322" font-size="20" fill="#c0392b">水平线（v 不变）</text>
+  <!-- 行 3：匀加速（从静止） -->
+  <text x="2" y="600" font-size="23" fill="#1a1a1a">匀加速（从静止）</text>
+  <line x1="110" y1="620" x2="410" y2="620" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="110" y1="620" x2="110" y2="520" stroke="#1a1a1a" stroke-width="2.5"/>
+  <polyline points="110,620 180,614 250,596 320,560 390,502" fill="none" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <text x="286" y="648" font-size="20" fill="#1a1a1a">抛物线（越来越陡）</text>
+  <line x1="560" y1="620" x2="860" y2="620" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="560" y1="620" x2="560" y2="520" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="560" y1="620" x2="850" y2="536" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <text x="680" y="580" font-size="20" fill="#1a1a1a">倾斜直线（斜率＝a）</text>
+</svg>
+
+<!-- 15. 图像专题：交点含义对比（x–t 相遇 vs v–t 速度相等） -->
+<svg id="fig-graph-intersect" xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470">
+  <defs>
+    <marker id="intArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="900" height="470" fill="#ffffff"/>
+  <!-- 左：x–t 交点＝相遇 -->
+  <text x="262" y="60" font-size="24" fill="#1565c0" text-anchor="middle" font-weight="bold">x–t 图：交点＝相遇</text>
+  <line x1="110" y1="380" x2="420" y2="380" stroke="#1a1a1a" stroke-width="3" marker-end="url(#intArr)"/>
+  <line x1="110" y1="380" x2="110" y2="90" stroke="#1a1a1a" stroke-width="3" marker-end="url(#intArr)"/>
+  <text x="430" y="388" font-size="23" font-style="italic" fill="#1a1a1a">t</text>
+  <text x="74" y="102" font-size="23" font-style="italic" fill="#1a1a1a">x</text>
+  <line x1="110" y1="340" x2="400" y2="110" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <line x1="110" y1="190" x2="400" y2="290" stroke="#1565c0" stroke-width="5" stroke-linecap="round"/>
+  <text x="176" y="146" font-size="22" fill="#c0392b">甲</text>
+  <text x="140" y="230" font-size="22" fill="#1565c0">乙</text>
+  <circle cx="242" cy="236" r="9" fill="#1a1a1a"/>
+  <line x1="242" y1="236" x2="242" y2="380" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 6"/>
+  <line x1="242" y1="236" x2="110" y2="236" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="258" y="222" font-size="22" fill="#1a1a1a">同一时刻、同一位置</text>
+  <text x="150" y="440" font-size="22" fill="#1a1a1a">位置坐标相同 → 两物体相遇</text>
+  <!-- 右：v–t 交点＝速度相等 -->
+  <text x="712" y="60" font-size="24" fill="#1565c0" text-anchor="middle" font-weight="bold">v–t 图：交点＝速度相等</text>
+  <line x1="560" y1="380" x2="870" y2="380" stroke="#1a1a1a" stroke-width="3" marker-end="url(#intArr)"/>
+  <line x1="560" y1="380" x2="560" y2="90" stroke="#1a1a1a" stroke-width="3" marker-end="url(#intArr)"/>
+  <text x="880" y="388" font-size="23" font-style="italic" fill="#1a1a1a">t</text>
+  <text x="524" y="102" font-size="23" font-style="italic" fill="#1a1a1a">v</text>
+  <line x1="560" y1="110" x2="850" y2="300" stroke="#c0392b" stroke-width="5" stroke-linecap="round"/>
+  <line x1="560" y1="380" x2="850" y2="150" stroke="#1565c0" stroke-width="5" stroke-linecap="round"/>
+  <text x="586" y="140" font-size="22" fill="#c0392b">甲（匀减速）</text>
+  <text x="596" y="186" font-size="22" fill="#1565c0">乙（匀加速）</text>
+  <circle cx="746" cy="232" r="9" fill="#1a1a1a"/>
+  <line x1="746" y1="232" x2="746" y2="380" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 6"/>
+  <line x1="746" y1="232" x2="560" y2="232" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="568" y="440" font-size="22" fill="#1a1a1a">此刻仅速度相同，位置一般不同</text>
+</svg>
+
 </div>
 </body>
 </html>

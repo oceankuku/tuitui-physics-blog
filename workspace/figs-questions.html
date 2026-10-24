@@ -796,6 +796,45 @@
   <text x="110" y="450" font-size="23" fill="#1565c0">两门速度同比例偏大 → a测 ＝ a真/cos²θ，偏大</text>
 </svg>
 
+<!-- G. 方法篇：主线纸带各点速度的 v–t 数据图（由例题二、三数据生成） -->
+<svg id="fig-k007e-vt-fit" xmlns="http://www.w3.org/2000/svg" width="800" height="470" viewBox="0 0 800 470">
+  <defs>
+    <marker id="kjArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="800" height="470" fill="#ffffff"/>
+  <text x="110" y="36" font-size="22" fill="#1a1a1a">主线纸带各计数点的速度：描点、画线、取斜率</text>
+  <!-- 坐标轴 -->
+  <line x1="100" y1="380" x2="740" y2="380" stroke="#1a1a1a" stroke-width="3" marker-end="url(#kjArr)"/>
+  <line x1="100" y1="380" x2="100" y2="60" stroke="#1a1a1a" stroke-width="3" marker-end="url(#kjArr)"/>
+  <text x="745" y="388" font-size="22" fill="#1a1a1a">t/s</text>
+  <text x="46" y="70" font-size="22" fill="#1a1a1a">v</text>
+  <!-- 刻度 -->
+  <text x="192" y="408" font-size="20" fill="#1a1a1a">0.1</text>
+  <text x="292" y="408" font-size="20" fill="#1a1a1a">0.2</text>
+  <text x="392" y="408" font-size="20" fill="#1a1a1a">0.3</text>
+  <text x="492" y="408" font-size="20" fill="#1a1a1a">0.4</text>
+  <text x="592" y="408" font-size="20" fill="#1a1a1a">0.5</text>
+  <text x="72" y="300" font-size="20" fill="#1a1a1a">0.1</text>
+  <text x="72" y="215" font-size="20" fill="#1a1a1a">0.2</text>
+  <text x="72" y="129" font-size="20" fill="#1a1a1a">0.3</text>
+  <!-- 直线 v = 0.10 + 0.40t -->
+  <line x1="150" y1="277" x2="650" y2="106" stroke="#1565c0" stroke-width="3"/>
+  <!-- 数据点 -->
+  <circle cx="200" cy="260" r="6" fill="#c0392b"/>
+  <circle cx="300" cy="226" r="6" fill="#c0392b"/>
+  <circle cx="400" cy="191" r="6" fill="#c0392b"/>
+  <circle cx="500" cy="157" r="6" fill="#c0392b"/>
+  <circle cx="600" cy="123" r="6" fill="#c0392b"/>
+  <!-- 斜率三角 -->
+  <line x1="400" y1="191" x2="500" y2="191" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 5"/>
+  <line x1="500" y1="191" x2="500" y2="157" stroke="#90a4ae" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="428" y="213" font-size="20" fill="#90a4ae">Δt = 0.1 s</text>
+  <text x="512" y="178" font-size="20" fill="#90a4ae">Δv = 0.04 m/s</text>
+  <text x="540" y="98" font-size="23" fill="#1565c0">斜率 a = Δv/Δt = 0.40 m/s²</text>
+</svg>
+
 </div>
 </body>
 </html>

@@ -32,6 +32,7 @@ const jobs = [
   ['#fig-k007e-freefall', 'k007-experiments', 'fig-freefall-setup.png'],
   ['#fig-k007e-q3-direction', 'k007-experiments-practice', 'fig-q3-tape-direction.png'],
   ['#fig-k007e-q29-tilt', 'k007-experiments-practice', 'fig-q29-tilted-vane.png'],
+  ['#fig-k007e-vt-fit', 'k007-experiments-methods', 'fig-vt-fit.png'],
 ];
 
 // K006 的 RST 图复用 K003 同一张 SVG 源（选择器再渲染一份独立输出）

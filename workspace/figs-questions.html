@@ -835,6 +835,49 @@
   <text x="540" y="98" font-size="23" fill="#1565c0">斜率 a = Δv/Δt = 0.40 m/s²</text>
 </svg>
 
+<!-- H. 板块模型专题：例题 2 双物体 v–t 过程图（数据由例题生成） -->
+<svg id="fig-blockmodel-vt" xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <marker id="kmArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="800" height="480" fill="#ffffff"/>
+  <text x="100" y="36" font-size="22" fill="#1a1a1a">例题 2：滑块 A 与木板 B 的 v–t 图（交点即共速）</text>
+  <!-- 坐标轴：t 0–1.6 s → x 100–700；v 0–8 → y 380–80 -->
+  <line x1="100" y1="380" x2="730" y2="380" stroke="#1a1a1a" stroke-width="3" marker-end="url(#kmArr)"/>
+  <line x1="100" y1="380" x2="100" y2="60" stroke="#1a1a1a" stroke-width="3" marker-end="url(#kmArr)"/>
+  <text x="736" y="388" font-size="22" fill="#1a1a1a">t/s</text>
+  <text x="50" y="70" font-size="22" fill="#1a1a1a">v</text>
+  <text x="86" y="404" font-size="20" fill="#1a1a1a">0</text>
+  <text x="458" y="404" font-size="20" fill="#1a1a1a">1</text>
+  <text x="66" y="311" font-size="20" fill="#1a1a1a">2</text>
+  <text x="66" y="161" font-size="20" fill="#1a1a1a">6</text>
+  <!-- xA 梯形面积（A 线下方） -->
+  <polygon points="100,380 100,155 475,305 475,380" fill="#d7e4dc" opacity="0.55"/>
+  <!-- xB 三角形面积（B 线下方） -->
+  <polygon points="100,380 475,305 475,380" fill="#ffe9c8" opacity="0.75"/>
+  <!-- 两线间面积 = 相对位移 -->
+  <polygon points="100,155 100,380 475,305" fill="#f5c6a0" opacity="0.65"/>
+  <!-- A 线：v = 6 − 4t -->
+  <line x1="100" y1="155" x2="475" y2="305" stroke="#c0392b" stroke-width="4"/>
+  <!-- B 线：v = 2t -->
+  <line x1="100" y1="380" x2="475" y2="305" stroke="#1565c0" stroke-width="4"/>
+  <!-- 共速后共同匀速 -->
+  <line x1="475" y1="305" x2="650" y2="305" stroke="#1a1a1a" stroke-width="3" stroke-dasharray="9 6"/>
+  <!-- 交点 -->
+  <circle cx="475" cy="305" r="7" fill="#1a1a1a"/>
+  <line x1="475" y1="305" x2="475" y2="380" stroke="#1a1a1a" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="452" y="288" font-size="21" fill="#1a1a1a">(1 s, 2 m/s)</text>
+  <text x="497" y="298" font-size="21" fill="#1565c0">共速，之后一起匀速</text>
+  <!-- 线标注 -->
+  <text x="120" y="150" font-size="22" fill="#c0392b">A：a = −4 m/s²</text>
+  <text x="255" y="330" font-size="22" fill="#1565c0">B：a = +2 m/s²</text>
+  <!-- 面积标注 -->
+  <text x="150" y="255" font-size="20" fill="#b05a1f">两线间面积 = xA − xB = 3 m（板长至少 3 m）</text>
+  <text x="510" y="360" font-size="20" fill="#606963">xA = 4 m，xB = 1 m</text>
+</svg>
+
 </div>
 </body>
 </html>

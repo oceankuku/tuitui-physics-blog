@@ -73,6 +73,20 @@ for (const file of targets) {
   const isDraft = fm.meta.draft === 'true';
   const rows = classifyLines(fm.body);
 
+  // 容器嵌套检查（2026-10-24）：卡片内不得再开 formula/problem/answer/note，
+  // 内层围栏会提前关闭外层卡片（例题五公式外溢事故的根因）。
+  let openContainer = '';
+  for (const { line, number, inCode } of rows) {
+    if (inCode) continue;
+    const open = line.match(/^:::(formula|problem|answer|note)\s*$/);
+    if (open) {
+      if (openContainer) push(rel, number + fm.metaLines, 'error', `容器嵌套：${openContainer} 内又开 ${open[1]}（内层会提前关闭外层卡片，把公式块移到卡片外）`);
+      else openContainer = open[1];
+    } else if (/^:::\s*$/.test(line) && openContainer) {
+      openContainer = '';
+    }
+  }
+
   // frontmatter 必填项
   for (const key of ['title', 'description', 'pubDate']) {
     if (!fm.meta[key]) push(rel, 1, 'error', `frontmatter 缺 ${key}`);

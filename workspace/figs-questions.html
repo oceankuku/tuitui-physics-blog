@@ -557,6 +557,245 @@
   <text x="398" y="452" font-size="21" fill="#c0392b">10 m（减速段位移）</text>
 </svg>
 
+<!-- ===== 2026-10-24 第二章实验重构：精确示意图 6 张 ===== -->
+
+<!-- A. 中间时刻速度：A、B、C 三计数点 -->
+<svg id="fig-k007e-tape-mid" xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330">
+  <defs>
+    <marker id="kdArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect width="900" height="330" fill="#ffffff"/>
+  <text x="90" y="52" font-size="23" fill="#1565c0">匀变速中，AC 段的平均速度 ＝ 中间时刻 B 的瞬时速度</text>
+  <!-- 纸带 -->
+  <rect x="70" y="140" width="760" height="64" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.5"/>
+  <circle cx="190" cy="172" r="6" fill="#1a1a1a"/>
+  <circle cx="450" cy="172" r="6" fill="#1a1a1a"/>
+  <circle cx="710" cy="172" r="6" fill="#1a1a1a"/>
+  <text x="181" y="238" font-size="24" fill="#1a1a1a">A</text>
+  <text x="441" y="238" font-size="24" fill="#1a1a1a">B</text>
+  <text x="701" y="238" font-size="24" fill="#1a1a1a">C</text>
+  <!-- 位移标注 -->
+  <line x1="190" y1="112" x2="450" y2="112" stroke="#1a1a1a" stroke-width="2.5" marker-start="url(#kdArr)" marker-end="url(#kdArr)"/>
+  <text x="308" y="96" font-size="23" fill="#1a1a1a">x₁</text>
+  <line x1="450" y1="112" x2="710" y2="112" stroke="#1a1a1a" stroke-width="2.5" marker-start="url(#kdArr)" marker-end="url(#kdArr)"/>
+  <text x="568" y="96" font-size="23" fill="#1a1a1a">x₂</text>
+  <!-- 时间标注 -->
+  <line x1="190" y1="270" x2="450" y2="270" stroke="#90a4ae" stroke-width="2.5" marker-start="url(#kdArr)" marker-end="url(#kdArr)"/>
+  <text x="308" y="300" font-size="23" fill="#90a4ae">T′</text>
+  <line x1="450" y1="270" x2="710" y2="270" stroke="#90a4ae" stroke-width="2.5" marker-start="url(#kdArr)" marker-end="url(#kdArr)"/>
+  <text x="568" y="300" font-size="23" fill="#90a4ae">T′</text>
+</svg>
+
+<!-- B. 六段纸带与前后分组（逐差法） -->
+<svg id="fig-k007e-tape-six" xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400">
+  <defs>
+    <marker id="keArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="keArrG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#90a4ae"/>
+    </marker>
+    <marker id="keArrB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1565c0"/>
+    </marker>
+  </defs>
+  <rect width="900" height="400" fill="#ffffff"/>
+  <!-- 纸带 -->
+  <rect x="60" y="170" width="790" height="60" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.5"/>
+  <circle cx="90" cy="200" r="5.5" fill="#1a1a1a"/>
+  <circle cx="210" cy="200" r="5.5" fill="#1a1a1a"/>
+  <circle cx="330" cy="200" r="5.5" fill="#1a1a1a"/>
+  <circle cx="450" cy="200" r="5.5" fill="#1a1a1a"/>
+  <circle cx="570" cy="200" r="5.5" fill="#1a1a1a"/>
+  <circle cx="690" cy="200" r="5.5" fill="#1a1a1a"/>
+  <circle cx="810" cy="200" r="5.5" fill="#1a1a1a"/>
+  <text x="83" y="262" font-size="22" fill="#1a1a1a">0</text>
+  <text x="203" y="262" font-size="22" fill="#1a1a1a">1</text>
+  <text x="323" y="262" font-size="22" fill="#1a1a1a">2</text>
+  <text x="443" y="262" font-size="22" fill="#1a1a1a">3</text>
+  <text x="563" y="262" font-size="22" fill="#1a1a1a">4</text>
+  <text x="683" y="262" font-size="22" fill="#1a1a1a">5</text>
+  <text x="803" y="262" font-size="22" fill="#1a1a1a">6</text>
+  <!-- 各段标注 -->
+  <text x="141" y="152" font-size="21" fill="#1a1a1a">x₁</text>
+  <text x="261" y="152" font-size="21" fill="#1a1a1a">x₂</text>
+  <text x="381" y="152" font-size="21" fill="#1a1a1a">x₃</text>
+  <text x="501" y="152" font-size="21" fill="#1a1a1a">x₄</text>
+  <text x="621" y="152" font-size="21" fill="#1a1a1a">x₅</text>
+  <text x="741" y="152" font-size="21" fill="#1a1a1a">x₆</text>
+  <!-- 分组 -->
+  <line x1="90" y1="88" x2="450" y2="88" stroke="#90a4ae" stroke-width="3" marker-start="url(#keArrG)" marker-end="url(#keArrG)"/>
+  <text x="200" y="66" font-size="22" fill="#90a4ae">前三段求和</text>
+  <line x1="450" y1="88" x2="810" y2="88" stroke="#1565c0" stroke-width="3" marker-start="url(#keArrB)" marker-end="url(#keArrB)"/>
+  <text x="595" y="66" font-size="22" fill="#1565c0">后三段求和</text>
+  <!-- 结论 -->
+  <text x="105" y="330" font-size="24" fill="#1a1a1a">x₄ − x₁ ＝ x₅ − x₂ ＝ x₆ − x₃ ＝ 3aT′²</text>
+  <text x="105" y="372" font-size="24" fill="#1565c0">a ＝ [(x₄＋x₅＋x₆) − (x₁＋x₂＋x₃)] / 9T′²</text>
+</svg>
+
+<!-- C. 双光电门测加速度 -->
+<svg id="fig-k007e-photogate" xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430">
+  <defs>
+    <marker id="kfArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+    <marker id="kfArrB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1565c0"/>
+    </marker>
+  </defs>
+  <rect width="900" height="430" fill="#ffffff"/>
+  <!-- 轨道 -->
+  <line x1="60" y1="310" x2="840" y2="310" stroke="#1a1a1a" stroke-width="4"/>
+  <g stroke="#90a4ae" stroke-width="2">
+    <line x1="110" y1="310" x2="92" y2="330"/><line x1="210" y1="310" x2="192" y2="330"/>
+    <line x1="310" y1="310" x2="292" y2="330"/><line x1="410" y1="310" x2="392" y2="330"/>
+    <line x1="510" y1="310" x2="492" y2="330"/><line x1="610" y1="310" x2="592" y2="330"/>
+    <line x1="710" y1="310" x2="692" y2="330"/><line x1="810" y1="310" x2="792" y2="330"/>
+  </g>
+  <!-- 光电门 A -->
+  <rect x="266" y="185" width="10" height="125" fill="#1a1a1a"/>
+  <rect x="324" y="185" width="10" height="125" fill="#1a1a1a"/>
+  <rect x="266" y="185" width="68" height="10" fill="#1a1a1a"/>
+  <line x1="276" y1="255" x2="324" y2="255" stroke="#c0392b" stroke-width="3" stroke-dasharray="7 5"/>
+  <text x="272" y="168" font-size="22" fill="#1a1a1a">光电门 A</text>
+  <!-- 光电门 B -->
+  <rect x="606" y="185" width="10" height="125" fill="#1a1a1a"/>
+  <rect x="664" y="185" width="10" height="125" fill="#1a1a1a"/>
+  <rect x="606" y="185" width="68" height="10" fill="#1a1a1a"/>
+  <line x1="616" y1="255" x2="664" y2="255" stroke="#c0392b" stroke-width="3" stroke-dasharray="7 5"/>
+  <text x="612" y="168" font-size="22" fill="#1a1a1a">光电门 B</text>
+  <!-- 滑块与挡光片 -->
+  <rect x="110" y="258" width="120" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"/>
+  <circle cx="140" cy="308" r="12" fill="#1a1a1a"/>
+  <circle cx="200" cy="308" r="12" fill="#1a1a1a"/>
+  <rect x="163" y="205" width="12" height="53" fill="#1565c0"/>
+  <line x1="175" y1="215" x2="258" y2="150" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="88" y="135" font-size="22" fill="#1a1a1a">挡光片宽 d（游标卡尺测出）</text>
+  <!-- 速度箭头 -->
+  <line x1="270" y1="120" x2="350" y2="120" stroke="#1565c0" stroke-width="4" marker-end="url(#kfArrB)"/>
+  <text x="292" y="102" font-size="23" fill="#1565c0">vA</text>
+  <line x1="600" y1="120" x2="740" y2="120" stroke="#1565c0" stroke-width="4" marker-end="url(#kfArrB)"/>
+  <text x="652" y="102" font-size="23" fill="#1565c0">vB</text>
+  <!-- 间距 -->
+  <line x1="300" y1="365" x2="640" y2="365" stroke="#1a1a1a" stroke-width="2.5" marker-start="url(#kfArr)" marker-end="url(#kfArr)"/>
+  <text x="432" y="395" font-size="23" fill="#1a1a1a">L（两门间距）</text>
+  <text x="640" y="60" font-size="24" fill="#1a1a1a">a ＝ (vB² − vA²) / 2L</text>
+</svg>
+
+<!-- D. 自由落体测 g 装置 -->
+<svg id="fig-k007e-freefall" xmlns="http://www.w3.org/2000/svg" width="700" height="540" viewBox="0 0 700 540">
+  <defs>
+    <marker id="kgArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+  <rect width="700" height="540" fill="#ffffff"/>
+  <text x="120" y="40" font-size="22" fill="#1565c0">重物拖纸带，纸带穿过限位孔、压在复写纸下</text>
+  <!-- 桌沿与支架 -->
+  <line x1="140" y1="70" x2="460" y2="70" stroke="#1a1a1a" stroke-width="4"/>
+  <!-- 打点计时器 -->
+  <rect x="270" y="70" width="160" height="65" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"/>
+  <text x="446" y="110" font-size="22" fill="#1a1a1a">打点计时器（50 Hz）</text>
+  <circle cx="310" cy="135" r="5" fill="#1a1a1a"/>
+  <circle cx="390" cy="135" r="5" fill="#1a1a1a"/>
+  <text x="446" y="142" font-size="20" fill="#90a4ae">限位孔</text>
+  <!-- 纸带（点距向下增大） -->
+  <rect x="342" y="135" width="16" height="310" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="350" cy="162" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="187" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="214" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="243" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="274" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="307" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="342" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="379" r="3.5" fill="#1a1a1a"/>
+  <circle cx="350" cy="418" r="3.5" fill="#1a1a1a"/>
+  <!-- 重物 -->
+  <line x1="350" y1="445" x2="350" y2="468" stroke="#1a1a1a" stroke-width="3"/>
+  <rect x="318" y="468" width="64" height="42" fill="#90a4ae" stroke="#1a1a1a" stroke-width="3"/>
+  <text x="398" y="490" font-size="22" fill="#1a1a1a">重物</text>
+  <text x="398" y="520" font-size="20" fill="#90a4ae">适当重一些，减小阻力占比</text>
+  <!-- 下落箭头 -->
+  <line x1="240" y1="180" x2="240" y2="330" stroke="#c0392b" stroke-width="4" marker-end="url(#kgArr)"/>
+  <text x="150" y="265" font-size="22" fill="#c0392b">自由下落</text>
+</svg>
+
+<!-- E. 练习：点迹左密右疏的方位图 -->
+<svg id="fig-k007e-q3-direction" xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400">
+  <defs>
+    <marker id="khArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+  <rect width="900" height="400" fill="#ffffff"/>
+  <!-- 打点计时器 -->
+  <rect x="70" y="150" width="115" height="85" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"/>
+  <text x="78" y="285" font-size="22" fill="#1a1a1a">打点计时器（固定）</text>
+  <!-- 纸带：左密右疏 -->
+  <rect x="185" y="180" width="485" height="48" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="205" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="221" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="237" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="253" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="269" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="285" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="301" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="327" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="347" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="367" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="387" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="417" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="443" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="469" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="495" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="521" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="547" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="573" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="599" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="625" cy="204" r="4" fill="#1a1a1a"/>
+  <circle cx="651" cy="204" r="4" fill="#1a1a1a"/>
+  <!-- 小车 -->
+  <rect x="670" y="172" width="130" height="62" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"/>
+  <circle cx="702" cy="238" r="13" fill="#1a1a1a"/>
+  <circle cx="772" cy="238" r="13" fill="#1a1a1a"/>
+  <text x="700" y="290" font-size="22" fill="#1a1a1a">小车</text>
+  <line x1="815" y1="204" x2="880" y2="204" stroke="#c0392b" stroke-width="4" marker-end="url(#khArr)"/>
+  <text x="838" y="184" font-size="23" fill="#c0392b">v</text>
+  <!-- 注释 -->
+  <text x="196" y="330" font-size="22" fill="#90a4ae">后打的点，留在计时器附近（左端）</text>
+  <text x="390" y="368" font-size="22" fill="#1565c0">先打的点，被拉到离计时器最远处（右端）</text>
+  <text x="150" y="60" font-size="23" fill="#1a1a1a">纸带被小车向右拉动：右端的点先打，左端的点后打</text>
+</svg>
+
+<!-- F. 练习：挡光片倾斜的误差链（俯视） -->
+<svg id="fig-k007e-q29-tilt" xmlns="http://www.w3.org/2000/svg" width="800" height="470" viewBox="0 0 800 470">
+  <defs>
+    <marker id="kiArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+  <rect width="800" height="470" fill="#ffffff"/>
+  <line x1="80" y1="60" x2="240" y2="60" stroke="#c0392b" stroke-width="4" marker-end="url(#kiArr)"/>
+  <text x="255" y="68" font-size="22" fill="#c0392b">滑块运动方向（俯视）</text>
+  <!-- 光束点 -->
+  <circle cx="430" cy="260" r="7" fill="#c0392b"/>
+  <text x="462" y="255" font-size="22" fill="#1a1a1a">光束（俯视看成一个点）</text>
+  <!-- 挡光片（倾斜） -->
+  <line x1="294" y1="323" x2="566" y2="197" stroke="#1565c0" stroke-width="5"/>
+  <text x="586" y="192" font-size="22" fill="#1565c0">挡光片（宽 d，</text>
+  <text x="586" y="222" font-size="22" fill="#1565c0">与运动方向成 θ 角）</text>
+  <!-- 投影 -->
+  <line x1="294" y1="323" x2="566" y2="323" stroke="#90a4ae" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <text x="300" y="355" font-size="21" fill="#90a4ae">挡光期间实际前进的距离 d·cosθ（小于 d）</text>
+  <path d="M 540 323 A 92 92 0 0 0 532 285" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <text x="548" y="312" font-size="23" fill="#1a1a1a">θ</text>
+  <!-- 结论 -->
+  <text x="110" y="415" font-size="23" fill="#1a1a1a">v测 ＝ d/Δt ＝ v真/cosθ ＞ v真，偏大；</text>
+  <text x="110" y="450" font-size="23" fill="#1565c0">两门速度同比例偏大 → a测 ＝ a真/cos²θ，偏大</text>
+</svg>
+
 </div>
 </body>
 </html>

@@ -25,6 +25,13 @@ const jobs = [
   ['#fig-graph-shapes', 'motion-graphs', 'graph-shapes.png'],
   ['#fig-graph-intersect', 'motion-graphs', 'graph-intersection.png'],
   ['#fig-brake-courtesy', 'motion-graphs', 'brake-courtesy-vt.png'],
+  // 2026-10-24 第二章实验重构
+  ['#fig-k007e-tape-mid', 'k007-experiments', 'fig-tape-midpoint.png'],
+  ['#fig-k007e-tape-six', 'k007-experiments', 'fig-tape-six-segments.png'],
+  ['#fig-k007e-photogate', 'k007-experiments', 'fig-photogate-double.png'],
+  ['#fig-k007e-freefall', 'k007-experiments', 'fig-freefall-setup.png'],
+  ['#fig-k007e-q3-direction', 'k007-experiments-practice', 'fig-q3-tape-direction.png'],
+  ['#fig-k007e-q29-tilt', 'k007-experiments-practice', 'fig-q29-tilted-vane.png'],
 ];
 
 // K006 的 RST 图复用 K003 同一张 SVG 源（选择器再渲染一份独立输出）

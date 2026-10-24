@@ -140,7 +140,14 @@ try {
   // 标签文章数随发稿增长（2026-10-23 实验题型篇入列后 7→8），改为与首页标签徽标数对账。
   const expectedTagged = await page.locator('.filter-button').filter({ hasText: '题型方法' }).locator('.filter-count, .count, span').first().innerText().then((t) => parseInt(t, 10)).catch(() => null);
   if (expectedTagged) {
-    assert.equal(await page.locator('.post-card:visible').count(), expectedTagged, '题型方法标签数应与徽标一致');
+    // 徽标是全量计数，第一页可见数受 PAGE_SIZE=8 截断（2026-10-24 标签数到 9 时踩到）。
+    assert.equal(await page.locator('.post-card:visible').count(), Math.min(8, expectedTagged), '题型方法标签第一页应与徽标一致（分页截断）');
+    if (expectedTagged > 8) {
+      await page.locator('#nextPage').click();
+      assert.equal(await page.locator('.post-card:visible').count(), expectedTagged - 8, '题型方法标签第二页应为余量');
+      await page.goto(hosting.origin + '/blog/');
+      await page.locator('.filter-button').filter({ hasText: '题型方法' }).click();
+    }
   } else {
     assert((await page.locator('.post-card:visible').count()) >= 7, '题型方法标签至少应有既有文章数');
   }

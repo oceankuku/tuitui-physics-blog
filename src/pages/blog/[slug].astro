@@ -648,6 +648,10 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     .article-content :global(.problem-card p) { margin-bottom: 0.85rem; color: var(--text); }
     .article-content :global(.problem-card p:last-child) { margin-bottom: 0; }
     .article-content :global(.problem-card strong) { color: var(--accent-strong); }
+    /* 题卡标签配色（2026-10-24 重构定稿）：分级用主题强调绿，来源用赭棕。
+       走 CSS 变量保证深浅主题各自成立；公众号复制时管线内联计算后的具体色值。 */
+    .article-content :global(.prob-grade) { color: var(--accent-strong); font-weight: 600; }
+    .article-content :global(.prob-source) { color: var(--prob-source); }
     /* 答案+解析卡片（2026-10-18 原老师要求：答案与题目同一套字体格式）。
        同款楷体，底色偏绿与题干灰底区分，"答案"行天然醒目。 */
     .article-content :global(.answer-card) {

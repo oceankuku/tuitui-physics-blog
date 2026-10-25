@@ -124,11 +124,11 @@ for (const file of targets) {
     }
   }
 
-  // 围栏配平（formula/problem/answer/note/usage 五种容器都是合法围栏）
+  // 围栏配平（formula/problem/answer/note/usage/selfcheck 六种容器都是合法围栏）
   const fences = rows.filter((r) => /^:::/.test(r.line) && !r.inCode);
   if (fences.length % 2 !== 0) push(rel, fences.at(-1).number + fm.metaLines, 'error', `::: 围栏不配平（共 ${fences.length} 个）`);
   for (let i = 0; i + 1 < fences.length; i += 2) {
-    if (!/^:::(formula|problem|answer|note|usage)/.test(fences[i].line)) push(rel, fences[i].number + fm.metaLines, 'error', `第 ${i / 2 + 1} 个围栏不是 :::formula/:::problem/:::answer/:::note 开头`);
+    if (!/^:::(formula|problem|answer|note|usage|selfcheck)/.test(fences[i].line)) push(rel, fences[i].number + fm.metaLines, 'error', `第 ${i / 2 + 1} 个围栏不是 :::formula/:::problem/:::answer/:::note 开头`);
   }
 
   // 表格：每行列数必须一致

@@ -237,6 +237,9 @@ export function formulaBlocks() {
       } else if (node.type === 'containerDirective' && node.name === 'usage') {
         // 用法与分层说明等元信息：小字号、淡色，弱于正文（2026-10-25 站主要求）。
         node.data ??= {}; node.data.hName = 'div'; node.data.hProperties = { className: ['usage-note'] };
+      } else if (node.type === 'containerDirective' && node.name === 'selfcheck') {
+        // 自测对照表：楷体小字号，与正文区分（2026-10-25 站主要求）。
+        node.data ??= {}; node.data.hName = 'div'; node.data.hProperties = { className: ['selfcheck'] };
       }
       // 每个文本子节点都做数学解析：√( )、√token、{a/b}、裸斜杠分数，
       // 正文/答案/备注/公式块内统一渲染，不再局限于 :::formula 块。

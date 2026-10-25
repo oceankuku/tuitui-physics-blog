@@ -693,6 +693,15 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     .article-content :global(.usage-note ul) { margin: 0 0 0.55rem; padding-left: 1.25rem; }
     .article-content :global(.usage-note li) { margin-bottom: 0.3rem; }
     .article-content :global(.usage-note table) { font-size: 0.78rem; }
+    /* 自测对照表：楷体小字号，与正文黑体区分（2026-10-25 站主要求） */
+    .article-content :global(.selfcheck) {
+      font-family: 'Kaiti SC', 'STKaiti', KaiTi, '楷体', 'Noto Serif SC', serif;
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+    .article-content :global(.selfcheck p) { margin-bottom: 0.5rem; }
+    .article-content :global(.selfcheck p:last-child) { margin-bottom: 0; }
+    .article-content :global(.selfcheck table) { font-size: 0.8rem; }
     /* 正式公式块：居中、衬线字体，配合 .formula-frac 还原横线分数 */
     .article-content :global(.formula-block) {
       display: block;

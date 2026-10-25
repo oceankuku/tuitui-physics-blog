@@ -681,6 +681,18 @@ const wechatDate = post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeri
     .article-content :global(.note-card p) { margin-bottom: 0.7rem; color: var(--muted-on-ink); }
     .article-content :global(.note-card p:last-child) { margin-bottom: 0; }
     .article-content :global(.note-card strong) { color: var(--accent-strong); }
+    /* 用法与分层说明等元信息：小字号、淡色，弱于正文（2026-10-25 站主要求） */
+    .article-content :global(.usage-note) {
+      font-size: 0.84rem;
+      color: var(--text);
+      opacity: 0.72;
+      line-height: 1.7;
+    }
+    .article-content :global(.usage-note p) { margin-bottom: 0.55rem; }
+    .article-content :global(.usage-note p:last-child) { margin-bottom: 0; }
+    .article-content :global(.usage-note ul) { margin: 0 0 0.55rem; padding-left: 1.25rem; }
+    .article-content :global(.usage-note li) { margin-bottom: 0.3rem; }
+    .article-content :global(.usage-note table) { font-size: 0.78rem; }
     /* 正式公式块：居中、衬线字体，配合 .formula-frac 还原横线分数 */
     .article-content :global(.formula-block) {
       display: block;

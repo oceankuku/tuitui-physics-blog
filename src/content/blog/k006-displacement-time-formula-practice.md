@@ -74,9 +74,13 @@ mathjax: true
 :::
 
 :::problem
-<span class="prob-grade">3.【基础题·经典题·选择题】</span><span class="prob-source">（题库《高中物理题型全总结》专题 1.1 第 1 题，未注明卷别；原题斜面示意图已删，题干文字自足）</span>
+<span class="prob-grade">3.【基础题·经典题·选择题】</span><span class="prob-source">（题库《高中物理题型全总结》专题 1.1 第 1 题，未注明卷别）</span>
 
-一小球从 $A$ 点由静止开始沿斜面向下做匀加速直线运动，到达 $B$ 点时速度为 $v$，到达 $C$ 点时速度为 $2v$。则 $AB : BC$ 等于（　）
+![原题配图：斜面上 A、B、C 三处各有一个小球，B 处速度标为 v，C 处速度标为 2v](/blog-images/k006-displacement-time-formula-practice/orig-3-斜面小球v与2v示意图.png)
+
+图 2｜原题配图：斜面上依次经过 A、B、C 的小球
+
+如图 2 所示，一小球从 $A$ 点由静止开始沿斜面向下做匀变速直线运动，若到达 $B$ 点时速度为 $v$，到达 $C$ 点时速度为 $2v$，则 $AB : BC$ 等于（　）
 
 
 　　A. $1 : 1$
@@ -122,7 +126,7 @@ mathjax: true
 :::
 
 :::problem
-<span class="prob-grade">6.【基础题·常考题·计算题】</span><span class="prob-source">（题库模拟卷《黄金 30 题》模拟一第 17 题，节选改编：只取原题匀加速下滑数据，第(2)问涉及受力未选，增设验算问）</span>
+<span class="prob-grade">6.【基础题·常考题·计算题】</span><span class="prob-source">（题库模拟卷《黄金 30 题》模拟一第 17 题改编：原题第(2)问求下滑阻力，需用下一章的受力分析，超出本单元知识边界，故只取匀加速下滑部分并增设验算问）</span>
 
 一名滑雪的人以 2 m/s 的初速度沿山坡匀加速滑下，5 s 内滑下的路程为 60 m。求：
 
@@ -153,9 +157,13 @@ mathjax: true
 :::
 
 :::problem
-<span class="prob-grade">8.【基础题·经典题·选择题】</span><span class="prob-source">（题库《高中物理题型全总结》专题 1.1 第 12 题，未注明卷别；原题斜面示意图已删，选项按原答案结构整理）</span>
+<span class="prob-grade">8.【基础题·经典题·选择题】</span><span class="prob-source">（题库《高中物理题型全总结》专题 1.1 第 12 题，未注明卷别；原卷含根号的选项式在转换中散失，按原书解析版整理）</span>
 
-（多选）一小滑块从斜面顶端 $A$ 由静止开始沿斜面向下做匀加速直线运动，滑到底端 $C$，已知 $AB = BC$。下列说法正确的是（　）
+![原题配图：斜面顶端 A 处有一滑块，斜面上标有 B 点，底端为 C](/blog-images/k006-displacement-time-formula-practice/orig-8-斜面滑块AB与BC等长示意图.png)
+
+图 3｜原题配图：斜面顶端 A 滑到底端 C，B 为斜面中点
+
+（多选）如图 3 所示，一小滑块从斜面顶端 $A$ 由静止开始沿斜面向下做匀加速直线运动，滑到底端 $C$，已知 $AB = BC$。下列说法正确的是（　）
 
 
 　　A. 滑块到达 $B$、$C$ 两点的速度之比为 $1 : 2$
@@ -210,7 +218,7 @@ mathjax: true
 
 ![位移公式解题分析](/blog-images/k006-displacement-time-formula/K006-匀变速直线运动的位移与时间的关系-06-位移公式-解题分析.png)
 
-图 2｜位移公式解题分析
+图 4｜位移公式解题分析
 
 :::problem
 <span class="prob-grade">11.【提升题·常考题·计算题】</span><span class="prob-source">（学而思暑期讲义《第15讲：匀变速直线运动的规律》即学即练 10，数值改编）</span>
@@ -266,9 +274,13 @@ mathjax: true
 :::
 
 :::problem
-<span class="prob-grade">15.【提升题·经典题·计算题】</span><span class="prob-source">（题库《高中物理题型全总结》专题 1.1 第 13 题，未注明卷别；原题示意图已删，题干几何关系已写入文字）</span>
+<span class="prob-grade">15.【提升题·经典题·计算题】</span><span class="prob-source">（题库《高中物理题型全总结》专题 1.1 第 13 题，未注明卷别；原卷为单选选择题，改计算题并增设第(2)问）</span>
 
-一位旅客在站台 8 号车厢候车线处候车。动车一节车厢长 25 m，进站时可以看作匀减速直线运动。他发现第 6 节车厢的前端到达他的位置起，到这节车厢的尾端离开，共用了 4 s；动车停止时，第 8 节车厢的前端恰好到达他的位置。求：
+![原题配图：站台上一名旅客站在动车旁，旅客所在位置对着的车厢标有 8 号、7 号等编号](/blog-images/k006-displacement-time-formula-practice/orig-15-站台动车与旅客示意图.png)
+
+图 5｜原题配图：站台上的旅客与进站动车
+
+一位旅客在站台 8 号车厢候车线处候车，如图 5 所示。动车一节车厢长 25 m，进站时可以看作匀减速直线运动。他发现第 6 节车厢的前端到达他的位置起，到这节车厢的尾端离开，共用了 4 s；动车停止时，第 8 节车厢的前端恰好到达他的位置。求：
 
 
 　　(1) 动车刹车时的加速度大小（结果保留一位有效数字）；
@@ -336,9 +348,13 @@ mathjax: true
 :::
 
 :::problem
-<span class="prob-grade">20.【提升题·经典题·选择题】</span><span class="prob-source">（2015·江苏卷 T5 原题；原题关卡示意图已删，题干文字自足）</span>
+<span class="prob-grade">20.【提升题·经典题·选择题】</span><span class="prob-source">（2015·江苏卷 T5 原题）</span>
 
-某"闯关游戏"的笔直通道上每隔 8 m 设有一个关卡，各关卡同步放行和关闭，放行和关闭的时间分别为 5 s 和 2 s。关卡刚放行时，一同学立即在关卡 1 处以 2 m/s² 的加速度由静止加速到 2 m/s，然后匀速向前。则最先挡住他前进的关卡是（　）
+![原题配图：笔直通道上依次排列关卡 1 到关卡 5，相邻两关间隔 8 m](/blog-images/k006-displacement-time-formula-practice/orig-20-闯关游戏五个关卡示意图.png)
+
+图 6｜原题配图：闯关游戏的关卡布设
+
+如图 6 所示，某"闯关游戏"的笔直通道上每隔 8 m 设有一个关卡，各关卡同步放行和关闭，放行和关闭的时间分别为 5 s 和 2 s。关卡刚放行时，一同学立即在关卡 1 处以 2 m/s² 的加速度由静止加速到 2 m/s，然后匀速向前。则最先挡住他前进的关卡是（　）
 
 
 　　A. 关卡 2
@@ -357,7 +373,7 @@ mathjax: true
 
 ![图像面积解题分析](/blog-images/k006-displacement-time-formula/K006-匀变速直线运动的位移与时间的关系-12-图像面积-解题分析.png)
 
-图 3｜图像面积解题分析
+图 7｜图像面积解题分析
 
 :::problem
 <span class="prob-grade">21.【提升题·常考题·计算题】</span><span class="prob-source">（自编，多段接力框架，数据自设）</span>
@@ -506,7 +522,7 @@ mathjax: true
 :::
 
 :::problem
-<span class="prob-grade">30.【提升题·易错题·选择题】</span><span class="prob-source">（题库模拟卷《黄金 30 题》第 4 套图像题，未注明卷别；原题为图像选择题，图线信息已写入题干，选项按原解析逻辑重构）</span>
+<span class="prob-grade">30.【提升题·易错题·选择题】</span><span class="prob-source">（题库模拟卷《黄金 30 题》第 4 套第 10 题改编，未注明卷别：原题的 v–t 图线配属于一道含质量、拉力与动摩擦因数的动力学题，超出本单元知识边界，故按其图像信息改编为纯运动学题，情境与选项自设）</span>
 
 物块沿直线从静止开始运动，其 v–t 图线为一条曲线：2 s 末速度为 5 m/s，且整个 0～2 s 内图线始终位于连接 $(0, 0)$ 与 $(2, 5)$ 两点的直线段的下方（切线斜率逐渐增大）。下列说法正确的是（　）
 
@@ -743,7 +759,7 @@ g = \frac{h}{2T^2} = \frac{(n+1)^2 h}{2t^2}
 
 　　(2) 10.5 m/s。
 
-　　(3) 钥匙是"中间时刻速度等于这一秒的平均速度"：第 3 s 的中间时刻是 2.5 s 末，速度 6 m/s；第 7 s 的中间时刻是 6.5 s 末，速度 10 m/s；两个中间时刻相隔 $6.5 - 2.5 = 4$ s，所以
+　　(3) 钥匙是"中间时刻速度等于这一秒的平均速度"：第 3 s 的中间时刻是 2.5 s 末，速度 6 m/s；第 7 s 的中间时刻是 6.5 s 末，速度 10 m/s；两个中间时刻相隔 $6.5\ \text{s} - 2.5\ \text{s} = 4$ s，所以
 
 :::formula
 a = \frac{10-6}{4} = 1 \text{ m/s}^2
@@ -752,7 +768,7 @@ a = \frac{10-6}{4} = 1 \text{ m/s}^2
 　　第 7 s 末还要从 6.5 s 末再走 0.5 s：
 
 :::formula
-v_7 = 10 + 1 \times 0.5 = 10.5 \text{ m/s}
+v_7 = 10\ \text{m/s} + 1\ \text{m/s}^2 \times 0.5\ \text{s} = 10.5 \text{ m/s}
 :::
 
 　　（典型错误：把两个中间时刻的间隔当成 3 s，或把 6.5 s 末的 10 m/s 当成 7 s 末的速度。）
@@ -860,10 +876,10 @@ v_7 = 10 + 1 \times 0.5 = 10.5 \text{ m/s}
 　　A 对。与速度同向，
 
 :::formula
-v=20+5\times6=50 \text{ m/s}
+v=20\ \text{m/s}+5\ \text{m/s}^2\times6\ \text{s}=50 \text{ m/s}
 :::
 
-　　B 错。是把 $20-5\times6=-10$ 直接取大小的结果——方向不变排除了倒车。
+　　B 错。是把 $20\ \text{m/s}-5\ \text{m/s}^2\times6\ \text{s}=-10\ \text{m/s}$ 直接取大小的结果——方向不变排除了倒车。
 
 　　C 对。与速度反向，停车时间
 
@@ -886,12 +902,12 @@ t_{\text{停}}=\frac{20}{4}=5 \text{ s}
 　　A 错。
 
 :::formula
-v(2)=20-4\times2=12 \text{ m/s}
+v(2)=20\ \text{m/s}-4\ \text{m/s}^2\times2\ \text{s}=12 \text{ m/s}
 :::
 
 　　即 43.2 km/h，"64 km/h"是把 4 m/s² 当成"每小时降 4 km/h"的单位陷阱（72−4×2）。
 
-　　B 错。5 s 末恰好停稳，速度为 0，"4 m/s"是 4 s 末的速度（$20-4\times4$），把时刻张冠李戴。
+　　B 错。5 s 末恰好停稳，速度为 0，"4 m/s"是 4 s 末的速度（$20\ \text{m/s}-4\ \text{m/s}^2\times4\ \text{s}$），把时刻张冠李戴。
 
 　　C 错。位移只算到停车时刻，
 
@@ -900,7 +916,7 @@ v(2)=20-4\times2=12 \text{ m/s}
 :::
 
 :::formula
-x=10\times5=50 \text{ m}
+x=10\ \text{m/s}\times5\ \text{s}=50 \text{ m}
 :::
 
 　　"60 m"是拿平均速度乘满 6 s、没对表的结果。
@@ -1033,13 +1049,13 @@ t_{\text{停}}=\frac{0-25}{-5}=5 \text{ s}
 　　(2) 2 s<5 s，
 
 :::formula
-v=25-5\times2=15 \text{ m/s}
+v=25\ \text{m/s}-5\ \text{m/s}^2\times2\ \text{s}=15 \text{ m/s}
 :::
 
 　　(3) 7 s>5 s，汽车 5 s 末已停稳，速度为 0。不看时间直接代会得
 
 :::formula
-25-5\times7=-10 \text{ m/s}
+25\ \text{m/s}-5\ \text{m/s}^2\times7\ \text{s}=-10 \text{ m/s}
 :::
 
 　　"倒着越开越快"，物理上不存在。
@@ -1055,7 +1071,7 @@ v=25-5\times2=15 \text{ m/s}
 　　(1)
 
 :::formula
-v=v_0+at=10+0.2\times50=20 \text{ m/s}
+v=v_0+at=10\ \text{m/s}+0.2\ \text{m/s}^2\times50\ \text{s}=20 \text{ m/s}
 :::
 
 　　(2) 匀变速的平均速度等于首末速度的平均：速度均匀变化，一段内的平均快慢就是首末平均，
@@ -1064,7 +1080,7 @@ v=v_0+at=10+0.2\times50=20 \text{ m/s}
 \bar v=\frac{v_0+v}{2}=\frac{10+20}{2}=15 \text{ m/s}
 :::
 
-　　（等价验证：中间时刻 25 s 末的瞬时速度 $10+0.2\times25=15$ m/s。）
+　　（等价验证：中间时刻 25 s 末的瞬时速度 $10\ \text{m/s}+0.2\ \text{m/s}^2\times25\ \text{s}=15$ m/s。）
 
 10. 72 km/h = 20 m/s，18 km/h = 5 m/s。
 
@@ -1092,12 +1108,12 @@ t_1=\frac{20}{0.5}=40 \text{ s}
 
 　　(2) 出站加速恢复原速，减速加速对称，$t_2=40$ s。
 
-　　(3) $40+60+40=140$ s。
+　　(3) $40\ \text{s}+60\ \text{s}+40\ \text{s}=140$ s。
 
 13. (1) 先由减速段反推最大速度：
 
 :::formula
-v_{\max}=a_{\text{减}}t_2=6\times5=30 \text{ m/s}
+v_{\max}=a_{\text{减}}t_2=6\ \text{m/s}^2\times5\ \text{s}=30 \text{ m/s}
 :::
 
 加速段平均加速度
@@ -1106,7 +1122,7 @@ v_{\max}=a_{\text{减}}t_2=6\times5=30 \text{ m/s}
 \bar a=\frac{30-0}{4}=7.5 \text{ m/s}^2
 :::
 
-　　(2) $v_{\max}=30$ m/s，换算 $30\times3.6=108$ km/h，与"时速可达 100 多公里"相符。
+　　(2) $v_{\max}=30$ m/s，换算 $30\ \text{m/s}\times3.6=108$ km/h，与"时速可达 100 多公里"相符。
 
 14. 54 km/h = 15 m/s。
 
@@ -1115,7 +1131,7 @@ v_{\max}=a_{\text{减}}t_2=6\times5=30 \text{ m/s}
 　　(2) 刹车后 1 s 末：
 
 :::formula
-v=15-6\times1=9 \text{ m/s}
+v=15\ \text{m/s}-6\ \text{m/s}^2\times1\ \text{s}=9 \text{ m/s}
 :::
 
 　　(3) 停车时间
@@ -1137,7 +1153,7 @@ t_{\text{停}}=\frac{30}{10}=3 \text{ s}
 　　(2) 1.5 s<3 s，
 
 :::formula
-v=30-10\times1.5=15 \text{ m/s}
+v=30\ \text{m/s}-10\ \text{m/s}^2\times1.5\ \text{s}=15 \text{ m/s}
 :::
 
 　　(3) 4 s>3 s，摩托车 3 s 末已停，速度为 0。
@@ -1161,13 +1177,13 @@ a_2=\frac{4-10}{3}=-2 \text{ m/s}^2
 18. (1)
 
 :::formula
-v(4)=0+1.5\times4=6 \text{ m/s}
+v(4)=0+1.5\ \text{m/s}^2\times4\ \text{s}=6 \text{ m/s}
 :::
 
 $v(10)=6$ m/s（匀速段保持）；
 
 :::formula
-v(14)=6-1.5\times4=0
+v(14)=6\ \text{m/s}-1.5\ \text{m/s}^2\times4\ \text{s}=0
 :::
 
 （恰好停）。
@@ -1181,10 +1197,10 @@ v(14)=6-1.5\times4=0
 　　(2)
 
 :::formula
-v_{\max}=2\times10=20 \text{ m/s}
+v_{\max}=2\ \text{m/s}^2\times10\ \text{s}=20 \text{ m/s}
 :::
 
-（减速段验算 $4\times5=20$ m/s，一致。）
+（减速段验算 $4\ \text{m/s}^2\times5\ \text{s}=20$ m/s，一致。）
 
 　　(3) 以起飞为计时起点，减速段从 10 s 开始：$v=20-4(t-10)$（10 s≤t≤15 s）。
 
@@ -1197,7 +1213,7 @@ t=\frac{12}{4}=3 \text{ s}
 　　(2) 3 s 末 $v=0$；5 s 末
 
 :::formula
-v=12-4\times5=-8 \text{ m/s}
+v=12\ \text{m/s}-4\ \text{m/s}^2\times5\ \text{s}=-8 \text{ m/s}
 :::
 
 负号表示滑块已从最高点沿斜面向下加速滑回，速度大小 8 m/s。
@@ -1236,9 +1252,9 @@ t_{\text{停甲}}=\frac{30}{6}=5 \text{ s}
 t_{\text{停乙}}=\frac{20}{5}=4 \text{ s}
 :::
 
-　　(2) 2 s 末均未停：甲 $30-6\times2=18$ m/s；乙 $20-5\times2=10$ m/s。
+　　(2) 2 s 末均未停：甲 $30\ \text{m/s}-6\ \text{m/s}^2\times2\ \text{s}=18$ m/s；乙 $20\ \text{m/s}-5\ \text{m/s}^2\times2\ \text{s}=10$ m/s。
 
-　　(3) 4.5 s 末：甲 $30-6\times4.5=3$ m/s；乙已停（4.5>4），0。
+　　(3) 4.5 s 末：甲 $30\ \text{m/s}-6\ \text{m/s}^2\times4.5\ \text{s}=3$ m/s；乙已停（4.5>4），0。
 
 　　(4) 刹车过程内
 

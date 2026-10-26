@@ -3,7 +3,7 @@ title: "自由落体运动③｜分层自测、题型库加练与单元答案区
 description: "自由落体分层练习篇：30 道题按四层排布只放题目，另附题型库加练 5 题含答案；文末附本单元完整答案与逐题解析，并收录 K001 至 K006 各单元练习的完整答案索引。"
 pubDate: 2026-11-04
 draft: false
-updatedAt: 2026-10-25
+updatedAt: 2026-10-26
 tags: ["力学", "练习", "运动学"]
 mathjax: true
 ---
@@ -302,9 +302,13 @@ mathjax: true
 :::
 
 :::problem
-<span class="prob-grade">17.【提升题·常考题·选择题】</span><span class="prob-source">（2021 年河北卷 T15）</span>
+<span class="prob-grade">17.【提升题·常考题·选择题】</span><span class="prob-source">（2021 年河北卷 T15 原题）</span>
 
-铯原子钟是精确的计时仪器。某铯原子在真空中从 O 点以 100 m/s 的初速度做平抛运动，到达竖直平面 MN，O 点到平面 MN 的水平距离为 0.2 m，所用时间为 $t_1$；另一铯原子在真空中从 P 点做竖直上抛运动，到达最高点 Q 再返回 P 点，P 点到 Q 点的竖直距离也为 0.2 m，整个过程所用时间为 $t_2$。重力加速度取 10 m/s²，则 $t_1 : t_2$ 为（　）
+![原题配图：图 1 铯原子从 O 点平抛到达竖直平面 MN，图 2 铯原子从 P 点竖直上抛经最高点 Q 返回](/blog-images/k007-free-fall-practice/orig-17-铯原子平抛与竖直上抛.png)
+
+图 3｜原题配图：图 1 铯原子平抛示意、图 2 铯原子竖直上抛示意
+
+铯原子钟是精确的计时仪器。图 1 中铯原子从 O 点以 100 m/s 的初速度在真空中做平抛运动，到达竖直平面 MN 所用时间为 $t_1$；图 2 中铯原子在真空中从 P 点做竖直上抛运动，到达最高点 Q 再返回 P 点，整个过程所用时间为 $t_2$。O 点到竖直平面 MN、P 点到 Q 点的距离均为 0.2 m。重力加速度取 g = 10 m/s²，则 $t_1 : t_2$ 为（　）
 
 
 　　A. 100 : 1
@@ -365,7 +369,7 @@ mathjax: true
 
 ![竖直上抛问题模型](/blog-images/k007-free-fall/K007-自由落体运动-09-竖直上抛拓展-问题模型.png)
 
-图 3｜竖直上抛问题模型
+图 4｜竖直上抛问题模型
 
 :::problem
 <span class="prob-grade">21.【提升题·经典题·计算题】</span><span class="prob-source">（2016 年银川二中高三年级统练一）</span>
@@ -604,7 +608,7 @@ g 是矢量，方向竖直向下。
 5. B。
 
 :::formula
-h = \frac{1}{2}gt^2 = \frac{1}{2} \times 10 \times 2^2 = 20\ \text{m}
+h = \frac{1}{2}gt^2 = \frac{1}{2} \times 10 \times 2^2\ \text{m} = 20\ \text{m}
 :::
 
 注意前提是题干声明的"不计声音传播时间"，第 28 题会把这个前提撤掉。
@@ -646,7 +650,7 @@ H - \frac{H}{4} = \frac{3H}{4}
 10. (1) 10 s。
 
 :::formula
-t = \sqrt{\frac{2 \times 500}{10}} = 10\ \text{s}
+t = \sqrt{\frac{2 \times 500}{10}}\ \text{s} = 10\ \text{s}
 :::
 
 　　(2) 最后 180 m 之前已落 320 m，用时 8 s，故末段用时 2 s。
@@ -686,11 +690,11 @@ ac = \frac{(3v)^2}{2g} = \frac{9v^2}{2g}
 石子到 A 点时约 5.5 m/s，径迹 12 cm 内速度变化很小，按匀速估算 0.02 s。
 
 :::formula
-v \approx \sqrt{2 \times 10 \times 1.5} \approx 5.5\ \text{m/s}
+v \approx \sqrt{2 \times 10 \times 1.5}\ \text{m/s} \approx 5.5\ \text{m/s}
 :::
 
 :::formula
-\Delta t \approx \frac{0.12}{5.5} \approx 0.02\ \text{s}
+\Delta t \approx \frac{0.12}{5.5}\ \text{s} \approx 0.02\ \text{s}
 :::
 
 也可两端点分别算：
@@ -703,13 +707,13 @@ v \approx \sqrt{2 \times 10 \times 1.5} \approx 5.5\ \text{m/s}
 
 上升到最高点用 3 s、升高 45 m；第 5 s 末已回落 2 s、下落 20 m。
 
-45 m、3 s、30 m/s 正是主讲篇图 5、6、9、10 板书上那一组数。
+45 m、3 s、30 m/s 正是主讲篇图 6、7、11、12 板书上那一组数。
 
 　　A 对。路程 $45 + 20 = 65$ m。
 
 　　B 对。位移 $45 - 20 = 25$ m 向上。
 
-　　C 错。$\Delta v = g \times 5 = 50$ m/s。
+　　C 错。$\Delta v = g \times 5\ \text{m/s} = 50$ m/s。
 
 　　D 错。平均速度 $\frac{25}{5} = 5$ m/s 向上。
 
@@ -718,7 +722,7 @@ v \approx \sqrt{2 \times 10 \times 1.5} \approx 5.5\ \text{m/s}
 设总时间 t：前 $(t-1)$ s 落下塔高的 $\frac{9}{16}$，由 $h \propto t^2$ 得 $\left(\frac{t-1}{t}\right)^2 = \frac{9}{16}$，解出 t = 4 s，塔高：
 
 :::formula
-H = \frac{1}{2} \times 10 \times 4^2 = 80\ \text{m}
+H = \frac{1}{2} \times 10 \times 4^2\ \text{m} = 80\ \text{m}
 :::
 
 检查：末 1 s 落 $80 - 45 = 35$ m $= \frac{7}{16} \times 80$ ✓。
@@ -736,13 +740,13 @@ H = \frac{1}{2} \times 10 \times 4^2 = 80\ \text{m}
 17. C。
 
 :::formula
-t_1 = \frac{d}{v} = \frac{0.2}{100} = 0.002\ \text{s}
+t_1 = \frac{d}{v} = \frac{0.2}{100}\ \text{s} = 0.002\ \text{s}
 :::
 
 （平抛的水平分运动是匀速——《自由落体运动①》例题三埋过这颗种子。）
 
 :::formula
-t_2 = 2\sqrt{\frac{2 \times 0.2}{10}} = 0.4\ \text{s}
+t_2 = 2\sqrt{\frac{2 \times 0.2}{10}}\ \text{s} = 0.4\ \text{s}
 :::
 
 :::formula
@@ -754,7 +758,7 @@ t_1 : t_2 = 1 : 200
 设第二个物体下落 t 秒后绳拉直，此时两者位移差 93.1 m：
 
 :::formula
-\Delta h = \frac{1}{2}g(t+1)^2 - \frac{1}{2}gt^2 = g\left(t + \frac{1}{2}\right) = 9.8 \times 9.5 = 93.1
+\Delta h = \frac{1}{2}g(t+1)^2 - \frac{1}{2}gt^2 = g\left(t + \frac{1}{2}\right) = 9.8 \times 9.5\ \text{m} = 93.1\ \text{m}
 :::
 
 得 t = 9 s。
@@ -776,7 +780,7 @@ t_1 : t_2 = 1 : 200
 :::
 
 :::formula
-h = \frac{1}{2} \times 10 \times 0.5^2 = 1.25\ \text{m}
+h = \frac{1}{2} \times 10 \times 0.5^2\ \text{m} = 1.25\ \text{m}
 :::
 
 对齐条件是"最后同时落地"这一句。
@@ -822,17 +826,17 @@ v_0^2 - 5^2 = 2 \times 12.5\,h
 差量方程：
 
 :::formula
-\frac{1}{2} \times 9.8 \times \left[T^2 - (T-4)^2\right] = 196
+\frac{1}{2} \times 9.8 \times \left[T^2 - (T-4)^2\right] = 196\ \text{m}
 :::
 
 :::formula
-4.9(8T - 16) = 196
+4.9(8T - 16) = 196\ \text{m}
 :::
 
 解出 T = 7 s。
 
 :::formula
-H = \frac{1}{2} \times 9.8 \times 49 = 240.1\ \text{m}
+H = \frac{1}{2} \times 9.8 \times 49\ \text{m} = 240.1\ \text{m}
 :::
 
 23. A。
@@ -844,15 +848,15 @@ H = \frac{1}{2} \times 9.8 \times 49 = 240.1\ \text{m}
 :::
 
 :::formula
-OA = \frac{1}{2} \times 10 \times 2^2 = 20\ \text{m}
+OA = \frac{1}{2} \times 10 \times 2^2\ \text{m} = 20\ \text{m}
 :::
 
 :::formula
-OB = \frac{1}{2} \times 10 \times 3^2 = 45\ \text{m}
+OB = \frac{1}{2} \times 10 \times 3^2\ \text{m} = 45\ \text{m}
 :::
 
 :::formula
-AB = 45 - 20 = 25\ \text{m}
+AB = 45 - 20\ \text{m} = 25\ \text{m}
 :::
 
 　　B 错。对应 $\frac{1}{2}g \times 1^2$（第 1 s 内落下的距离）这一中间量，是"半成品"。
@@ -908,7 +912,7 @@ B 开始下落的瞬间，A 已下落 $\frac{gt^2}{8}$，A 离地 $\frac{3gt^2}{
 27. (1) 匀加速段 5 m/s²，燃料用完时 20 m/s。
 
 :::formula
-a = \frac{2 \times 40}{4^2} = 5\ \text{m/s}^2
+a = \frac{2 \times 40}{4^2}\ \text{m/s}^2 = 5\ \text{m/s}^2
 :::
 
 :::formula
@@ -918,7 +922,7 @@ v_1 = at = 20\ \text{m/s}
 　　(2) 燃料用完后竖直上抛再升 20 m，最大高度 60 m。
 
 :::formula
-\frac{v_1^2}{2g} = \frac{400}{20} = 20\ \text{m}
+\frac{v_1^2}{2g} = \frac{400}{20}\ \text{m} = 20\ \text{m}
 :::
 
 :::formula
@@ -946,7 +950,7 @@ h = 340(2.6 - t_1)
 解出 $t_1 \approx 2.51$ s，h ≈ 31.4 m，约 31 m。
 
 :::formula
-h \approx 5 \times 2.51^2 \approx 31.4\ \text{m}
+h \approx 5 \times 2.51^2\ \text{m} \approx 31.4\ \text{m}
 :::
 
 对比第 5 题：撤掉"不计声速"的前提，深度从 20 m 修正到 31 m——模型近似是否可接受，取决于井有多深、要求多准。
@@ -956,13 +960,13 @@ h \approx 5 \times 2.51^2 \approx 31.4\ \text{m}
 接住前 1 s 的平均速度 4 m/s，等于中间时刻（接住前 0.5 s）的瞬时速度。
 
 :::formula
-\bar{v} = \frac{4}{1} = 4\ \text{m/s}
+\bar{v} = \frac{4}{1}\ \text{m/s} = 4\ \text{m/s}
 :::
 
 接住瞬间 v = -1 m/s，负号说明已在下落。
 
 :::formula
-v = 4 - 10 \times 0.5 = -1\ \text{m/s}
+v = 4 - 10 \times 0.5\ \text{m/s} = -1\ \text{m/s}
 :::
 
 由 $11 - 10t = -1$ 得 t = 1.2 s。
@@ -970,7 +974,7 @@ v = 4 - 10 \times 0.5 = -1\ \text{m/s}
 　　(2) 井深 = 抛出点到接住点的位移 6 m。
 
 :::formula
-x = 11 \times 1.2 - \frac{1}{2} \times 10 \times 1.2^2 = 13.2 - 7.2 = 6\ \text{m}
+x = 11 \times 1.2 - \frac{1}{2} \times 10 \times 1.2^2\ \text{m} = 13.2 - 7.2\ \text{m} = 6\ \text{m}
 :::
 
 检查：上升最大高度 $\frac{11^2}{2 \times 10} = 6.05$ m $> 6$ m，物块恰能冲出井口 0.05 m 再落回 ✓。
@@ -1010,7 +1014,7 @@ g = \frac{8H}{T_2^2 - T_1^2}
 第一球在抛出点上方共滞留 1.2 s；这 1.2 s 里每隔 0.2 s 升起一球，即 t = 0.2、0.4、0.6、0.8、1.0 s 共 5 颗，都在它落回之前与它在抛出点上方相遇；t = 1.2 s 那一颗与它同时回到抛出点，不算"在抛出点以上"。
 
 :::formula
-\frac{2v_0}{g} = \frac{2 \times 6}{10} = 1.2\ \text{s}
+\frac{2v_0}{g} = \frac{2 \times 6}{10}\ \text{s} = 1.2\ \text{s}
 :::
 
 　　A 错。少数了。
@@ -1137,7 +1141,7 @@ B 穿过圆筒：
 由静止匀加速，匀变速的平均速度等于首末平均，位移 x = 100 m。
 
 :::formula
-a = \frac{20-0}{10} = 2\ \text{m/s}^2
+a = \frac{20-0}{10}\ \text{m/s}^2 = 2\ \text{m/s}^2
 :::
 
 :::formula
@@ -1145,7 +1149,7 @@ a = \frac{20-0}{10} = 2\ \text{m/s}^2
 :::
 
 :::formula
-x = 10 \times 10 = 100\ \text{m}
+x = 10 \times 10\ \text{m} = 100\ \text{m}
 :::
 
 　　A 错。20 是把末速度当加速度。
@@ -1195,7 +1199,7 @@ AB : BC = 1 : (4-1) = 1 : 3
 4. B。
 
 :::formula
-x = 6 \times 5 + \frac{1}{2} \times 1 \times 5^2 = 30 + 12.5 = 42.5\ \text{m}
+x = 6 \times 5 + \frac{1}{2} \times 1 \times 5^2\ \text{m} = 30 + 12.5\ \text{m} = 42.5\ \text{m}
 :::
 
 　　A 错。32.5 漏了初速项（只剩 12.5）。
@@ -1219,18 +1223,18 @@ x = 6 \times 5 + \frac{1}{2} \times 1 \times 5^2 = 30 + 12.5 = 42.5\ \text{m}
 停车时间：
 
 :::formula
-t = \frac{30}{6} = 5\ \text{s}
+t = \frac{30}{6}\ \text{s} = 5\ \text{s}
 :::
 
 总位移：
 
 :::formula
-x = \bar{v} t = \frac{30+0}{2} \times 5 = 75\ \text{m}
+x = \bar{v} t = \frac{30+0}{2} \times 5\ \text{m} = 75\ \text{m}
 :::
 
 　　A 错。45 是把"最后 1 s 内 3 m"误读成"刹车共用 3 s"（$\frac{1}{2} \times 30 \times 3$）。
 
-　　C 错。150 是逆向求 $a$ 时漏了 $\frac{1}{2}$（得 $a = 3$、$t = 10$ s，再 $\frac{1}{2} \times 30 \times 10$）。
+　　C 错。150 是逆向求 $a$ 时漏了 $\frac{1}{2}$（得 $a = 3\ \text{m/s}^2$、$t = 10$ s，再 $\frac{1}{2} \times 30 \times 10$）。
 
 　　D 错。300 是同一错解下再漏平均速度的 $\frac{1}{2}$（$30 \times 10$）。
 
@@ -1271,7 +1275,7 @@ t_{AC} = \sqrt{2L/a}
 第 1 s 内 2 m：
 
 :::formula
-\frac{1}{2} a \times 1^2 = 2
+\frac{1}{2} a \times 1^2 = 2\ \text{m}
 :::
 
 :::formula
@@ -1316,9 +1320,9 @@ a = 4\ \text{m/s}^2
 
 第 5 s 内平均速度 13.5 m/s 就是 4.5 s 时刻的瞬时速度。
 
-　　A 对。$v_0 = 6 - 3 \times 2 = 0$。
+　　A 对。$v_0 = 6 - 3 \times 2\ \text{m/s} = 0\ \text{m/s}$。
 
-　　B 对。$a = \frac{13.5-6}{4.5-2} = 3$ m/s²。
+　　B 对。$a = \frac{13.5-6}{4.5-2}\ \text{m/s}^2 = 3$ m/s²。
 
 　　C 错。30 是拿第 2 s 末速度 6 m/s 乘 5 s（$6 \times 5$）。
 
@@ -1329,19 +1333,19 @@ a = 4\ \text{m/s}^2
 先对表：
 
 :::formula
-t_{\text{停}} = \frac{12}{3} = 4\ \text{s}
+t_{\text{停}} = \frac{12}{3}\ \text{s} = 4\ \text{s}
 :::
 
 3 s 未停：
 
 :::formula
-x_3 = 12 \times 3 - \frac{1}{2} \times 3 \times 3^2 = 22.5\ \text{m}
+x_3 = 12 \times 3 - \frac{1}{2} \times 3 \times 3^2\ \text{m} = 22.5\ \text{m}
 :::
 
 6 s 已超过停车时间，位移停在：
 
 :::formula
-x_{\text{总}} = \bar{v} t_{\text{停}} = \frac{12}{2} \times 4 = 24\ \text{m}
+x_{\text{总}} = \bar{v} t_{\text{停}} = \frac{12}{2} \times 4\ \text{m} = 24\ \text{m}
 :::
 
 :::formula
@@ -1408,13 +1412,13 @@ d_3 : d_2 : d_1 = 25 : (81-25) : (144-81) = 25 : 56 : 63
 
 36 km/h = 10 m/s。
 
-　　A 对。立即匀加速 3 s，$x = 10 \times 3 + \frac{1}{2} \times 2 \times 9 = 39$ m $> 36$ m，能通过。
+　　A 对。立即匀加速 3 s，$x = 10 \times 3 + \frac{1}{2} \times 2 \times 9\ \text{m} = 39$ m $> 36$ m，能通过。
 
 　　B 错。末速 $16$ m/s $= 57.6$ km/h $< 60$ km/h，"一定超速"错。
 
-　　C 对。立即以 3 m/s² 减速，3 s 内 $x = 30 - \frac{1}{2} \times 3 \times 9 = 16.5$ m $< 36$ m，一定不能通过。
+　　C 对。立即以 3 m/s² 减速，3 s 内 $x = 30 - \frac{1}{2} \times 3 \times 9\ \text{m} = 16.5$ m $< 36$ m，一定不能通过。
 
-　　D 错。在距线 8 m 处以 5 m/s² 减速，停车时间 $\frac{10}{5} = 2$ s，停车距离 $= \bar{v} t_{\text{停}} = \frac{10}{2} \times 2 = 5$ m，停在线前 3 m，"恰好停在停车线"不成立。
+　　D 错。在距线 8 m 处以 5 m/s² 减速，停车时间 $\frac{10}{5} = 2$ s，停车距离 $= \bar{v} t_{\text{停}} = \frac{10}{2} \times 2\ \text{m} = 5$ m，停在线前 3 m，"恰好停在停车线"不成立。
 
 27. A。
 
@@ -1456,21 +1460,21 @@ $t$ 是"本段"总时长，跨段（加速 3 s 后匀速 4 s）必须分段各�
 5. (1) 450 m。
 
 :::formula
-x = v_0 t + \frac{1}{2}at^2 = 20 \times 10 + \frac{1}{2} \times 5 \times 10^2 = 200 + 250 = 450\ \text{m}
+x = v_0 t + \frac{1}{2}at^2 = 20 \times 10 + \frac{1}{2} \times 5 \times 10^2\ \text{m} = 200 + 250\ \text{m} = 450\ \text{m}
 :::
 
 　　(2) 匀减速到停，平均速度 20 m/s，t = 2.5 s；加速度大小 16 m/s²（方向与运动方向相反）。
 
 :::formula
-\bar{v} = \frac{40+0}{2} = 20\ \text{m/s}
+\bar{v} = \frac{40+0}{2}\ \text{m/s} = 20\ \text{m/s}
 :::
 
 :::formula
-t = \frac{x}{\bar{v}} = \frac{50}{20} = 2.5\ \text{s}
+t = \frac{x}{\bar{v}} = \frac{50}{20}\ \text{s} = 2.5\ \text{s}
 :::
 
 :::formula
-|a| = \frac{40}{2.5} = 16\ \text{m/s}^2
+|a| = \frac{40}{2.5}\ \text{m/s}^2 = 16\ \text{m/s}^2
 :::
 
 6. (1) a = 4 m/s²；(2) 22 m/s。
@@ -1482,17 +1486,17 @@ t = \frac{x}{\bar{v}} = \frac{50}{20} = 2.5\ \text{s}
 得 $a = 4$ m/s²。
 
 :::formula
-v = v_0 + at = 2 + 4 \times 5 = 22\ \text{m/s}
+v = v_0 + at = 2 + 4 \times 5\ \text{m/s} = 22\ \text{m/s}
 :::
 
 　　(3) 验算：匀变速平均速度 12 m/s，x = 60 m，与题给路程一致，(1)(2) 互证成立。
 
 :::formula
-\bar{v} = \frac{2+22}{2} = 12\ \text{m/s}
+\bar{v} = \frac{2+22}{2}\ \text{m/s} = 12\ \text{m/s}
 :::
 
 :::formula
-x = 12 \times 5 = 60\ \text{m}
+x = 12 \times 5\ \text{m} = 60\ \text{m}
 :::
 
 （原题给出的质量 50 kg 在节选设问里用不到。）
@@ -1510,7 +1514,7 @@ t^2 + 10t - 144 = 0
 :::
 
 :::formula
-t = \frac{-10 + \sqrt{100 + 576}}{2} = \frac{-10+26}{2} = 8\ \text{s}
+t = \frac{-10 + \sqrt{100 + 576}}{2}\ \text{s} = \frac{-10+26}{2}\ \text{s} = 8\ \text{s}
 :::
 
 （负根舍去。）
@@ -1518,7 +1522,7 @@ t = \frac{-10 + \sqrt{100 + 576}}{2} = \frac{-10+26}{2} = 8\ \text{s}
 　　(2) 13 m/s。
 
 :::formula
-v = 5 + 1 \times 8 = 13\ \text{m/s}
+v = 5 + 1 \times 8\ \text{m/s} = 13\ \text{m/s}
 :::
 
 12. $\sqrt{5} - 2 \approx 0.24$ s。
@@ -1530,7 +1534,7 @@ v = 5 + 1 \times 8 = 13\ \text{m/s}
 :::
 
 :::formula
-t_B = \sqrt{\frac{2 \times 20}{10}} = 2\ \text{s}
+t_B = \sqrt{\frac{2 \times 20}{10}}\ \text{s} = 2\ \text{s}
 :::
 
 上端 $A$ 到达 $C$ 时已下落 25 m：
@@ -1542,7 +1546,7 @@ t_A = \sqrt{\frac{2 \times 25}{10}} = \sqrt{5} \approx 2.236\ \text{s}
 全部通过 $C$ 点所需时间：
 
 :::formula
-t_A - t_B = \sqrt{5} - 2 \approx 0.24\ \text{s}
+t_A - t_B = \sqrt{5} - 2\ \text{s} \approx 0.24\ \text{s}
 :::
 
 15. (1) 约 0.5 m/s²；(2) 约 7.3 m/s。
@@ -1550,25 +1554,25 @@ t_A - t_B = \sqrt{5} - 2 \approx 0.24\ \text{s}
 (1) 动车停止前最后 50 m 恰好是第 7、6 两节车厢依次通过的过程。倒过来看成由静止匀加速连过两个 25 m：相邻等位移时间比 $1 : (\sqrt{2}-1)$，第 6 节车厢（离停止点较远那段）对应 $(\sqrt{2}-1)$ 份，即 $\sqrt{2}-1$ 份为 4 s，第一份：
 
 :::formula
-t_1 = \frac{4}{\sqrt{2}-1} = 4(\sqrt{2}+1) \approx 9.66\ \text{s}
+t_1 = \frac{4}{\sqrt{2}-1}\ \text{s} = 4(\sqrt{2}+1)\ \text{s} \approx 9.66\ \text{s}
 :::
 
 总时间：
 
 :::formula
-T = t_1 + 4 \approx 13.66\ \text{s}
+T = t_1 + 4\ \text{s} \approx 13.66\ \text{s}
 :::
 
 由 $50 = \frac{1}{2} a T^2$ 得
 
 :::formula
-a = \frac{100}{13.66^2} \approx 0.54 \approx 0.5\ \text{m/s}^2
+a = \frac{100}{13.66^2}\ \text{m/s}^2 \approx 0.54\ \text{m/s}^2 \approx 0.5\ \text{m/s}^2
 :::
 
 　　(2) 此时速度：
 
 :::formula
-v = aT \approx 0.54 \times 13.66 \approx 7.3\ \text{m/s}
+v = aT \approx 0.54 \times 13.66\ \text{m/s} \approx 7.3\ \text{m/s}
 :::
 
 （验算：全程平均速度 $\frac{50}{13.66} \approx 3.66$ m/s，由静止匀减速的初速是平均速度的 2 倍，$2 \times 3.66 \approx 7.3$ m/s，一致。）
@@ -1604,11 +1608,11 @@ v = aT \approx 0.54 \times 13.66 \approx 7.3\ \text{m/s}
 18. (a) 2 m/s²；-5 m/s²（大小 5 m/s²，方向与正方向相反）。
 
 :::formula
-a_1 = \frac{6-0}{3} = 2\ \text{m/s}^2
+a_1 = \frac{6-0}{3}\ \text{m/s}^2 = 2\ \text{m/s}^2
 :::
 
 :::formula
-a_2 = \frac{-4-6}{2} = -5\ \text{m/s}^2
+a_2 = \frac{-4-6}{2}\ \text{m/s}^2 = -5\ \text{m/s}^2
 :::
 
 　　(b) 3～5 s 图线穿过 t 轴：由 $6 - 5(t-3) = 0$ 得 t = 4.2 s，此时刻速度方向改变。
@@ -1656,7 +1660,7 @@ a_2 = \frac{-4-6}{2} = -5\ \text{m/s}^2
 21. (a) 12 m/s。
 
 :::formula
-v_{\max} = 2 \times 6 = 12\ \text{m/s}
+v_{\max} = 2 \times 6\ \text{m/s} = 12\ \text{m/s}
 :::
 
 　　(b) 加速段 36 m；匀速段 288 m；减速段 24 m（减速用时 4 s）。
@@ -1694,21 +1698,21 @@ v_{\max} = 2 \times 6 = 12\ \text{m/s}
 22. (a) 10 m/s；21 m。
 
 :::formula
-v(3) = 4 + 2 \times 3 = 10\ \text{m/s}
+v(3) = 4 + 2 \times 3\ \text{m/s} = 10\ \text{m/s}
 :::
 
 :::formula
-x = 4 \times 3 + \frac{1}{2} \times 2 \times 3^2 = 12 + 9 = 21\ \text{m}
+x = 4 \times 3 + \frac{1}{2} \times 2 \times 3^2\ \text{m} = 12 + 9\ \text{m} = 21\ \text{m}
 :::
 
 　　(b) 7 m/s，21 m，两法一致。
 
 :::formula
-\bar{v} = \frac{4+10}{2} = 7\ \text{m/s}
+\bar{v} = \frac{4+10}{2}\ \text{m/s} = 7\ \text{m/s}
 :::
 
 :::formula
-x = 7 \times 3 = 21\ \text{m}
+x = 7 \times 3\ \text{m} = 21\ \text{m}
 :::
 
 　　(c) 不能。平均速度推论只对匀变速段成立；加速度逐渐增大时 v–t 图线弯到同初末速度直线的上方，围的面积更大，实际位移大于 21 m。
@@ -1730,7 +1734,7 @@ x = 7 \times 3 = 21\ \text{m}
 　　(c) 速度相等前甲一直更快，距离持续拉大：$t = 5$ s 时相距最远，最远距离 = 两图线间面积差 25 m。
 
 :::formula
-10 \times 5 - \frac{1}{2} \times 2 \times 5^2 = 50 - 25 = 25\ \text{m}
+10 \times 5 - \frac{1}{2} \times 2 \times 5^2\ \text{m} = 50 - 25\ \text{m} = 25\ \text{m}
 :::
 
 29. (a) 草图：0～4 s 升到 6 m/s 的直线，4～14 s 的水平线，14～17 s 降到零的直线。

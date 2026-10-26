@@ -6,6 +6,7 @@
 > 题型覆盖：`docs/physics-coverage-map.md`；题目来源核验：`docs/problem-source-register.md`。
 
 ## 当前进度
+- **第三章三单元成稿（2026-10-26）**：K008 重力与弹力 / K009 摩擦力 / K010 牛顿第三定律，各主讲·题型与方法·练习三篇共 9 篇全部完成（draft: true，待站主学科审核后转 draft: false 上线）。按新三类篇制与答案自闭环执行；题目整题搬运（站主 2026-10-26 新规），原题配图自物理大集合原文件提取直用，逐题独立求解并登记（problem-source-register「2026-10-26 第三章」节）；覆盖表 T8/T9/T10 转正（physics-coverage-map 文末「K008–K010 覆盖表」）。配图：课程图片包 K008/K009/K010 + 原题图 + 自绘 SVG（figs-k008/k009/k010.html 三套源）。第三章实验篇（弹簧测劲度系数等，图 008–013 已备）按机制待三篇过审后编写。
 
 - **全站题目替换为本地题库题（2026-10-25，站主指示"把站点内所有文章题目换成 D 盘物理大集合中的真题/模拟题/同步练习题，来源写清楚"）**：26 篇文章约 446 张题卡全部换新并逐题登记（docs/problem-source-register.md「2026-10-25 全站题目替换登记」节，23 份分单元登记表）。执行要点：
   - 题源：D:\物理大集合（高考真题汇编、5 年好题、经典题库、实验专项、板块模型专题、学而思讲义体系、黄金卷/2025 北京一模等）；29+9 个 docx 经 pandoc 转出带 LaTeX 的题源库后逐题核对原卷/解析。
@@ -69,9 +70,15 @@
 
 | 单元 | 章节 | 课程名称 | 篇目 | slug | 状态 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
-| K008 | 三章1 | 重力与弹力 | 主讲篇 | k008-gravity-elastic-force-concepts | 规划中 | 动笔前建覆盖表 |
-| K008 | 三章1 | 重力与弹力 | 题型与方法篇 | k008-gravity-elastic-force-methods | 规划中 | 依赖覆盖表+题目核验 |
-| K008 | 三章1 | 重力与弹力 | 练习篇 | k008-gravity-elastic-force-practice | 规划中 | 与前两篇逐项对应 |
+| K008 | 三章1 | 重力与弹力 | 主讲篇 | k008-gravity-elastic-force-concepts | 成稿 draft | 2026-10-26 完成，覆盖表已转正 |
+| K008 | 三章1 | 重力与弹力 | 题型与方法篇 | k008-gravity-elastic-force-methods | 成稿 draft | 同上 |
+| K008 | 三章1 | 重力与弹力 | 练习篇 | k008-gravity-elastic-force-practice | 成稿 draft | 答案自闭环 |
+| K009 | 三章2 | 摩擦力 | 主讲篇 | k009-friction-concepts | 成稿 draft | 2026-10-26 完成 |
+| K009 | 三章2 | 摩擦力 | 题型与方法篇 | k009-friction-methods | 成稿 draft | 同上 |
+| K009 | 三章2 | 摩擦力 | 练习篇 | k009-friction-practice | 成稿 draft | 答案自闭环 |
+| K010 | 三章3 | 牛顿第三定律 | 主讲篇 | k010-newton-third-law-concepts | 成稿 draft | 2026-10-26 完成 |
+| K010 | 三章3 | 牛顿第三定律 | 题型与方法篇 | k010-newton-third-law-methods | 成稿 draft | 同上 |
+| K010 | 三章3 | 牛顿第三定律 | 练习篇 | k010-newton-third-law-practice | 成稿 draft | 答案自闭环 |
 | K009 | 三章2 | 摩擦力 | — | （未定） | 规划中 | |
 | K010 | 三章3 | 牛顿第三定律 | — | （未定） | 规划中 | |
 | K011 | 三章4 | 力的合成和分解 | — | （未定） | 规划中 | |

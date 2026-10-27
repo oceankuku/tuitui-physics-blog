@@ -30,7 +30,10 @@ const posts = (await getCollection('blog'))
       };
     };
     const pa = po(a), pb = po(b);
-    return pa.group - pb.group || pa.rank - pb.rank || pa.date - pb.date || (pa.slug < pb.slug ? -1 : 1);
+    if (pa.group === 999 && pb.group === 999) return pa.date.valueOf() - pb.date.valueOf();
+    if (pa.group === 999) return 1;
+    if (pb.group === 999) return -1;
+    return pb.group - pa.group || pa.rank - pb.rank || pa.date.valueOf() - pb.date.valueOf();
   });
 const currentIndex = posts.findIndex((entry) => entry.slug === post.slug);
 const newerPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined;

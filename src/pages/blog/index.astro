@@ -3,9 +3,23 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../../../site.config.mjs';
 
+const postOrder = (entry: { slug: string; data: { pubDate: Date } }) => {
+  const rankMap: Record<string, number> = { concepts: 0, methods: 1, practice: 2 };
+  const groupMatch = entry.slug.match(/^k(\d+)/);
+  const rankMatch = entry.slug.match(/-(concepts|methods|practice)$/);
+  return {
+    group: groupMatch ? parseInt(groupMatch[1], 10) : 999,
+    rank: rankMatch ? rankMap[rankMatch[1]] : 0,
+    date: entry.data.pubDate.valueOf(),
+    slug: entry.slug,
+  };
+};
 const posts = (await getCollection('blog'))
   .filter((post) => !post.data.draft && post.data.pubDate)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a, b) => {
+    const pa = postOrder(a), pb = postOrder(b);
+    return pa.group - pb.group || pa.rank - pb.rank || pa.date - pb.date || (pa.slug < pb.slug ? -1 : 1);
+  });
 
 const tagCounts = posts.flatMap((post) => post.data.tags).reduce<Record<string, number>>((counts, tag) => {
   counts[tag] = (counts[tag] || 0) + 1;

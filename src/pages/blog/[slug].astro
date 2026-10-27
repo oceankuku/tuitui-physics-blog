@@ -17,7 +17,21 @@ const { Content, headings } = await post.render();
 const articleHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const posts = (await getCollection('blog'))
   .filter((entry) => !entry.data.draft && entry.data.pubDate)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a, b) => {
+    const po = (entry: { slug: string; data: { pubDate: Date } }) => {
+      const rankMap: Record<string, number> = { concepts: 0, methods: 1, practice: 2 };
+      const gm = entry.slug.match(/^k(\d+)/);
+      const rm = entry.slug.match(/-(concepts|methods|practice)$/);
+      return {
+        group: gm ? parseInt(gm[1], 10) : 999,
+        rank: rm ? rankMap[rm[1]] : 0,
+        date: entry.data.pubDate.valueOf(),
+        slug: entry.slug,
+      };
+    };
+    const pa = po(a), pb = po(b);
+    return pa.group - pb.group || pa.rank - pb.rank || pa.date - pb.date || (pa.slug < pb.slug ? -1 : 1);
+  });
 const currentIndex = posts.findIndex((entry) => entry.slug === post.slug);
 const newerPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined;
 const olderPost = currentIndex < posts.length - 1 ? posts[currentIndex + 1] : undefined;

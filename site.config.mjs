@@ -1,5 +1,5 @@
 // 初次使用修改这里；日常写作只维护 src/content/blog/ 和 public/blog-images/。
-const url = new URL(process.env.SITE_URL || 'https://example.com');
+const url = new URL(process.env.SITE_URL || 'https://imkuku.me');
 if (!['http:', 'https:'].includes(url.protocol) || url.pathname !== '/' || url.search || url.hash) {
   throw new Error('SITE_URL 必须是完整站点域名，例如 https://your-domain.com，不带子路径、查询参数或锚点。');
 }

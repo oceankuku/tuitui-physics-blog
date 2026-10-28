@@ -143,8 +143,19 @@ try {
     // 徽标是全量计数，第一页可见数受 PAGE_SIZE=8 截断（2026-10-24 标签数到 9 时踩到）。
     assert.equal(await page.locator('.post-card:visible').count(), Math.min(8, expectedTagged), '题型方法标签第一页应与徽标一致（分页截断）');
     if (expectedTagged > 8) {
+      // 标签文章数已超过两页（2026-10-28 达 17 篇）：逐页断言余量，支持任意页数。
       await page.locator('#nextPage').click();
-      assert.equal(await page.locator('.post-card:visible').count(), expectedTagged - 8, '题型方法标签第二页应为余量');
+      let remaining = expectedTagged - 8;
+      let pageNumber = 2;
+      while (remaining > 0) {
+        const expectedPage = Math.min(8, remaining);
+        assert.equal(await page.locator('.post-card:visible').count(), expectedPage, `题型方法标签第 ${pageNumber} 页应为余量`);
+        remaining -= expectedPage;
+        if (remaining > 0) {
+          await page.locator('#nextPage').click();
+          pageNumber += 1;
+        }
+      }
       await page.goto(hosting.origin + '/blog/');
       await page.locator('.filter-button').filter({ hasText: '题型方法' }).click();
     }

@@ -70,6 +70,19 @@
 
 | 单元 | 章节 | 课程名称 | 篇目 | slug | 状态 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
+| K013 | 四章1 | 牛顿第一定律与惯性 | 主讲篇 | k013-newton-first-law-concepts | 已发布 | 2026-10-28 完成 |
+| K013 | 四章1 | 牛顿第一定律与惯性 | 题型与方法篇 | k013-newton-first-law-methods | 已发布 | 同上 |
+| K013 | 四章1 | 牛顿第一定律与惯性 | 练习篇 | k013-newton-first-law-practice | 已发布 | 答案自闭环 |
+| K014 | 四章2 | 牛顿第二定律（含 4.2 实验） | 主讲篇 | k014-newton-second-law-concepts | 已发布 | 2026-10-28 完成，4.2 实验题型并入方法/练习 |
+| K014 | 四章2 | 牛顿第二定律（含 4.2 实验） | 题型与方法篇 | k014-newton-second-law-methods | 已发布 | 同上 |
+| K014 | 四章2 | 牛顿第二定律（含 4.2 实验） | 练习篇 | k014-newton-second-law-practice | 已发布 | 答案自闭环 |
+| K015 | 四章3 | 力学单位制 | 单篇合并（主讲+题型+练习） | k015-mechanical-units | 已发布 | 内容单薄按规则合并，原因见文内与台账 |
+| K016 | 四章4 | 牛顿运动定律的应用 | 主讲篇 | k016-newton-laws-applications-concepts | 已发布 | 2026-10-28 完成 |
+| K016 | 四章4 | 牛顿运动定律的应用 | 题型与方法篇 | k016-newton-laws-applications-methods | 已发布 | 同上 |
+| K016 | 四章4 | 牛顿运动定律的应用 | 练习篇 | k016-newton-laws-applications-practice | 已发布 | 答案自闭环 |
+| K017 | 四章5 | 超重和失重 | 主讲篇 | k017-apparent-weight-concepts | 已发布 | 2026-10-28 完成 |
+| K017 | 四章5 | 超重和失重 | 题型与方法篇 | k017-apparent-weight-methods | 已发布 | 同上 |
+| K017 | 四章5 | 超重和失重 | 练习篇 | k017-apparent-weight-practice | 已发布 | 答案自闭环 |
 | K008 | 三章1 | 重力与弹力 | 主讲篇 | k008-gravity-elastic-force-concepts | 已发布（2026-10-27 站主指示直接上线） | 2026-10-26 完成，覆盖表已转正 |
 | K008 | 三章1 | 重力与弹力 | 题型与方法篇 | k008-gravity-elastic-force-methods | 已发布（2026-10-27 站主指示直接上线） | 同上 |
 | K008 | 三章1 | 重力与弹力 | 练习篇 | k008-gravity-elastic-force-practice | 已发布（2026-10-27 站主指示直接上线） | 答案自闭环 |

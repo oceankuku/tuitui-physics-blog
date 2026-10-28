@@ -302,13 +302,52 @@ const {
       return `“${excerpt}”\n\n出处：${config.author}《${config.title}》\n${config.url}`;
     };
 
+    // 微信公众号引用块上限 300 字：超过即发表失败。复制引用时自动按段落与句子
+    // 边界拆分为多个 ≤280 字的引用块（2026-10-28 站主反馈）。
+    const QUOTE_LIMIT = 280;
+    const splitLongQuote = (text: string): string[] => {
+      const pieces: string[] = [];
+      text.split('\n').forEach((paragraph) => {
+        if (!paragraph.trim()) return;
+        paragraph.split(/(?<=[。！？；…])/).forEach((sentence) => {
+          let piece = sentence.trim();
+          if (!piece) return;
+          while (piece.length > QUOTE_LIMIT) {
+            pieces.push(piece.slice(0, QUOTE_LIMIT));
+            piece = piece.slice(QUOTE_LIMIT);
+          }
+          pieces.push(piece);
+        });
+      });
+      const chunks: string[] = [];
+      let current = '';
+      pieces.forEach((piece) => {
+        if (!current) { current = piece; return; }
+        if (current.length + 1 + piece.length <= QUOTE_LIMIT) {
+          current = `${current}\n${piece}`;
+        } else {
+          chunks.push(current);
+          current = piece;
+        }
+      });
+      if (current) chunks.push(current);
+      return chunks;
+    };
+
     const copyCitation = async () => {
       const plain = citationText();
-      const paragraphs = escapeHtml(selectedText.length > 600 ? `${selectedText.slice(0, 599)}…` : selectedText)
-        .split('\n')
-        .map((paragraph) => `<p>${paragraph || '<br>'}</p>`)
+      const chunks = splitLongQuote(selectedText);
+      const quoteBlocks = chunks
+        .map((chunk) => escapeHtml(chunk)
+          .split('\n')
+          .map((paragraph) => `<p>${paragraph || '<br>'}</p>`)
+          .join(''))
+        .map((block) => `<blockquote>${block}</blockquote>`)
         .join('');
-      const rich = `<blockquote>${paragraphs}</blockquote><p>出处：${escapeHtml(config.author)}《${escapeHtml(config.title)}》<br><a href="${escapeHtml(config.url)}">${escapeHtml(config.url)}</a></p>`;
+      const splitHint = chunks.length > 1
+        ? `<p>（长引用已按公众号 300 字限制自动拆为 ${chunks.length} 段，连续阅读）</p>`
+        : '';
+      const rich = `${quoteBlocks}${splitHint}<p>出处：${escapeHtml(config.author)}《${escapeHtml(config.title)}》<br><a href="${escapeHtml(config.url)}">${escapeHtml(config.url)}</a></p>`;
 
       if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined' && window.isSecureContext) {
         await navigator.clipboard.write([new ClipboardItem({

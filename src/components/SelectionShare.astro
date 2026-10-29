@@ -343,7 +343,9 @@ const {
           .map((paragraph) => `<p>${paragraph || '<br>'}</p>`)
           .join(''))
         .map((block) => `<blockquote>${block}</blockquote>`)
-        .join('');
+        // 相邻引用块之间插入空行隔开：公众号粘贴时会把相邻 blockquote 合并成
+        // 一个引用组件，合并后总字数再超 300 就前功尽弃（2026-10-28 实测）。
+        .join('<p><br></p>');
       const splitHint = chunks.length > 1
         ? `<p>（长引用已按公众号 300 字限制自动拆为 ${chunks.length} 段，连续阅读）</p>`
         : '';
